@@ -39,6 +39,8 @@ const METRICS_ALL = [
   { id: "90日販売数", label: "90日販売数（実績）", sourceKey: "90日販売数" },
   { id: "180日販売数", label: "180日販売数（実績）", sourceKey: "180日販売数" },
   { id: "予測30日販売数", label: "予測30日販売数", sourceKey: "予測30日販売数" },
+  { id: "予測60日販売数", label: "予測60日販売数", sourceKey: "予測60日販売数" },
+  { id: "予測90日販売数", label: "予測90日販売数", sourceKey: "予測90日販売数" },
 
   { id: "複数在庫指数45日分", label: "複数在庫指数45日分", sourceKey: "複数在庫指数45日分" },
   { id: "複数在庫指数60日分", label: "複数在庫指数60日分", sourceKey: "複数在庫指数60日分" },
@@ -103,8 +105,10 @@ function labelOf(token) {
 ========================= */
 const DEFAULT_ZONES = {
   pool: [
-    ...METRICS_ALL.map((m) => tokM(m.id)),
-    ...INFO_FIELDS_ALL.map((f) => tokI(f.id))
+    tokM("ライバル偏差1"),
+    tokM("ライバル偏差2"),
+    tokM("90日販売数"),
+    tokM("180日販売数")
   ],
   info: [
     tokI("商品名"),
@@ -112,36 +116,43 @@ const DEFAULT_ZONES = {
     tokI("評価"),
     tokI("各種ASIN"),
     tokI("JAN"),
-    tokI("SKU"),
     tokI("サイズ"),
     tokI("重量（容積重量）"),
     tokI("カテゴリ"),
-    tokI("注意事項"),
-    tokI("材質")
+    tokI("材質"),
+    tokI("注意事項")
   ],
   center: [
-    tokM("過去3月FBA最安値"),
+    tokM("予測30日販売数"),
+    tokM("予測60日販売数"),
+    tokM("予測90日販売数"),
+    tokM("在庫数"),
     tokM("FBA最安値"),
-    tokM("入金額予測"),
-    tokM("180日販売数"),
-    tokM("90日販売数"),
-    tokM("粗利益率予測"),
     tokM("30日販売数"),
-    tokM("日本最安値"),
-    tokM("粗利益予測")
+    tokM("過去3月FBA最安値"),
+    tokM("入金額予測")
   ],
   table: [
-    tokM("在庫数"),
     tokM("想定送料"),
     tokM("返品率"),
     tokM("仕入れ目安単価"),
-    tokM("販売額（ドル）"),
     tokM("送料"),
     tokM("関税"),
-    tokM("予測30日販売数"),
-    tokM("入金額（円）")
+    tokM("入金額（円）"),
+    tokM("入金額計（円）")
   ],
-  hidden: []
+  hidden: [
+    tokI("SKU"),
+    tokM("販売額（ドル）"),
+    tokM("粗利益"),
+    tokM("粗利益率"),
+    tokM("複数在庫指数45日分"),
+    tokM("複数在庫指数60日分"),
+    tokM("ライバル増加率"),
+    tokM("粗利益予測"),
+    tokM("日本最安値"),
+    tokM("粗利益率予測")
+  ]
 };
 
 function normalizeDefaultZones() {
@@ -745,7 +756,9 @@ function buildDetailTable(tableEl, ctx, data) {
 
 function rerenderAllCards() {
   const isThird = document.body.classList.contains("third-layout");
-  const isFourth = document.body.classList.contains("fourth-layout");
+  const isFourth =
+    document.body.classList.contains("fourth-layout") ||
+    document.body.classList.contains("fifth-layout");
 
   cardState.forEach((v) => {
     const asin = v.el.dataset.asin;
@@ -796,6 +809,7 @@ function renderChart(canvas) {
   let s = Math.max(1, Math.round(3 + Math.random() * 4));
   const basePrice = 30 + (Math.random() - 0.5) * 6;
   let p = basePrice;
+  const redLine = Number((basePrice * 0.95).toFixed(2));
 
   let nextPriceChangeIn = 1 + Math.floor(Math.random() * 4);
 
@@ -848,27 +862,78 @@ function renderChart(canvas) {
     price.push(Number(p.toFixed(2)));
   }
 
+  const minPrice = Math.min(...price);
+  const diffPct = redLine > 0 ? Math.abs(redLine - minPrice) / redLine * 100 : 0;
+  const tier = diffPct < 5 ? "light" : diffPct < 10 ? "medium" : "strong";
+  const isBlue = minPrice >= redLine;
+  const backgroundColorMap = {
+    blue: {
+      light: "rgba(59,130,246,0.08)",
+      medium: "rgba(59,130,246,0.16)",
+      strong: "rgba(59,130,246,0.24)"
+    },
+    red: {
+      light: "rgba(239,68,68,0.08)",
+      medium: "rgba(239,68,68,0.16)",
+      strong: "rgba(239,68,68,0.24)"
+    }
+  };
+  const backgroundColor = isBlue
+    ? backgroundColorMap.blue[tier]
+    : backgroundColorMap.red[tier];
+
+  const backgroundFillPlugin = {
+    id: "backgroundFill",
+    beforeDraw(chartInstance, args, options) {
+      const { ctx, chartArea } = chartInstance;
+      if (!chartArea) return;
+      ctx.save();
+      ctx.fillStyle = options.color;
+      ctx.fillRect(
+        chartArea.left,
+        chartArea.top,
+        chartArea.right - chartArea.left,
+        chartArea.bottom - chartArea.top
+      );
+      ctx.restore();
+    }
+  };
+
   const chart = new Chart(canvas, {
     type: "line",
     data: {
       labels,
       datasets: [
-        { label: "ランキング", data: rank, yAxisID: "y", borderColor: "#2563eb", backgroundColor: "rgba(37,99,235,0.25)", tension: 0.25 },
-        { label: "セラー数", data: sellers, yAxisID: "y1" , borderColor: "#fbbf24", backgroundColor: "rgba(251,191,36,0.35)", tension: 0.25 },
-        { label: "価格(USD)", data: price, yAxisID: "y2", borderColor: "#10b981", backgroundColor: "rgba(16,185,129,0.25)", tension: 0.25 }
+        { label: "ランキング", data: rank, yAxisID: "y", borderColor: "#0ea5e9", backgroundColor: "rgba(14,165,233,0.24)", tension: 0.25 },
+        { label: "セラー数", data: sellers, yAxisID: "y1", borderColor: "#f97316", backgroundColor: "rgba(249,115,22,0.24)", tension: 0.25 },
+        { label: "価格(USD)", data: price, yAxisID: "y2", borderColor: "#22c55e", backgroundColor: "rgba(34,197,94,0.24)", tension: 0.25 },
+        {
+          label: "赤字ライン",
+          data: Array.from({ length: labels.length }, () => redLine),
+          yAxisID: "y2",
+          borderColor: "#ef4444",
+          borderDash: [6, 4],
+          pointRadius: 0,
+          borderWidth: 2,
+          fill: false
+        }
       ]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
       interaction: { mode: "index", intersect: false },
-      plugins: { legend: { display: true } },
+      plugins: {
+        legend: { display: true },
+        backgroundFill: { color: backgroundColor }
+      },
       scales: {
         y: { position: "left" },
         y1: { position: "right", grid: { drawOnChartArea: false } },
         y2: { position: "right", grid: { drawOnChartArea: false } }
       }
-    }
+    },
+    plugins: [backgroundFillPlugin]
   });
 
   return chart;
@@ -879,6 +944,7 @@ function updateChartVisibility(chart, showDS, showSP) {
     if (ds.label === "ランキング") ds.hidden = !showDS;
     if (ds.label === "セラー数") ds.hidden = !(showDS || showSP);
     if (ds.label === "価格(USD)") ds.hidden = !showSP;
+    if (ds.label === "赤字ライン") ds.hidden = false;
   });
   chart.update();
 }
@@ -921,7 +987,9 @@ function createProductCard(asin, data) {
 
   const isAltLayout = document.body.classList.contains("alt-layout");
   const isThirdLayout = document.body.classList.contains("third-layout");
-  const isFourthLayout = document.body.classList.contains("fourth-layout");
+  const isFourthLayout =
+    document.body.classList.contains("fourth-layout") ||
+    document.body.classList.contains("fifth-layout");
 
   if (isThirdLayout) {
     card.innerHTML = `
