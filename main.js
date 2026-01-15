@@ -5,6 +5,7 @@
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const FX_RATE = 155;
+const APP_VERSION = "v2025.02.13";
 
 const fmtJPY = (n) => "￥" + Number(n || 0).toLocaleString("ja-JP");
 const num = (v) => {
@@ -192,6 +193,7 @@ const asinCatalog = $("#asinCatalog");
 const itemsContainer = $("#itemsContainer");
 const emptyState = $("#emptyState");
 const headerStatus = $("#headerStatus");
+const appVersion = $("#appVersion");
 
 /* cart */
 const cartTotalCost = $("#cartTotalCost");
@@ -220,6 +222,7 @@ function init() {
   initActions();
   updateCartSummary();
   updateHeaderStatus();
+  if (appVersion) appVersion.textContent = `Version ${APP_VERSION}`;
   renderTopZones();
 }
 
