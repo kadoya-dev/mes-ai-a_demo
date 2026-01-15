@@ -39,6 +39,8 @@ const METRICS_ALL = [
   { id: "90日販売数", label: "90日販売数（実績）", sourceKey: "90日販売数" },
   { id: "180日販売数", label: "180日販売数（実績）", sourceKey: "180日販売数" },
   { id: "予測30日販売数", label: "予測30日販売数", sourceKey: "予測30日販売数" },
+  { id: "予測60日販売数", label: "予測60日販売数", sourceKey: "予測60日販売数" },
+  { id: "予測90日販売数", label: "予測90日販売数", sourceKey: "予測90日販売数" },
 
   { id: "複数在庫指数45日分", label: "複数在庫指数45日分", sourceKey: "複数在庫指数45日分" },
   { id: "複数在庫指数60日分", label: "複数在庫指数60日分", sourceKey: "複数在庫指数60日分" },
@@ -103,8 +105,10 @@ function labelOf(token) {
 ========================= */
 const DEFAULT_ZONES = {
   pool: [
-    ...METRICS_ALL.map((m) => tokM(m.id)),
-    ...INFO_FIELDS_ALL.map((f) => tokI(f.id))
+    tokM("ライバル偏差1"),
+    tokM("ライバル偏差2"),
+    tokM("90日販売数"),
+    tokM("180日販売数")
   ],
   info: [
     tokI("商品名"),
@@ -112,36 +116,43 @@ const DEFAULT_ZONES = {
     tokI("評価"),
     tokI("各種ASIN"),
     tokI("JAN"),
-    tokI("SKU"),
     tokI("サイズ"),
     tokI("重量（容積重量）"),
     tokI("カテゴリ"),
-    tokI("注意事項"),
-    tokI("材質")
+    tokI("材質"),
+    tokI("注意事項")
   ],
   center: [
-    tokM("過去3月FBA最安値"),
+    tokM("予測30日販売数"),
+    tokM("予測60日販売数"),
+    tokM("予測90日販売数"),
+    tokM("在庫数"),
     tokM("FBA最安値"),
-    tokM("入金額予測"),
-    tokM("180日販売数"),
-    tokM("90日販売数"),
-    tokM("粗利益率予測"),
     tokM("30日販売数"),
-    tokM("日本最安値"),
-    tokM("粗利益予測")
+    tokM("過去3月FBA最安値"),
+    tokM("入金額予測")
   ],
   table: [
-    tokM("在庫数"),
     tokM("想定送料"),
     tokM("返品率"),
     tokM("仕入れ目安単価"),
-    tokM("販売額（ドル）"),
     tokM("送料"),
     tokM("関税"),
-    tokM("予測30日販売数"),
-    tokM("入金額（円）")
+    tokM("入金額（円）"),
+    tokM("入金額計（円）")
   ],
-  hidden: []
+  hidden: [
+    tokI("SKU"),
+    tokM("販売額（ドル）"),
+    tokM("粗利益"),
+    tokM("粗利益率"),
+    tokM("複数在庫指数45日分"),
+    tokM("複数在庫指数60日分"),
+    tokM("ライバル増加率"),
+    tokM("粗利益予測"),
+    tokM("日本最安値"),
+    tokM("粗利益率予測")
+  ]
 };
 
 function normalizeDefaultZones() {
