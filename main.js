@@ -5,6 +5,7 @@
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const FX_RATE = 155;
+const APP_VERSION = "v2025.02.13";
 
 const fmtJPY = (n) => "￥" + Number(n || 0).toLocaleString("ja-JP");
 const num = (v) => {
@@ -192,6 +193,7 @@ const asinCatalog = $("#asinCatalog");
 const itemsContainer = $("#itemsContainer");
 const emptyState = $("#emptyState");
 const headerStatus = $("#headerStatus");
+const appVersion = $("#appVersion");
 
 /* cart */
 const cartTotalCost = $("#cartTotalCost");
@@ -220,6 +222,7 @@ function init() {
   initActions();
   updateCartSummary();
   updateHeaderStatus();
+  if (appVersion) appVersion.textContent = `Version ${APP_VERSION}`;
   renderTopZones();
 }
 
@@ -796,7 +799,7 @@ function rerenderAllCards() {
 /* =========================
    チャート（既存）
 ========================= */
-function renderChart(canvas) {
+function renderChart(canvas, { redLineUSD } = {}) {
   const labels = Array.from({ length: 180 }, (_, i) => `${180 - i}日`);
 
   const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
@@ -809,7 +812,8 @@ function renderChart(canvas) {
   let s = Math.max(1, Math.round(3 + Math.random() * 4));
   const basePrice = 30 + (Math.random() - 0.5) * 6;
   let p = basePrice;
-  const redLine = Number((basePrice * 0.95).toFixed(2));
+  const defaultRedLine = Number((basePrice * 0.95).toFixed(2));
+  const resolvedRedLine = Number.isFinite(redLineUSD) && redLineUSD > 0 ? redLineUSD : defaultRedLine;
 
   let nextPriceChangeIn = 1 + Math.floor(Math.random() * 4);
 
@@ -863,9 +867,9 @@ function renderChart(canvas) {
   }
 
   const minPrice = Math.min(...price);
-  const diffPct = redLine > 0 ? Math.abs(redLine - minPrice) / redLine * 100 : 0;
+  const diffPct = resolvedRedLine > 0 ? Math.abs(resolvedRedLine - minPrice) / resolvedRedLine * 100 : 0;
   const tier = diffPct < 5 ? "light" : diffPct < 10 ? "medium" : "strong";
-  const isBlue = minPrice >= redLine;
+  const isBlue = minPrice >= resolvedRedLine;
   const backgroundColorMap = {
     blue: {
       light: "rgba(59,130,246,0.08)",
@@ -909,7 +913,7 @@ function renderChart(canvas) {
         { label: "価格(USD)", data: price, yAxisID: "y2", borderColor: "#22c55e", backgroundColor: "rgba(34,197,94,0.24)", tension: 0.25 },
         {
           label: "赤字ライン",
-          data: Array.from({ length: labels.length }, () => redLine),
+          data: Array.from({ length: labels.length }, () => resolvedRedLine),
           yAxisID: "y2",
           borderColor: "#ef4444",
           borderDash: [6, 4],
@@ -936,6 +940,7 @@ function renderChart(canvas) {
     plugins: [backgroundFillPlugin]
   });
 
+  chart.__redLineActive = Number.isFinite(resolvedRedLine) && resolvedRedLine > 0;
   return chart;
 }
 
@@ -944,8 +949,24 @@ function updateChartVisibility(chart, showDS, showSP) {
     if (ds.label === "ランキング") ds.hidden = !showDS;
     if (ds.label === "セラー数") ds.hidden = !(showDS || showSP);
     if (ds.label === "価格(USD)") ds.hidden = !showSP;
-    if (ds.label === "赤字ライン") ds.hidden = false;
+    if (ds.label === "赤字ライン") ds.hidden = !chart.__redLineActive;
   });
+  chart.update();
+}
+
+function calcBreakEvenUSD(costJPY) {
+  if (!Number.isFinite(costJPY) || costJPY <= 0) return null;
+  return Number((costJPY / FX_RATE).toFixed(2));
+}
+
+function updateRedLine(chart, costJPY) {
+  if (!chart) return;
+  const redLineUSD = calcBreakEvenUSD(costJPY);
+  const ds = chart.data.datasets.find((dataset) => dataset.label === "赤字ライン");
+  if (!ds) return;
+  const hasLine = Number.isFinite(redLineUSD) && redLineUSD > 0;
+  chart.__redLineActive = hasLine;
+  ds.data = Array.from({ length: chart.data.labels.length }, () => (hasLine ? redLineUSD : null));
   chart.update();
 }
 
@@ -1370,6 +1391,8 @@ function createProductCard(asin, data) {
       const profitCard = varProfitCombinedEl ? varProfitCombinedEl.closest('.center-card') : null;
       if (profitCard) profitCard.classList.remove('is-negative');
     }
+
+    updateRedLine(card.__chart, costJPY);
   };
 
   sellInput.addEventListener("input", updateVariableMetrics);
@@ -1414,7 +1437,8 @@ card.querySelector(".js-addCart").addEventListener("click", () => {
 
   // chart
   const canvas = card.querySelector(".js-chart");
-  const chart = renderChart(canvas);
+  const initialCostJPY = num(costInput.value);
+  const chart = renderChart(canvas, { redLineUSD: calcBreakEvenUSD(initialCostJPY) });
   card.__chart = chart;
 
   const chkDS = card.querySelector(".js-chkDS");
@@ -1423,6 +1447,7 @@ card.querySelector(".js-addCart").addEventListener("click", () => {
   chkDS?.addEventListener("change", refreshVis);
   chkSP?.addEventListener("change", refreshVis);
   updateChartVisibility(chart, true, false);
+  updateRedLine(chart, initialCostJPY);
 
   // keepa
   const keepaFrame = card.querySelector(".js-keepaFrame");
