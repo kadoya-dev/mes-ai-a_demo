@@ -745,9 +745,7 @@ function buildDetailTable(tableEl, ctx, data) {
 
 function rerenderAllCards() {
   const isThird = document.body.classList.contains("third-layout");
-  const isFourth =
-    document.body.classList.contains("fourth-layout") ||
-    document.body.classList.contains("fifth-layout");
+  const isFourth = document.body.classList.contains("fourth-layout");
 
   cardState.forEach((v) => {
     const asin = v.el.dataset.asin;
@@ -976,9 +974,7 @@ function createProductCard(asin, data) {
 
   const isAltLayout = document.body.classList.contains("alt-layout");
   const isThirdLayout = document.body.classList.contains("third-layout");
-  const isFourthLayout =
-    document.body.classList.contains("fourth-layout") ||
-    document.body.classList.contains("fifth-layout");
+  const isFourthLayout = document.body.classList.contains("fourth-layout");
 
   if (isThirdLayout) {
     card.innerHTML = `

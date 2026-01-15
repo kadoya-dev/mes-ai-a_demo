@@ -861,12 +861,12 @@ body.third-layout .l3-mes canvas{
    ※ ここ以外は一切変更しない
 ========================= */
 
-body:is(.fourth-layout, .fifth-layout){
+body.fourth-layout{
   /* 1段目（画像/商品情報/主要項目）の高さを統一（=主要項目の枠高さ） */
   --l4-top-h: 460px;
 }
 
-body:is(.fourth-layout, .fifth-layout) .layout4-grid{
+body.fourth-layout .layout4-grid{
   display:grid;
 
   /* 画像(細) / 商品情報 / 主要項目(広) / 主要項目(広) / カート */
@@ -883,31 +883,31 @@ body:is(.fourth-layout, .fifth-layout) .layout4-grid{
 }
 
 /* 各ブロックの配置 */
-body:is(.fourth-layout, .fifth-layout) .l4-image{ grid-area: image; }
-body:is(.fourth-layout, .fifth-layout) .l4-info{ grid-area: info; }
-body:is(.fourth-layout, .fifth-layout) .l4-center{ grid-area: center; }
-body:is(.fourth-layout, .fifth-layout) .l4-keepa{ grid-area: keepa; }
-body:is(.fourth-layout, .fifth-layout) .l4-mes{ grid-area: mes; }
-body:is(.fourth-layout, .fifth-layout) .l4-buy{ grid-area: cart; }
+body.fourth-layout .l4-image{ grid-area: image; }
+body.fourth-layout .l4-info{ grid-area: info; }
+body.fourth-layout .l4-center{ grid-area: center; }
+body.fourth-layout .l4-keepa{ grid-area: keepa; }
+body.fourth-layout .l4-mes{ grid-area: mes; }
+body.fourth-layout .l4-buy{ grid-area: cart; }
 
 /* ブロック共通 */
-body:is(.fourth-layout, .fifth-layout) .l4-block{
+body.fourth-layout .l4-block{
   background:#fff;
   border:1px solid var(--line);
   border-radius:18px;
   padding:12px;
   box-shadow: var(--shadow);
 }
-body:is(.fourth-layout, .fifth-layout) .l4-block .head{
+body.fourth-layout .l4-block .head{
   font-weight:900;
   margin-bottom:10px;
   color:#0f172a;
 }
 
 /* 高さ統一：1段目の3つは必ず同じ高さ */
-body:is(.fourth-layout, .fifth-layout) .l4-image,
-body:is(.fourth-layout, .fifth-layout) .l4-info,
-body:is(.fourth-layout, .fifth-layout) .l4-center{
+body.fourth-layout .l4-image,
+body.fourth-layout .l4-info,
+body.fourth-layout .l4-center{
   height: 100%;
   display:flex;
   flex-direction:column;
@@ -915,7 +915,7 @@ body:is(.fourth-layout, .fifth-layout) .l4-center{
 }
 
 /* 商品画像：上の1枚だけ表示（枠内にフィット） */
-body:is(.fourth-layout, .fifth-layout) .l4-image .image-grid{
+body.fourth-layout .l4-image .image-grid{
   flex: 1;
   min-height: 0;
   display:grid;
@@ -924,11 +924,11 @@ body:is(.fourth-layout, .fifth-layout) .l4-image .image-grid{
 }
 
 /* 複数画像がDOMにある想定で、1枚だけ残す */
-body:is(.fourth-layout, .fifth-layout) .l4-image .image-grid img{ display:none; }
-body:is(.fourth-layout, .fifth-layout) .l4-image .image-grid img.main{ display:block; }
-body:is(.fourth-layout, .fifth-layout) .l4-image .image-grid img:first-child{ display:block; }
+body.fourth-layout .l4-image .image-grid img{ display:none; }
+body.fourth-layout .l4-image .image-grid img.main{ display:block; }
+body.fourth-layout .l4-image .image-grid img:first-child{ display:block; }
 
-body:is(.fourth-layout, .fifth-layout) .l4-image .image-grid img{
+body.fourth-layout .l4-image .image-grid img{
   width:100%;
   height:100%;
   object-fit:cover;
@@ -938,14 +938,14 @@ body:is(.fourth-layout, .fifth-layout) .l4-image .image-grid img{
 }
 
 /* 商品情報：枠固定＋中スクロール */
-body:is(.fourth-layout, .fifth-layout) .l4-info .info-grid{
+body.fourth-layout .l4-info .info-grid{
   flex: 1;
   min-height: 0;
   overflow:auto;
 }
 
 /* 主要項目：枠固定＋中スクロール */
-body:is(.fourth-layout, .fifth-layout) .l4-center .center-cards{
+body.fourth-layout .l4-center .center-cards{
   flex:1;
   min-height:0;
   overflow:auto;
@@ -954,19 +954,19 @@ body:is(.fourth-layout, .fifth-layout) .l4-center .center-cards{
   gap:10px;
   padding-right: 4px;
 }
-body:is(.fourth-layout, .fifth-layout) .l4-center .center-card{
+body.fourth-layout .l4-center .center-card{
   border:1px solid var(--line);
   border-radius:14px;
   padding:12px;
   background:#fff;
 }
-body:is(.fourth-layout, .fifth-layout) .l4-center .center-card .label{
+body.fourth-layout .l4-center .center-card .label{
   font-size:12px;
   font-weight:900;
   color:#475569;
   margin-bottom:6px;
 }
-body:is(.fourth-layout, .fifth-layout) .l4-center .center-card .value{
+body.fourth-layout .l4-center .center-card .value{
   font-size:15px;
   font-weight:1000;
   color:#0f172a;
@@ -975,28 +975,28 @@ body:is(.fourth-layout, .fifth-layout) .l4-center .center-card .value{
 }
 
 /* 変動項目（主要項目の下） */
-body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable{
+body.fourth-layout .l4-center .l4-variable{
   border-top:1px solid var(--line);
   margin-top:10px;
   padding-top:10px;
 }
-body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .subhead{
+body.fourth-layout .l4-center .l4-variable .subhead{
   font-size:12px;
   font-weight:900;
   color:#475569;
   margin-bottom:6px;
 }
-body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .var-cards{
+body.fourth-layout .l4-center .l4-variable .var-cards{
   display:grid;
   grid-template-columns: repeat(2, 1fr);
   gap:10px;
 }
 /* layout4の主要項目カードと同じ見た目（k/vベース） */
-body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .center-card .k{
+body.fourth-layout .l4-center .l4-variable .center-card .k{
   font-size:11px;
   opacity:0.55;
 }
-body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .center-card .v{
+body.fourth-layout .l4-center .l4-variable .center-card .v{
   font-size:16px;
   font-weight:900;
   text-align:right;
@@ -1004,51 +1004,51 @@ body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .center-card .v{
 }
 
 /* keepa（画像列に合わせる） */
-body:is(.fourth-layout, .fifth-layout) .l4-keepa{
+body.fourth-layout .l4-keepa{
   background:#f3f4f6;
 }
-body:is(.fourth-layout, .fifth-layout) .l4-keepa .keepa-mini{
+body.fourth-layout .l4-keepa .keepa-mini{
   height:180px;
   border-radius:14px;
   overflow:hidden;
   border:1px solid var(--line);
   background:#fff;
 }
-body:is(.fourth-layout, .fifth-layout) .l4-keepa iframe{
+body.fourth-layout .l4-keepa iframe{
   width:100%;
   height:100%;
   border:0;
 }
 
 /* 需要供給グラフ */
-body:is(.fourth-layout, .fifth-layout) .l4-mes .mes-big{
+body.fourth-layout .l4-mes .mes-big{
   height: 260px;
   border-radius:14px;
   overflow:hidden;
   border:1px solid #dbeafe;
   background:#eef2ff;
 }
-body:is(.fourth-layout, .fifth-layout) .l4-mes canvas{
+body.fourth-layout .l4-mes canvas{
   width:100%;
   height:100%;
 }
 
 /* カート */
-body:is(.fourth-layout, .fifth-layout) .l4-buy{
+body.fourth-layout .l4-buy{
   border:2px solid #1f2937;
   border-radius:18px;
   padding:14px;
   background:#fff;
   box-shadow: var(--shadow);
 }
-body:is(.fourth-layout, .fifth-layout) .l4-buy .buy-title{
+body.fourth-layout .l4-buy .buy-title{
   font-weight:900;
   font-size:12px;
   color:#334155;
   margin:0 0 6px;
 }
-body:is(.fourth-layout, .fifth-layout) .l4-buy input,
-body:is(.fourth-layout, .fifth-layout) .l4-buy select{
+body.fourth-layout .l4-buy input,
+body.fourth-layout .l4-buy select{
   width:100%;
   border:1px solid var(--line);
   border-radius:12px;
@@ -1056,17 +1056,17 @@ body:is(.fourth-layout, .fifth-layout) .l4-buy select{
   font-weight:1000;
   font-size:13px;
 }
-body:is(.fourth-layout, .fifth-layout) .l4-buy .cart-btn{
+body.fourth-layout .l4-buy .cart-btn{
   height:46px;
 }
 
 /* 端末幅が狭い時は縦積み */
 @media (max-width: 1200px){
-  body:is(.fourth-layout, .fifth-layout){
+  body.fourth-layout{
     --l4-top-h: 320px;
   }
 
-  body:is(.fourth-layout, .fifth-layout) .layout4-grid{
+  body.fourth-layout .layout4-grid{
     grid-template-columns: 1fr 1fr;
     grid-template-rows: auto;
     grid-template-areas:
@@ -1140,17 +1140,17 @@ body:is(.fourth-layout, .fifth-layout) .l4-buy .cart-btn{
 
 
 /* 強制適用：変動カードはデフォルトで薄緑（.center-card の白背景を上書き） */
-body:is(.fourth-layout, .fifth-layout) .l4-variable .center-card.var-sell,
-body:is(.fourth-layout, .fifth-layout) .l4-variable .center-card.var-profit {
+body.fourth-layout .l4-variable .center-card.var-sell,
+body.fourth-layout .l4-variable .center-card.var-profit {
   background-color: #eef2ff;
 }
 
 /* マイナス時：薄赤＋文字赤 */
-body:is(.fourth-layout, .fifth-layout) .l4-variable .center-card.var-profit.is-negative {
+body.fourth-layout .l4-variable .center-card.var-profit.is-negative {
   background-color: #fff3f3;
 }
-body:is(.fourth-layout, .fifth-layout) .l4-variable .center-card.var-profit.is-negative .k,
-body:is(.fourth-layout, .fifth-layout) .l4-variable .center-card.var-profit.is-negative .v {
+body.fourth-layout .l4-variable .center-card.var-profit.is-negative .k,
+body.fourth-layout .l4-variable .center-card.var-profit.is-negative .v {
   color: #c62828;
 }
 
@@ -1158,18 +1158,18 @@ body:is(.fourth-layout, .fifth-layout) .l4-variable .center-card.var-profit.is-n
 /* ─────────────────────────────
    layout4: 主要項目を3列表示（幅を切り詰め）
    ───────────────────────────── */
-body:is(.fourth-layout, .fifth-layout) .l4-center .center-cards{
+body.fourth-layout .l4-center .center-cards{
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
   padding-right: 2px;
 }
-body:is(.fourth-layout, .fifth-layout) .l4-center .center-card{
+body.fourth-layout .l4-center .center-card{
   padding: 10px;
 }
-body:is(.fourth-layout, .fifth-layout) .l4-center .center-card .k{
+body.fourth-layout .l4-center .center-card .k{
   font-size: 12px;
 }
-body:is(.fourth-layout, .fifth-layout) .l4-center .center-card .v{
+body.fourth-layout .l4-center .center-card .v{
   font-size: 16px;
 }
 
@@ -1177,14 +1177,14 @@ body:is(.fourth-layout, .fifth-layout) .l4-center .center-card .v{
 /* ─────────────────────────────
    layout4: 主要項目の高さをさらに圧縮
    ───────────────────────────── */
-body:is(.fourth-layout, .fifth-layout) .l4-center .center-card{
+body.fourth-layout .l4-center .center-card{
   padding: 8px 10px;      /* 縦余白を削減 */
 }
-body:is(.fourth-layout, .fifth-layout) .l4-center .center-card .k{
+body.fourth-layout .l4-center .center-card .k{
   margin-bottom: 2px;     /* ラベル下余白を縮小 */
   line-height: 1.2;
 }
-body:is(.fourth-layout, .fifth-layout) .l4-center .center-card .v{
+body.fourth-layout .l4-center .center-card .v{
   line-height: 1.2;
 }
 
@@ -1192,22 +1192,22 @@ body:is(.fourth-layout, .fifth-layout) .l4-center .center-card .v{
 /* ─────────────────────────────
    layout4: 主要項目カードの高さを確実に圧縮（強制上書き）
    ───────────────────────────── */
-body:is(.fourth-layout, .fifth-layout) .l4-center .center-cards{
+body.fourth-layout .l4-center .center-cards{
   row-gap: 6px;
 }
 
-body:is(.fourth-layout, .fifth-layout) .l4-center .center-card{
+body.fourth-layout .l4-center .center-card{
   padding: 6px 8px !important;
   min-height: auto !important;
 }
 
-body:is(.fourth-layout, .fifth-layout) .l4-center .center-card .k{
+body.fourth-layout .l4-center .center-card .k{
   font-size: 11px;
   line-height: 1.15;
   margin-bottom: 1px;
 }
 
-body:is(.fourth-layout, .fifth-layout) .l4-center .center-card .v{
+body.fourth-layout .l4-center .center-card .v{
   font-size: 15px;
   line-height: 1.15;
 }
@@ -1216,12 +1216,12 @@ body:is(.fourth-layout, .fifth-layout) .l4-center .center-card .v{
 /* ─────────────────────────────
    layout4: 主要項目をスクロール領域にして高さを固定
    ───────────────────────────── */
-body:is(.fourth-layout, .fifth-layout) .l4-center{
+body.fourth-layout .l4-center{
   display: flex;
   flex-direction: column;
   min-height: 0; /* 子要素のoverflowが効くように */
 }
-body:is(.fourth-layout, .fifth-layout) .l4-center .center-cards{
+body.fourth-layout .l4-center .center-cards{
   flex: 1;
   min-height: 0;
   max-height: 320px;          /* ここを好みで調整可 */
@@ -1231,10 +1231,10 @@ body:is(.fourth-layout, .fifth-layout) .l4-center .center-cards{
   padding-right: 6px;         /* スクロールバー分 */
 }
 /* スクロールバーが邪魔なら細めに（対応ブラウザのみ） */
-body:is(.fourth-layout, .fifth-layout) .l4-center .center-cards::-webkit-scrollbar{
+body.fourth-layout .l4-center .center-cards::-webkit-scrollbar{
   width: 8px;
 }
-body:is(.fourth-layout, .fifth-layout) .l4-center .center-cards::-webkit-scrollbar-thumb{
+body.fourth-layout .l4-center .center-cards::-webkit-scrollbar-thumb{
   background: rgba(0,0,0,0.12);
   border-radius: 999px;
 }
@@ -1243,15 +1243,15 @@ body:is(.fourth-layout, .fifth-layout) .l4-center .center-cards::-webkit-scrollb
 /* ─────────────────────────────
    layout4: 商品情報も枠内スクロール（l4-infoをflex化）
    ───────────────────────────── */
-body:is(.fourth-layout, .fifth-layout) .l4-info{
+body.fourth-layout .l4-info{
   display: flex;
   flex-direction: column;
   min-height: 0; /* 子のoverflowを有効化 */
 }
-body:is(.fourth-layout, .fifth-layout) .l4-info .head{
+body.fourth-layout .l4-info .head{
   flex: 0 0 auto;
 }
-body:is(.fourth-layout, .fifth-layout) .l4-info .info-grid{
+body.fourth-layout .l4-info .info-grid{
   flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
@@ -1259,10 +1259,10 @@ body:is(.fourth-layout, .fifth-layout) .l4-info .info-grid{
   padding-right: 6px; /* スクロールバー分 */
 }
 /* スクロールバー細め（対応ブラウザのみ） */
-body:is(.fourth-layout, .fifth-layout) .l4-info .info-grid::-webkit-scrollbar{
+body.fourth-layout .l4-info .info-grid::-webkit-scrollbar{
   width: 8px;
 }
-body:is(.fourth-layout, .fifth-layout) .l4-info .info-grid::-webkit-scrollbar-thumb{
+body.fourth-layout .l4-info .info-grid::-webkit-scrollbar-thumb{
   background: rgba(0,0,0,0.12);
   border-radius: 999px;
 }
