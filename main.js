@@ -42,6 +42,9 @@ const METRICS_ALL = [
   { id: "予測30日販売数", label: "予測30日販売数", sourceKey: "予測30日販売数" },
   { id: "予測60日販売数", label: "予測60日販売数", sourceKey: "予測60日販売数" },
   { id: "予測90日販売数", label: "予測90日販売数", sourceKey: "予測90日販売数" },
+  { id: "推奨仕入数(30日)", label: "推奨仕入数(30日)", sourceKey: "予測30日販売数" },
+  { id: "推奨仕入数(60日)", label: "推奨仕入数(60日)", sourceKey: "予測60日販売数" },
+  { id: "推奨仕入数(90日)", label: "推奨仕入数(90日)", sourceKey: "予測90日販売数" },
 
   { id: "複数在庫指数45日分", label: "複数在庫指数45日分", sourceKey: "複数在庫指数45日分" },
   { id: "複数在庫指数60日分", label: "複数在庫指数60日分", sourceKey: "複数在庫指数60日分" },
@@ -127,6 +130,9 @@ const DEFAULT_ZONES = {
     tokM("予測30日販売数"),
     tokM("予測60日販売数"),
     tokM("予測90日販売数"),
+    tokM("推奨仕入数(30日)"),
+    tokM("推奨仕入数(60日)"),
+    tokM("推奨仕入数(90日)"),
     tokM("在庫数"),
     tokM("FBA最安値"),
     tokM("30日販売数"),
@@ -799,7 +805,7 @@ function rerenderAllCards() {
 /* =========================
    チャート（既存）
 ========================= */
-function renderChart(canvas, { redLineUSD } = {}) {
+function renderChart(canvas, { redLineUSD, priceUSD } = {}) {
   const labels = Array.from({ length: 180 }, (_, i) => `${180 - i}日`);
 
   const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
@@ -810,12 +816,10 @@ function renderChart(canvas, { redLineUSD } = {}) {
 
   let r = 58000 + (Math.random() - 0.5) * 12000;
   let s = Math.max(1, Math.round(3 + Math.random() * 4));
-  const basePrice = 30 + (Math.random() - 0.5) * 6;
-  let p = basePrice;
+  const basePrice = Number.isFinite(priceUSD) && priceUSD > 0 ? priceUSD : 30 + (Math.random() - 0.5) * 6;
+  const p = basePrice;
   const defaultRedLine = Number((basePrice * 0.95).toFixed(2));
   const resolvedRedLine = Number.isFinite(redLineUSD) && redLineUSD > 0 ? redLineUSD : defaultRedLine;
-
-  let nextPriceChangeIn = 1 + Math.floor(Math.random() * 4);
 
   for (let i = 0; i < labels.length; i++) {
     const prevR = r;
@@ -845,22 +849,6 @@ function renderChart(canvas, { redLineUSD } = {}) {
 
     s = Math.round(clamp(s + ds, 1, 18));
 
-    nextPriceChangeIn -= 1;
-    if (nextPriceChangeIn <= 0) {
-      nextPriceChangeIn = 2 + Math.floor(Math.random() * 6);
-
-      const sellerPressure = (s - 3) * 0.55;
-      const rankSignal = clamp((meanR - r) / 50000, -0.6, 0.6) * 0.9;
-      const noise = (Math.random() - 0.5) * 0.6;
-
-      const target = basePrice - sellerPressure - rankSignal + noise;
-
-      p += (target - p) * 0.6;
-
-      p = Math.round(p / 0.05) * 0.05;
-      p = clamp(p, basePrice * 0.65, basePrice * 1.25);
-    }
-
     rank.push(Math.round(r));
     sellers.push(s);
     price.push(Number(p.toFixed(2)));
@@ -872,14 +860,14 @@ function renderChart(canvas, { redLineUSD } = {}) {
   const isBlue = minPrice >= resolvedRedLine;
   const backgroundColorMap = {
     blue: {
-      light: "rgba(59,130,246,0.08)",
-      medium: "rgba(59,130,246,0.16)",
-      strong: "rgba(59,130,246,0.24)"
+      light: "rgba(59,130,246,0.12)",
+      medium: "rgba(59,130,246,0.2)",
+      strong: "rgba(59,130,246,0.28)"
     },
     red: {
-      light: "rgba(239,68,68,0.08)",
-      medium: "rgba(239,68,68,0.16)",
-      strong: "rgba(239,68,68,0.24)"
+      light: "rgba(239,68,68,0.12)",
+      medium: "rgba(239,68,68,0.2)",
+      strong: "rgba(239,68,68,0.28)"
     }
   };
   const backgroundColor = "#ffffff";
@@ -887,15 +875,20 @@ function renderChart(canvas, { redLineUSD } = {}) {
   const backgroundFillPlugin = {
     id: "backgroundFill",
     beforeDraw(chartInstance, args, options) {
-      const { ctx, chartArea } = chartInstance;
+      const { ctx, chartArea, scales } = chartInstance;
       if (!chartArea) return;
+      if (!chartInstance.__redLineActive || !chartInstance.__showPrice) return;
+      const yScale = scales?.y2;
+      if (!yScale) return;
+      const lineY = yScale.getPixelForValue(resolvedRedLine);
+      if (!Number.isFinite(lineY)) return;
       ctx.save();
       ctx.fillStyle = options.color;
       ctx.fillRect(
         chartArea.left,
-        chartArea.top,
+        Math.max(lineY, chartArea.top),
         chartArea.right - chartArea.left,
-        chartArea.bottom - chartArea.top
+        chartArea.bottom - Math.max(lineY, chartArea.top)
       );
       ctx.restore();
     }
@@ -939,6 +932,7 @@ function renderChart(canvas, { redLineUSD } = {}) {
   });
 
   chart.__redLineActive = Number.isFinite(resolvedRedLine) && resolvedRedLine > 0;
+  chart.__showPrice = false;
   return chart;
 }
 
@@ -949,6 +943,23 @@ function updateChartVisibility(chart, showDS, showSP) {
     if (ds.label === "価格(USD)") ds.hidden = !showSP;
     if (ds.label === "赤字ライン") ds.hidden = !(showSP && chart.__redLineActive);
   });
+  chart.__showPrice = showSP;
+  chart.update();
+}
+
+function calcBreakEvenUSD(costJPY) {
+  if (!Number.isFinite(costJPY) || costJPY <= 0) return null;
+  return Number((costJPY / FX_RATE).toFixed(2));
+}
+
+function updateRedLine(chart, costJPY) {
+  if (!chart) return;
+  const redLineUSD = calcBreakEvenUSD(costJPY);
+  const ds = chart.data.datasets.find((dataset) => dataset.label === "赤字ライン");
+  if (!ds) return;
+  const hasLine = Number.isFinite(redLineUSD) && redLineUSD > 0;
+  chart.__redLineActive = hasLine;
+  ds.data = Array.from({ length: chart.data.labels.length }, () => (hasLine ? redLineUSD : null));
   chart.update();
 }
 
@@ -1436,7 +1447,11 @@ card.querySelector(".js-addCart").addEventListener("click", () => {
   // chart
   const canvas = card.querySelector(".js-chart");
   const initialCostJPY = num(costInput.value);
-  const chart = renderChart(canvas, { redLineUSD: calcBreakEvenUSD(initialCostJPY) });
+  const priceUSD = num(data["販売額（ドル）"]);
+  const chart = renderChart(canvas, {
+    redLineUSD: calcBreakEvenUSD(initialCostJPY),
+    priceUSD
+  });
   card.__chart = chart;
 
   const chkDS = card.querySelector(".js-chkDS");
