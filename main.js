@@ -5,7 +5,7 @@
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const FX_RATE = 155;
-const APP_VERSION = "v2025.02.18";
+const APP_VERSION = "v2025.02.19";
 
 const fmtJPY = (n) => "￥" + Number(n || 0).toLocaleString("ja-JP");
 const fmtUSD = (n) => "＄" + Number(n || 0).toFixed(2);
@@ -1168,30 +1168,90 @@ function createProductCard(asin, data) {
         <div class="l4-buy l4-block">
           <div class="head">カート</div>
           <div class="buy-inner">
-            <div class="shop-list js-shopList">
-              <div class="shop-row">
-                <div class="shop-name">Amazon</div>
-                <input class="shop-input js-cost" type="number" step="1" placeholder="金額" />
-                <input class="shop-input js-qty" type="number" min="0" step="1" placeholder="個数" />
-                <button class="shop-remove" type="button" disabled>－</button>
+            <div class="shop-panel">
+              <div class="shop-panel-head">
+                <div class="shop-panel-title">上位3ショップ（価格の安い順）</div>
+                <button class="ghost-btn js-viewAll" type="button">全ショップを見る</button>
               </div>
-              <div class="shop-row">
-                <div class="shop-name">楽天</div>
-                <input class="shop-input js-shopAmount" type="number" step="1" placeholder="金額" />
-                <input class="shop-input js-shopQty" type="number" min="0" step="1" placeholder="個数" />
-                <button class="shop-remove" type="button" disabled>－</button>
+
+              <div class="shop-list js-shopList">
+                <div class="shop-card is-primary">
+                  <div class="shop-rank">1</div>
+                  <div class="shop-info">
+                    <div class="shop-name">Amazon</div>
+                    <div class="shop-meta">
+                      <input class="shop-input js-cost" type="number" step="1" placeholder="金額" />
+                      <span class="shop-margin js-shopMargin">粗利率 0%</span>
+                    </div>
+                  </div>
+                  <div class="shop-qty">
+                    <span>数量</span>
+                    <button class="qty-btn js-qtyMinus" type="button">－</button>
+                    <input class="shop-qty-input js-qty" type="number" min="0" step="1" value="0" />
+                    <button class="qty-btn js-qtyPlus" type="button">＋</button>
+                  </div>
+                </div>
+
+                <div class="shop-card">
+                  <div class="shop-rank">2</div>
+                  <div class="shop-info">
+                    <div class="shop-name">Yahoo</div>
+                    <div class="shop-meta">
+                      <input class="shop-input js-shopAmount" type="number" step="1" placeholder="金額" />
+                      <span class="shop-margin js-shopMargin">粗利率 0%</span>
+                    </div>
+                  </div>
+                  <div class="shop-qty">
+                    <span>数量</span>
+                    <button class="qty-btn js-qtyMinus" type="button">－</button>
+                    <input class="shop-qty-input js-shopQty" type="number" min="0" step="1" value="0" />
+                    <button class="qty-btn js-qtyPlus" type="button">＋</button>
+                  </div>
+                </div>
+
+                <div class="shop-card">
+                  <div class="shop-rank">3</div>
+                  <div class="shop-info">
+                    <div class="shop-name">楽天</div>
+                    <div class="shop-meta">
+                      <input class="shop-input js-shopAmount" type="number" step="1" placeholder="金額" />
+                      <span class="shop-margin js-shopMargin">粗利率 0%</span>
+                    </div>
+                  </div>
+                  <div class="shop-qty">
+                    <span>数量</span>
+                    <button class="qty-btn js-qtyMinus" type="button">－</button>
+                    <input class="shop-qty-input js-shopQty" type="number" min="0" step="1" value="0" />
+                    <button class="qty-btn js-qtyPlus" type="button">＋</button>
+                  </div>
+                </div>
               </div>
-              <div class="shop-row">
-                <div class="shop-name">ヤフー</div>
-                <input class="shop-input js-shopAmount" type="number" step="1" placeholder="金額" />
-                <input class="shop-input js-shopQty" type="number" min="0" step="1" placeholder="個数" />
-                <button class="shop-remove" type="button" disabled>－</button>
+
+              <div class="shop-note">※ここでも数量を＋/－で変更できます</div>
+            </div>
+
+            <div class="shop-panel">
+              <div class="shop-panel-head">
+                <div class="shop-panel-title">その他のショップ</div>
+                <div class="shop-panel-note">※増えたら下だけスクロール</div>
               </div>
-              <div class="shop-row js-customShop">
-                <input class="shop-name-input js-shopName" type="text" placeholder="ショップ名" />
-                <input class="shop-input js-shopAmount" type="number" step="1" placeholder="金額" />
-                <input class="shop-input js-shopQty" type="number" min="0" step="1" placeholder="個数" />
-                <button class="shop-remove" type="button">－</button>
+              <div class="shop-list js-extraShopList">
+                <div class="shop-card is-secondary js-customShop">
+                  <div class="shop-info">
+                    <input class="shop-name-input js-shopName" type="text" placeholder="ショップ名" />
+                    <div class="shop-meta">
+                      <input class="shop-input js-shopAmount" type="number" step="1" placeholder="金額" />
+                      <span class="shop-margin js-shopMargin">粗利率 0%</span>
+                    </div>
+                  </div>
+                  <div class="shop-qty">
+                    <span>数量</span>
+                    <button class="qty-btn js-qtyMinus" type="button">－</button>
+                    <input class="shop-qty-input js-shopQty" type="number" min="0" step="1" value="0" />
+                    <button class="qty-btn js-qtyPlus" type="button">＋</button>
+                  </div>
+                  <button class="shop-remove" type="button">－</button>
+                </div>
               </div>
             </div>
 
@@ -1202,7 +1262,10 @@ function createProductCard(asin, data) {
               <button class="ghost-btn js-later" type="button">後で仕入れる</button>
             </div>
 
-            <input class="js-sell" type="hidden" />
+            <div class="shop-sale">
+              <div class="shop-sale-label">販売価格（$）</div>
+              <input class="shop-input js-sell" type="number" step="0.01" placeholder="例: 39.99" />
+            </div>
           </div>
         </div>
 
@@ -1409,6 +1472,7 @@ function createProductCard(asin, data) {
   const costInput = card.querySelector(".js-cost");
   const qtyInput = card.querySelector(".js-qty");
   const shopList = card.querySelector(".js-shopList");
+  const extraShopList = card.querySelector(".js-extraShopList");
   const addShopBtn = card.querySelector(".js-addShop");
 
   if (data["販売額（ドル）"]) {
@@ -1425,9 +1489,9 @@ function createProductCard(asin, data) {
   if (qtyInput && !qtyInput.value) qtyInput.value = "1";
 
   if (shopList) {
-    const shopRows = shopList.querySelectorAll(".shop-row");
-    const rakutenAmount = shopRows[1]?.querySelector(".js-shopAmount");
-    const yahooAmount = shopRows[2]?.querySelector(".js-shopAmount");
+    const shopCards = shopList.querySelectorAll(".shop-card");
+    const yahooAmount = shopCards[1]?.querySelector(".js-shopAmount");
+    const rakutenAmount = shopCards[2]?.querySelector(".js-shopAmount");
     if (rakutenAmount && data["日本最安値"]) {
       rakutenAmount.value = String(data["日本最安値"]).replace(/[^\d]/g, "");
     }
@@ -1473,38 +1537,98 @@ function createProductCard(asin, data) {
     updateRedLine(card.__chart, costJPY);
   };
 
-  sellInput.addEventListener("input", updateVariableMetrics);
-  costInput.addEventListener("input", updateVariableMetrics);
+  const updateShopMargins = () => {
+    const sellUSD = num(sellInput.value);
+    const revenueJPY = sellUSD * FX_RATE;
+    const marginEls = card.querySelectorAll(".js-shopMargin");
+    marginEls.forEach((el) => {
+      const row = el.closest(".shop-card");
+      const amountInput = row?.querySelector(".js-cost, .js-shopAmount");
+      const costVal = num(amountInput?.value);
+      if (revenueJPY > 0 && costVal > 0) {
+        const marginPct = ((revenueJPY - costVal) / revenueJPY) * 100;
+        el.textContent = `粗利率 ${marginPct.toFixed(1)}%`;
+      } else {
+        el.textContent = "粗利率 0%";
+      }
+    });
+  };
+
+  const updateQtyControls = () => {
+    card.querySelectorAll(".shop-card").forEach((row) => {
+      const qtyInputEl = row.querySelector(".shop-qty-input");
+      const minusBtn = row.querySelector(".js-qtyMinus");
+      const plusBtn = row.querySelector(".js-qtyPlus");
+      if (!qtyInputEl || !minusBtn || !plusBtn) return;
+
+      minusBtn.onclick = () => {
+        const val = Math.max(0, Number(qtyInputEl.value || 0) - 1);
+        qtyInputEl.value = val;
+      };
+      plusBtn.onclick = () => {
+        const val = Math.max(0, Number(qtyInputEl.value || 0) + 1);
+        qtyInputEl.value = val;
+      };
+    });
+  };
+
+  sellInput.addEventListener("input", () => {
+    updateVariableMetrics();
+    updateShopMargins();
+  });
+  costInput.addEventListener("input", () => {
+    updateVariableMetrics();
+    updateShopMargins();
+  });
+  card.querySelectorAll(".js-shopAmount").forEach((input) => {
+    input.addEventListener("input", updateShopMargins);
+  });
   updateVariableMetrics();
+  updateShopMargins();
+  updateQtyControls();
 
 card.querySelector(".js-addCart").addEventListener("click", () => {
-    const qty = Math.max(1, Number(qtyInput?.value || 1));
+    const qty = Math.max(1, Number(qtyInput?.value || 0));
     const sellUSD = num(sellInput.value);
     const costJPY = num(costInput.value);
 
     if (sellUSD <= 0) return alert("販売価格（$）を入力してください");
     if (costJPY <= 0) return alert("仕入れ額（￥）を入力してください");
+    if (qty <= 0) return alert("個数を入力してください");
 
     cart.set(asin, { qty, sellUSD, costJPY });
     updateCartSummary();
   });
 
-  if (addShopBtn && shopList) {
+  if (addShopBtn && extraShopList) {
     addShopBtn.addEventListener("click", () => {
       const row = document.createElement("div");
-      row.className = "shop-row js-customShop";
+      row.className = "shop-card is-secondary js-customShop";
       row.innerHTML = `
-        <input class="shop-name-input js-shopName" type="text" placeholder="ショップ名" />
-        <input class="shop-input js-shopAmount" type="number" step="1" placeholder="金額" />
-        <input class="shop-input js-shopQty" type="number" min="0" step="1" placeholder="個数" />
+        <div class="shop-info">
+          <input class="shop-name-input js-shopName" type="text" placeholder="ショップ名" />
+          <div class="shop-meta">
+            <input class="shop-input js-shopAmount" type="number" step="1" placeholder="金額" />
+            <span class="shop-margin js-shopMargin">粗利率 0%</span>
+          </div>
+        </div>
+        <div class="shop-qty">
+          <span>数量</span>
+          <button class="qty-btn js-qtyMinus" type="button">－</button>
+          <input class="shop-qty-input js-shopQty" type="number" min="0" step="1" value="0" />
+          <button class="qty-btn js-qtyPlus" type="button">＋</button>
+        </div>
         <button class="shop-remove" type="button">－</button>
       `;
       row.querySelector(".shop-remove")?.addEventListener("click", () => row.remove());
-      shopList.appendChild(row);
+      row.querySelector(".js-shopAmount")?.addEventListener("input", updateShopMargins);
+      extraShopList.appendChild(row);
+      updateQtyControls();
+      updateShopMargins();
     });
-    shopList.querySelectorAll(".shop-remove").forEach((btn) => {
+    extraShopList.querySelectorAll(".shop-remove").forEach((btn) => {
       btn.addEventListener("click", (e) => {
-        const row = e.currentTarget.closest(".shop-row");
+        const row = e.currentTarget.closest(".shop-card");
         if (row?.classList.contains("js-customShop")) row.remove();
       });
     });
