@@ -870,9 +870,7 @@ function renderChart(canvas, { redLineUSD, priceUSD } = {}) {
       strong: "rgba(239,68,68,0.28)"
     }
   };
-  const backgroundColor = isBlue
-    ? backgroundColorMap.blue[tier]
-    : backgroundColorMap.red[tier];
+  const backgroundColor = "#ffffff";
 
   const backgroundFillPlugin = {
     id: "backgroundFill",
