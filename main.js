@@ -880,15 +880,18 @@ function renderChart(canvas, { redLineUSD, priceUSD } = {}) {
       if (!chartInstance.__redLineActive || !chartInstance.__showPrice) return;
       const yScale = scales?.y2;
       if (!yScale) return;
-      const lineY = yScale.getPixelForValue(resolvedRedLine);
+      const lineValue = chartInstance.__redLineValue ?? resolvedRedLine;
+      const lineY = yScale.getPixelForValue(lineValue);
       if (!Number.isFinite(lineY)) return;
+      if (lineY >= chartArea.bottom) return;
+      const clampedY = Math.min(chartArea.bottom, Math.max(lineY, chartArea.top));
       ctx.save();
       ctx.fillStyle = options.color;
       ctx.fillRect(
         chartArea.left,
-        Math.max(lineY, chartArea.top),
+        clampedY,
         chartArea.right - chartArea.left,
-        chartArea.bottom - Math.max(lineY, chartArea.top)
+        chartArea.bottom - clampedY
       );
       ctx.restore();
     }
@@ -932,6 +935,7 @@ function renderChart(canvas, { redLineUSD, priceUSD } = {}) {
   });
 
   chart.__redLineActive = Number.isFinite(resolvedRedLine) && resolvedRedLine > 0;
+  chart.__redLineValue = resolvedRedLine;
   chart.__showPrice = false;
   return chart;
 }
@@ -959,6 +963,7 @@ function updateRedLine(chart, costJPY) {
   if (!ds) return;
   const hasLine = Number.isFinite(redLineUSD) && redLineUSD > 0;
   chart.__redLineActive = hasLine;
+  chart.__redLineValue = hasLine ? redLineUSD : null;
   ds.data = Array.from({ length: chart.data.labels.length }, () => (hasLine ? redLineUSD : null));
   chart.update();
 }
