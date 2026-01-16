@@ -311,7 +311,7 @@ a{ color:inherit; }
 
 .cart-grid{
   display:grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap:10px;
 }
 .cart-grid > div{
@@ -328,7 +328,7 @@ a{ color:inherit; }
   margin-bottom:4px;
 }
 .cart-grid b{
-  font-size:15px;
+  font-size:14px;
   font-weight:900;
 }
 

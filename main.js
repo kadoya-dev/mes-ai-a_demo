@@ -5,7 +5,7 @@
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const FX_RATE = 155;
-const APP_VERSION = "v2025.02.16";
+const APP_VERSION = "v2025.02.17";
 
 const fmtJPY = (n) => "￥" + Number(n || 0).toLocaleString("ja-JP");
 const fmtUSD = (n) => "＄" + Number(n || 0).toFixed(2);
@@ -135,17 +135,18 @@ const DEFAULT_ZONES = {
     tokM("推奨仕入数(60日)"),
     tokM("推奨仕入数(90日)"),
     tokM("在庫数"),
-    tokM("FBA最安値"),
     tokM("30日販売数"),
+    tokM("日本最安値"),
     tokM("過去3月FBA最安値"),
-    tokM("入金額予測")
+    tokM("FBA最安値")
   ],
   table: [
-    tokM("想定送料"),
     tokM("返品率"),
-    tokM("仕入れ目安単価"),
+    tokM("想定送料"),
     tokM("送料"),
     tokM("関税"),
+    tokM("仕入れ目安単価"),
+    tokM("入金額予測"),
     tokM("入金額（円）"),
     tokM("入金額計（円）")
   ],
@@ -207,6 +208,7 @@ const cartTotalPayment = $("#cartTotalPayment");
 const cartTotalSales = $("#cartTotalSales");
 const cartTotalCost = $("#cartTotalCost");
 const cartTotalProfit = $("#cartTotalProfit");
+const cartProfitRate = $("#cartProfitRate");
 const cartItemCount = $("#cartItemCount");
 
 /* sort */
@@ -1015,6 +1017,7 @@ function updateCartSummary() {
   const avgSalesUSD = totalSalesUSD / avgDenom;
   const avgCost = totalCost / avgDenom;
   const avgProfit = profit / avgDenom;
+  const profitRate = totalRevenueJPY > 0 ? (profit / totalRevenueJPY) * 100 : 0;
   if (cartTotalPayment) {
     cartTotalPayment.textContent = `${fmtJPY(totalRevenueJPY)}(${fmtJPY(avgPayment)})`;
   }
@@ -1026,6 +1029,9 @@ function updateCartSummary() {
   }
   if (cartTotalProfit) {
     cartTotalProfit.textContent = `${fmtJPY(profit)}(${fmtJPY(avgProfit)})`;
+  }
+  if (cartProfitRate) {
+    cartProfitRate.textContent = `${profitRate.toFixed(1)}%`;
   }
   if (cartItemCount) {
     cartItemCount.textContent = `${itemCount}個`;
