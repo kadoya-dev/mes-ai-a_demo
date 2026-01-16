@@ -5,7 +5,7 @@
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const FX_RATE = 155;
-const APP_VERSION = "v2025.02.19";
+const APP_VERSION = "v2025.02.20";
 
 const fmtJPY = (n) => "￥" + Number(n || 0).toLocaleString("ja-JP");
 const fmtUSD = (n) => "＄" + Number(n || 0).toFixed(2);
@@ -1155,7 +1155,7 @@ function createProductCard(asin, data) {
             <div class="var-cards">
               <div class="center-card var-sell">
                 <div class="k">販売価格（$）</div>
-                <div class="v js-varSell">－</div>
+                <input class="v js-sell js-sellInput" type="number" step="0.01" placeholder="例: 39.99" />
               </div>
               <div class="center-card var-profit">
                 <div class="k">粗利益</div>
@@ -1257,15 +1257,11 @@ function createProductCard(asin, data) {
 
             <div class="shop-actions">
               <button class="shop-add js-addShop" type="button">＋</button>
-              <button class="ghost-btn js-more" type="button">もっと見る</button>
               <button class="cart-btn js-addCart" type="button">仕入れリスト</button>
               <button class="ghost-btn js-later" type="button">後で仕入れる</button>
             </div>
 
-            <div class="shop-sale">
-              <div class="shop-sale-label">販売価格（$）</div>
-              <input class="shop-input js-sell" type="number" step="0.01" placeholder="例: 39.99" />
-            </div>
+            <input class="js-sell" type="hidden" />
           </div>
         </div>
 
@@ -1547,28 +1543,10 @@ function createProductCard(asin, data) {
       const costVal = num(amountInput?.value);
       if (revenueJPY > 0 && costVal > 0) {
         const marginPct = ((revenueJPY - costVal) / revenueJPY) * 100;
-        el.textContent = `粗利率 ${marginPct.toFixed(1)}%`;
+        el.textContent = `${marginPct.toFixed(1)}%`;
       } else {
-        el.textContent = "粗利率 0%";
+        el.textContent = "0%";
       }
-    });
-  };
-
-  const updateQtyControls = () => {
-    card.querySelectorAll(".shop-card").forEach((row) => {
-      const qtyInputEl = row.querySelector(".shop-qty-input");
-      const minusBtn = row.querySelector(".js-qtyMinus");
-      const plusBtn = row.querySelector(".js-qtyPlus");
-      if (!qtyInputEl || !minusBtn || !plusBtn) return;
-
-      minusBtn.onclick = () => {
-        const val = Math.max(0, Number(qtyInputEl.value || 0) - 1);
-        qtyInputEl.value = val;
-      };
-      plusBtn.onclick = () => {
-        const val = Math.max(0, Number(qtyInputEl.value || 0) + 1);
-        qtyInputEl.value = val;
-      };
     });
   };
 
@@ -1585,7 +1563,6 @@ function createProductCard(asin, data) {
   });
   updateVariableMetrics();
   updateShopMargins();
-  updateQtyControls();
 
 card.querySelector(".js-addCart").addEventListener("click", () => {
     const qty = Math.max(1, Number(qtyInput?.value || 0));
@@ -1623,7 +1600,6 @@ card.querySelector(".js-addCart").addEventListener("click", () => {
       row.querySelector(".shop-remove")?.addEventListener("click", () => row.remove());
       row.querySelector(".js-shopAmount")?.addEventListener("input", updateShopMargins);
       extraShopList.appendChild(row);
-      updateQtyControls();
       updateShopMargins();
     });
     extraShopList.querySelectorAll(".shop-remove").forEach((btn) => {
