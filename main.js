@@ -963,22 +963,6 @@ function updateRedLine(chart, costJPY) {
   chart.update();
 }
 
-function calcBreakEvenUSD(costJPY) {
-  if (!Number.isFinite(costJPY) || costJPY <= 0) return null;
-  return Number((costJPY / FX_RATE).toFixed(2));
-}
-
-function updateRedLine(chart, costJPY) {
-  if (!chart) return;
-  const redLineUSD = calcBreakEvenUSD(costJPY);
-  const ds = chart.data.datasets.find((dataset) => dataset.label === "赤字ライン");
-  if (!ds) return;
-  const hasLine = Number.isFinite(redLineUSD) && redLineUSD > 0;
-  chart.__redLineActive = hasLine;
-  ds.data = Array.from({ length: chart.data.labels.length }, () => (hasLine ? redLineUSD : null));
-  chart.update();
-}
-
 /* =========================
    カート
 ========================= */
