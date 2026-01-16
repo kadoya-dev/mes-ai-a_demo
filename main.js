@@ -875,22 +875,6 @@ function renderChart(canvas, { redLineUSD, priceUSD } = {}) {
 
     s = Math.round(clamp(s + ds, 1, 18));
 
-    nextPriceChangeIn -= 1;
-    if (nextPriceChangeIn <= 0) {
-      nextPriceChangeIn = 2 + Math.floor(Math.random() * 6);
-
-      const sellerPressure = (s - 3) * 0.55;
-      const rankSignal = clamp((meanR - r) / 50000, -0.6, 0.6) * 0.9;
-      const noise = (Math.random() - 0.5) * 0.6;
-
-      const target = basePrice - sellerPressure - rankSignal + noise;
-
-      p += (target - p) * 0.6;
-
-      p = Math.round(p / 0.05) * 0.05;
-      p = clamp(p, basePrice * 0.65, basePrice * 1.25);
-    }
-
     rank.push(Math.round(r));
     sellers.push(s);
     price.push(Number(p.toFixed(2)));
