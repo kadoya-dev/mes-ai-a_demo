@@ -5,7 +5,7 @@
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const FX_RATE = 155;
-const APP_VERSION = "v2025.02.15";
+const APP_VERSION = "v2025.02.16";
 
 const fmtJPY = (n) => "￥" + Number(n || 0).toLocaleString("ja-JP");
 const fmtUSD = (n) => "＄" + Number(n || 0).toFixed(2);
@@ -207,7 +207,6 @@ const cartTotalPayment = $("#cartTotalPayment");
 const cartTotalSales = $("#cartTotalSales");
 const cartTotalCost = $("#cartTotalCost");
 const cartTotalProfit = $("#cartTotalProfit");
-const cartProfitRate = $("#cartProfitRate");
 const cartItemCount = $("#cartItemCount");
 
 /* sort */
@@ -1016,8 +1015,6 @@ function updateCartSummary() {
   const avgSalesUSD = totalSalesUSD / avgDenom;
   const avgCost = totalCost / avgDenom;
   const avgProfit = profit / avgDenom;
-  const profitRate = totalRevenueJPY > 0 ? (profit / totalRevenueJPY) * 100 : 0;
-
   if (cartTotalPayment) {
     cartTotalPayment.textContent = `${fmtJPY(totalRevenueJPY)}(${fmtJPY(avgPayment)})`;
   }
@@ -1029,9 +1026,6 @@ function updateCartSummary() {
   }
   if (cartTotalProfit) {
     cartTotalProfit.textContent = `${fmtJPY(profit)}(${fmtJPY(avgProfit)})`;
-  }
-  if (cartProfitRate) {
-    cartProfitRate.textContent = `${profitRate.toFixed(1)}%`;
   }
   if (cartItemCount) {
     cartItemCount.textContent = `${itemCount}個`;
