@@ -5,8 +5,10 @@
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const FX_RATE = 155;
+const APP_VERSION = "v2025.02.17";
 
 const fmtJPY = (n) => "￥" + Number(n || 0).toLocaleString("ja-JP");
+const fmtUSD = (n) => "＄" + Number(n || 0).toFixed(2);
 const num = (v) => {
   const x = Number(String(v ?? "").replace(/[^\d.\-]/g, ""));
   return Number.isFinite(x) ? x : 0;
@@ -41,6 +43,9 @@ const METRICS_ALL = [
   { id: "予測30日販売数", label: "予測30日販売数", sourceKey: "予測30日販売数" },
   { id: "予測60日販売数", label: "予測60日販売数", sourceKey: "予測60日販売数" },
   { id: "予測90日販売数", label: "予測90日販売数", sourceKey: "予測90日販売数" },
+  { id: "推奨仕入数(30日)", label: "推奨仕入数(30日)", sourceKey: "予測30日販売数" },
+  { id: "推奨仕入数(60日)", label: "推奨仕入数(60日)", sourceKey: "予測60日販売数" },
+  { id: "推奨仕入数(90日)", label: "推奨仕入数(90日)", sourceKey: "予測90日販売数" },
 
   { id: "複数在庫指数45日分", label: "複数在庫指数45日分", sourceKey: "複数在庫指数45日分" },
   { id: "複数在庫指数60日分", label: "複数在庫指数60日分", sourceKey: "複数在庫指数60日分" },
@@ -126,18 +131,22 @@ const DEFAULT_ZONES = {
     tokM("予測30日販売数"),
     tokM("予測60日販売数"),
     tokM("予測90日販売数"),
+    tokM("推奨仕入数(30日)"),
+    tokM("推奨仕入数(60日)"),
+    tokM("推奨仕入数(90日)"),
     tokM("在庫数"),
-    tokM("FBA最安値"),
     tokM("30日販売数"),
+    tokM("日本最安値"),
     tokM("過去3月FBA最安値"),
-    tokM("入金額予測")
+    tokM("FBA最安値")
   ],
   table: [
-    tokM("想定送料"),
     tokM("返品率"),
-    tokM("仕入れ目安単価"),
+    tokM("想定送料"),
     tokM("送料"),
     tokM("関税"),
+    tokM("仕入れ目安単価"),
+    tokM("入金額予測"),
     tokM("入金額（円）"),
     tokM("入金額計（円）")
   ],
@@ -192,12 +201,14 @@ const asinCatalog = $("#asinCatalog");
 const itemsContainer = $("#itemsContainer");
 const emptyState = $("#emptyState");
 const headerStatus = $("#headerStatus");
+const appVersion = $("#appVersion");
 
 /* cart */
+const cartTotalPayment = $("#cartTotalPayment");
+const cartTotalSales = $("#cartTotalSales");
 const cartTotalCost = $("#cartTotalCost");
-const cartTotalRevenue = $("#cartTotalRevenue");
 const cartTotalProfit = $("#cartTotalProfit");
-const cartAsinCount = $("#cartAsinCount");
+const cartProfitRate = $("#cartProfitRate");
 const cartItemCount = $("#cartItemCount");
 
 /* sort */
@@ -220,6 +231,7 @@ function init() {
   initActions();
   updateCartSummary();
   updateHeaderStatus();
+  if (appVersion) appVersion.textContent = `Version ${APP_VERSION}`;
   renderTopZones();
 }
 
@@ -796,7 +808,32 @@ function rerenderAllCards() {
 /* =========================
    チャート（既存）
 ========================= */
-function renderChart(canvas) {
+function getDeviationTier(pct) {
+  if (pct < 5) return "light";
+  if (pct < 10) return "medium";
+  return "strong";
+}
+
+function resolveBackgroundColor(minValue, lineValue) {
+  if (!Number.isFinite(lineValue) || lineValue <= 0 || !Number.isFinite(minValue)) return "rgba(0,0,0,0)";
+  const diffPct = Math.abs(lineValue - minValue) / lineValue * 100;
+  const tier = getDeviationTier(diffPct);
+  const isBlue = minValue >= lineValue;
+  const backgroundColorMap = {
+    blue: {
+      light: "rgba(59,130,246,0.12)",
+      medium: "rgba(59,130,246,0.2)",
+      strong: "rgba(59,130,246,0.28)"
+    },
+    red: {
+      light: "rgba(239,68,68,0.12)",
+      medium: "rgba(239,68,68,0.2)",
+      strong: "rgba(239,68,68,0.28)"
+    }
+  };
+  return isBlue ? backgroundColorMap.blue[tier] : backgroundColorMap.red[tier];
+}
+function renderChart(canvas, { redLineUSD, priceUSD } = {}) {
   const labels = Array.from({ length: 180 }, (_, i) => `${180 - i}日`);
 
   const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
@@ -807,10 +844,10 @@ function renderChart(canvas) {
 
   let r = 58000 + (Math.random() - 0.5) * 12000;
   let s = Math.max(1, Math.round(3 + Math.random() * 4));
-  const basePrice = 30 + (Math.random() - 0.5) * 6;
+  const basePrice = Number.isFinite(priceUSD) && priceUSD > 0 ? priceUSD : 30 + (Math.random() - 0.5) * 6;
   let p = basePrice;
-  const redLine = Number((basePrice * 0.95).toFixed(2));
-
+  const defaultRedLine = Number((basePrice * 0.95).toFixed(2));
+  const resolvedRedLine = Number.isFinite(redLineUSD) && redLineUSD > 0 ? redLineUSD : defaultRedLine;
   let nextPriceChangeIn = 1 + Math.floor(Math.random() * 4);
 
   for (let i = 0; i < labels.length; i++) {
@@ -863,37 +900,28 @@ function renderChart(canvas) {
   }
 
   const minPrice = Math.min(...price);
-  const diffPct = redLine > 0 ? Math.abs(redLine - minPrice) / redLine * 100 : 0;
-  const tier = diffPct < 5 ? "light" : diffPct < 10 ? "medium" : "strong";
-  const isBlue = minPrice >= redLine;
-  const backgroundColorMap = {
-    blue: {
-      light: "rgba(59,130,246,0.08)",
-      medium: "rgba(59,130,246,0.16)",
-      strong: "rgba(59,130,246,0.24)"
-    },
-    red: {
-      light: "rgba(239,68,68,0.08)",
-      medium: "rgba(239,68,68,0.16)",
-      strong: "rgba(239,68,68,0.24)"
-    }
-  };
-  const backgroundColor = isBlue
-    ? backgroundColorMap.blue[tier]
-    : backgroundColorMap.red[tier];
+  const backgroundColor = resolveBackgroundColor(minPrice, resolvedRedLine);
 
   const backgroundFillPlugin = {
     id: "backgroundFill",
     beforeDraw(chartInstance, args, options) {
-      const { ctx, chartArea } = chartInstance;
+      const { ctx, chartArea, scales } = chartInstance;
       if (!chartArea) return;
+      if (!chartInstance.__redLineActive || !chartInstance.__showPrice) return;
+      const yScale = scales?.y2;
+      if (!yScale) return;
+      const lineValue = chartInstance.__redLineValue ?? resolvedRedLine;
+      const lineY = yScale.getPixelForValue(lineValue);
+      if (!Number.isFinite(lineY)) return;
+      if (lineY >= chartArea.bottom) return;
+      const clampedY = Math.min(chartArea.bottom, Math.max(lineY, chartArea.top));
       ctx.save();
       ctx.fillStyle = options.color;
       ctx.fillRect(
         chartArea.left,
-        chartArea.top,
+        clampedY,
         chartArea.right - chartArea.left,
-        chartArea.bottom - chartArea.top
+        chartArea.bottom - clampedY
       );
       ctx.restore();
     }
@@ -909,7 +937,7 @@ function renderChart(canvas) {
         { label: "価格(USD)", data: price, yAxisID: "y2", borderColor: "#22c55e", backgroundColor: "rgba(34,197,94,0.24)", tension: 0.25 },
         {
           label: "赤字ライン",
-          data: Array.from({ length: labels.length }, () => redLine),
+          data: Array.from({ length: labels.length }, () => resolvedRedLine),
           yAxisID: "y2",
           borderColor: "#ef4444",
           borderDash: [6, 4],
@@ -936,6 +964,10 @@ function renderChart(canvas) {
     plugins: [backgroundFillPlugin]
   });
 
+  chart.__redLineActive = Number.isFinite(resolvedRedLine) && resolvedRedLine > 0;
+  chart.__redLineValue = resolvedRedLine;
+  chart.__priceMin = minPrice;
+  chart.__showPrice = false;
   return chart;
 }
 
@@ -944,8 +976,34 @@ function updateChartVisibility(chart, showDS, showSP) {
     if (ds.label === "ランキング") ds.hidden = !showDS;
     if (ds.label === "セラー数") ds.hidden = !(showDS || showSP);
     if (ds.label === "価格(USD)") ds.hidden = !showSP;
-    if (ds.label === "赤字ライン") ds.hidden = false;
+    if (ds.label === "赤字ライン") ds.hidden = !(showSP && chart.__redLineActive);
   });
+  chart.__showPrice = showSP;
+  chart.update();
+}
+
+function calcBreakEvenUSD(costJPY) {
+  if (!Number.isFinite(costJPY) || costJPY <= 0) return null;
+  return Number((costJPY / FX_RATE).toFixed(2));
+}
+
+function updateRedLine(chart, costJPY) {
+  if (!chart) return;
+  const redLineUSD = calcBreakEvenUSD(costJPY);
+  const ds = chart.data.datasets.find((dataset) => dataset.label === "赤字ライン");
+  if (!ds) return;
+  const hasLine = Number.isFinite(redLineUSD) && redLineUSD > 0;
+  chart.__redLineActive = hasLine;
+  chart.__redLineValue = hasLine ? redLineUSD : null;
+  ds.data = Array.from({ length: chart.data.labels.length }, () => (hasLine ? redLineUSD : null));
+  const priceDataset = chart.data.datasets.find((d) => d.label === "価格(USD)");
+  const priceMin = Number.isFinite(chart.__priceMin)
+    ? chart.__priceMin
+    : Math.min(...(priceDataset?.data ?? []));
+  chart.__priceMin = priceMin;
+  if (chart.options?.plugins?.backgroundFill) {
+    chart.options.plugins.backgroundFill.color = resolveBackgroundColor(priceMin, hasLine ? redLineUSD : null);
+  }
   chart.update();
 }
 
@@ -955,7 +1013,7 @@ function updateChartVisibility(chart, showDS, showSP) {
 function updateCartSummary() {
   let totalCost = 0;
   let totalRevenueJPY = 0;
-  let asinCount = cart.size;
+  let totalSalesUSD = 0;
   let itemCount = 0;
 
   cart.forEach((v) => {
@@ -966,15 +1024,34 @@ function updateCartSummary() {
     itemCount += qty;
     totalCost += costJPY * qty;
     totalRevenueJPY += sellUSD * FX_RATE * qty;
+    totalSalesUSD += sellUSD * qty;
   });
 
   const profit = totalRevenueJPY - totalCost;
-
-  cartTotalCost.textContent = fmtJPY(totalCost);
-  cartTotalRevenue.textContent = fmtJPY(totalRevenueJPY);
-  cartTotalProfit.textContent = fmtJPY(profit);
-  cartAsinCount.textContent = String(asinCount);
-  cartItemCount.textContent = String(itemCount);
+  const avgDenom = itemCount > 0 ? itemCount : 1;
+  const avgPayment = totalRevenueJPY / avgDenom;
+  const avgSalesUSD = totalSalesUSD / avgDenom;
+  const avgCost = totalCost / avgDenom;
+  const avgProfit = profit / avgDenom;
+  const profitRate = totalRevenueJPY > 0 ? (profit / totalRevenueJPY) * 100 : 0;
+  if (cartTotalPayment) {
+    cartTotalPayment.textContent = `${fmtJPY(totalRevenueJPY)}(${fmtJPY(avgPayment)})`;
+  }
+  if (cartTotalSales) {
+    cartTotalSales.textContent = `${fmtUSD(totalSalesUSD)}(${fmtUSD(avgSalesUSD)})`;
+  }
+  if (cartTotalCost) {
+    cartTotalCost.textContent = `${fmtJPY(totalCost)}(${fmtJPY(avgCost)})`;
+  }
+  if (cartTotalProfit) {
+    cartTotalProfit.textContent = `${fmtJPY(profit)}(${fmtJPY(avgProfit)})`;
+  }
+  if (cartProfitRate) {
+    cartProfitRate.textContent = `${profitRate.toFixed(1)}%`;
+  }
+  if (cartItemCount) {
+    cartItemCount.textContent = `${itemCount}個`;
+  }
 }
 
 /* =========================
@@ -1370,6 +1447,8 @@ function createProductCard(asin, data) {
       const profitCard = varProfitCombinedEl ? varProfitCombinedEl.closest('.center-card') : null;
       if (profitCard) profitCard.classList.remove('is-negative');
     }
+
+    updateRedLine(card.__chart, costJPY);
   };
 
   sellInput.addEventListener("input", updateVariableMetrics);
@@ -1414,7 +1493,12 @@ card.querySelector(".js-addCart").addEventListener("click", () => {
 
   // chart
   const canvas = card.querySelector(".js-chart");
-  const chart = renderChart(canvas);
+  const initialCostJPY = num(costInput.value);
+  const priceUSD = num(data["販売額（ドル）"]);
+  const chart = renderChart(canvas, {
+    redLineUSD: calcBreakEvenUSD(initialCostJPY),
+    priceUSD
+  });
   card.__chart = chart;
 
   const chkDS = card.querySelector(".js-chkDS");
@@ -1423,6 +1507,7 @@ card.querySelector(".js-addCart").addEventListener("click", () => {
   chkDS?.addEventListener("change", refreshVis);
   chkSP?.addEventListener("change", refreshVis);
   updateChartVisibility(chart, true, false);
+  updateRedLine(chart, initialCostJPY);
 
   // keepa
   const keepaFrame = card.querySelector(".js-keepaFrame");
