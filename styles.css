@@ -1155,9 +1155,6 @@ body:is(.fourth-layout, .fifth-layout) .l4-buy .shop-qty{
   display:flex;
   align-items:center;
   gap:6px;
-  background:rgba(255,255,255,0.4);
-  border-radius:999px;
-  padding:4px 8px;
   font-weight:800;
   font-size:12px;
 }
@@ -1166,20 +1163,12 @@ body:is(.fourth-layout, .fifth-layout) .l4-buy .shop-qty span{
   color:#1f2937;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-buy .shop-qty-input{
-  width:36px;
+  width:48px;
   text-align:center;
-  border:0;
-  background:transparent;
+  border:1px solid var(--line);
+  background:#fff;
+  border-radius:10px;
   font-weight:900;
-}
-body:is(.fourth-layout, .fifth-layout) .l4-buy .qty-btn{
-  width:26px;
-  height:26px;
-  border-radius:50%;
-  border:0;
-  background:#f1d5a1;
-  font-weight:900;
-  cursor:pointer;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-buy .shop-name-input{
   border:1px solid var(--line);
@@ -1196,11 +1185,6 @@ body:is(.fourth-layout, .fifth-layout) .l4-buy .shop-remove{
   background:#fff;
   font-weight:900;
   cursor:pointer;
-}
-body:is(.fourth-layout, .fifth-layout) .l4-buy .shop-note{
-  font-size:11px;
-  color:#4b5563;
-  margin-top:6px;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-buy .shop-actions{
   display:grid;
@@ -1222,18 +1206,6 @@ body:is(.fourth-layout, .fifth-layout) .l4-buy .shop-actions .cart-btn{
   background:#111827;
   color:#fff;
   border-color:#111827;
-}
-body:is(.fourth-layout, .fifth-layout) .l4-buy .shop-sale{
-  margin-top:12px;
-  display:flex;
-  align-items:center;
-  gap:8px;
-}
-body:is(.fourth-layout, .fifth-layout) .l4-buy .shop-sale-label{
-  font-weight:900;
-  font-size:12px;
-  color:#111827;
-  white-space:nowrap;
 }
 
 /* 端末幅が狭い時は縦積み */

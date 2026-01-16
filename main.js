@@ -5,7 +5,7 @@
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const FX_RATE = 155;
-const APP_VERSION = "v2025.02.20";
+const APP_VERSION = "v2025.02.21";
 
 const fmtJPY = (n) => "￥" + Number(n || 0).toLocaleString("ja-JP");
 const fmtUSD = (n) => "＄" + Number(n || 0).toFixed(2);
@@ -1181,14 +1181,12 @@ function createProductCard(asin, data) {
                     <div class="shop-name">Amazon</div>
                     <div class="shop-meta">
                       <input class="shop-input js-cost" type="number" step="1" placeholder="金額" />
-                      <span class="shop-margin js-shopMargin">粗利率 0%</span>
+                      <span class="shop-margin js-shopMargin">0%</span>
                     </div>
                   </div>
                   <div class="shop-qty">
                     <span>数量</span>
-                    <button class="qty-btn js-qtyMinus" type="button">－</button>
                     <input class="shop-qty-input js-qty" type="number" min="0" step="1" value="0" />
-                    <button class="qty-btn js-qtyPlus" type="button">＋</button>
                   </div>
                 </div>
 
@@ -1198,14 +1196,12 @@ function createProductCard(asin, data) {
                     <div class="shop-name">Yahoo</div>
                     <div class="shop-meta">
                       <input class="shop-input js-shopAmount" type="number" step="1" placeholder="金額" />
-                      <span class="shop-margin js-shopMargin">粗利率 0%</span>
+                      <span class="shop-margin js-shopMargin">0%</span>
                     </div>
                   </div>
                   <div class="shop-qty">
                     <span>数量</span>
-                    <button class="qty-btn js-qtyMinus" type="button">－</button>
                     <input class="shop-qty-input js-shopQty" type="number" min="0" step="1" value="0" />
-                    <button class="qty-btn js-qtyPlus" type="button">＋</button>
                   </div>
                 </div>
 
@@ -1215,19 +1211,17 @@ function createProductCard(asin, data) {
                     <div class="shop-name">楽天</div>
                     <div class="shop-meta">
                       <input class="shop-input js-shopAmount" type="number" step="1" placeholder="金額" />
-                      <span class="shop-margin js-shopMargin">粗利率 0%</span>
+                      <span class="shop-margin js-shopMargin">0%</span>
                     </div>
                   </div>
                   <div class="shop-qty">
                     <span>数量</span>
-                    <button class="qty-btn js-qtyMinus" type="button">－</button>
                     <input class="shop-qty-input js-shopQty" type="number" min="0" step="1" value="0" />
-                    <button class="qty-btn js-qtyPlus" type="button">＋</button>
                   </div>
                 </div>
               </div>
 
-              <div class="shop-note">※ここでも数量を＋/－で変更できます</div>
+              
             </div>
 
             <div class="shop-panel">
@@ -1241,14 +1235,12 @@ function createProductCard(asin, data) {
                     <input class="shop-name-input js-shopName" type="text" placeholder="ショップ名" />
                     <div class="shop-meta">
                       <input class="shop-input js-shopAmount" type="number" step="1" placeholder="金額" />
-                      <span class="shop-margin js-shopMargin">粗利率 0%</span>
+                      <span class="shop-margin js-shopMargin">0%</span>
                     </div>
                   </div>
                   <div class="shop-qty">
                     <span>数量</span>
-                    <button class="qty-btn js-qtyMinus" type="button">－</button>
                     <input class="shop-qty-input js-shopQty" type="number" min="0" step="1" value="0" />
-                    <button class="qty-btn js-qtyPlus" type="button">＋</button>
                   </div>
                   <button class="shop-remove" type="button">－</button>
                 </div>
@@ -1586,14 +1578,12 @@ card.querySelector(".js-addCart").addEventListener("click", () => {
           <input class="shop-name-input js-shopName" type="text" placeholder="ショップ名" />
           <div class="shop-meta">
             <input class="shop-input js-shopAmount" type="number" step="1" placeholder="金額" />
-            <span class="shop-margin js-shopMargin">粗利率 0%</span>
+            <span class="shop-margin js-shopMargin">0%</span>
           </div>
         </div>
         <div class="shop-qty">
           <span>数量</span>
-          <button class="qty-btn js-qtyMinus" type="button">－</button>
           <input class="shop-qty-input js-shopQty" type="number" min="0" step="1" value="0" />
-          <button class="qty-btn js-qtyPlus" type="button">＋</button>
         </div>
         <button class="shop-remove" type="button">－</button>
       `;
