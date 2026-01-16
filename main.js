@@ -5,9 +5,10 @@
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const FX_RATE = 155;
-const APP_VERSION = "v2025.02.14";
+const APP_VERSION = "v2025.02.15";
 
 const fmtJPY = (n) => "￥" + Number(n || 0).toLocaleString("ja-JP");
+const fmtUSD = (n) => "＄" + Number(n || 0).toFixed(2);
 const num = (v) => {
   const x = Number(String(v ?? "").replace(/[^\d.\-]/g, ""));
   return Number.isFinite(x) ? x : 0;
@@ -202,10 +203,11 @@ const headerStatus = $("#headerStatus");
 const appVersion = $("#appVersion");
 
 /* cart */
+const cartTotalPayment = $("#cartTotalPayment");
+const cartTotalSales = $("#cartTotalSales");
 const cartTotalCost = $("#cartTotalCost");
-const cartTotalRevenue = $("#cartTotalRevenue");
 const cartTotalProfit = $("#cartTotalProfit");
-const cartAsinCount = $("#cartAsinCount");
+const cartProfitRate = $("#cartProfitRate");
 const cartItemCount = $("#cartItemCount");
 
 /* sort */
@@ -994,7 +996,7 @@ function updateRedLine(chart, costJPY) {
 function updateCartSummary() {
   let totalCost = 0;
   let totalRevenueJPY = 0;
-  let asinCount = cart.size;
+  let totalSalesUSD = 0;
   let itemCount = 0;
 
   cart.forEach((v) => {
@@ -1005,15 +1007,35 @@ function updateCartSummary() {
     itemCount += qty;
     totalCost += costJPY * qty;
     totalRevenueJPY += sellUSD * FX_RATE * qty;
+    totalSalesUSD += sellUSD * qty;
   });
 
   const profit = totalRevenueJPY - totalCost;
+  const avgDenom = itemCount > 0 ? itemCount : 1;
+  const avgPayment = totalRevenueJPY / avgDenom;
+  const avgSalesUSD = totalSalesUSD / avgDenom;
+  const avgCost = totalCost / avgDenom;
+  const avgProfit = profit / avgDenom;
+  const profitRate = totalRevenueJPY > 0 ? (profit / totalRevenueJPY) * 100 : 0;
 
-  cartTotalCost.textContent = fmtJPY(totalCost);
-  cartTotalRevenue.textContent = fmtJPY(totalRevenueJPY);
-  cartTotalProfit.textContent = fmtJPY(profit);
-  cartAsinCount.textContent = String(asinCount);
-  cartItemCount.textContent = String(itemCount);
+  if (cartTotalPayment) {
+    cartTotalPayment.textContent = `${fmtJPY(totalRevenueJPY)}(${fmtJPY(avgPayment)})`;
+  }
+  if (cartTotalSales) {
+    cartTotalSales.textContent = `${fmtUSD(totalSalesUSD)}(${fmtUSD(avgSalesUSD)})`;
+  }
+  if (cartTotalCost) {
+    cartTotalCost.textContent = `${fmtJPY(totalCost)}(${fmtJPY(avgCost)})`;
+  }
+  if (cartTotalProfit) {
+    cartTotalProfit.textContent = `${fmtJPY(profit)}(${fmtJPY(avgProfit)})`;
+  }
+  if (cartProfitRate) {
+    cartProfitRate.textContent = `${profitRate.toFixed(1)}%`;
+  }
+  if (cartItemCount) {
+    cartItemCount.textContent = `${itemCount}個`;
+  }
 }
 
 /* =========================
