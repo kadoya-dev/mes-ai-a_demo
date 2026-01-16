@@ -870,9 +870,7 @@ function renderChart(canvas, { redLineUSD, priceUSD } = {}) {
       strong: "rgba(239,68,68,0.28)"
     }
   };
-  const backgroundColor = isBlue
-    ? backgroundColorMap.blue[tier]
-    : backgroundColorMap.red[tier];
+  const backgroundColor = "#ffffff";
 
   const backgroundFillPlugin = {
     id: "backgroundFill",
@@ -946,6 +944,22 @@ function updateChartVisibility(chart, showDS, showSP) {
     if (ds.label === "赤字ライン") ds.hidden = !(showSP && chart.__redLineActive);
   });
   chart.__showPrice = showSP;
+  chart.update();
+}
+
+function calcBreakEvenUSD(costJPY) {
+  if (!Number.isFinite(costJPY) || costJPY <= 0) return null;
+  return Number((costJPY / FX_RATE).toFixed(2));
+}
+
+function updateRedLine(chart, costJPY) {
+  if (!chart) return;
+  const redLineUSD = calcBreakEvenUSD(costJPY);
+  const ds = chart.data.datasets.find((dataset) => dataset.label === "赤字ライン");
+  if (!ds) return;
+  const hasLine = Number.isFinite(redLineUSD) && redLineUSD > 0;
+  chart.__redLineActive = hasLine;
+  ds.data = Array.from({ length: chart.data.labels.length }, () => (hasLine ? redLineUSD : null));
   chart.update();
 }
 
