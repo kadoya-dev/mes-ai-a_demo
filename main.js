@@ -5,7 +5,7 @@
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const FX_RATE = 155;
-const APP_VERSION = "v2025.02.17";
+const APP_VERSION = "v2025.02.18";
 
 const fmtJPY = (n) => "￥" + Number(n || 0).toLocaleString("ja-JP");
 const fmtUSD = (n) => "＄" + Number(n || 0).toFixed(2);
@@ -1168,22 +1168,41 @@ function createProductCard(asin, data) {
         <div class="l4-buy l4-block">
           <div class="head">カート</div>
           <div class="buy-inner">
-            <div class="buy-title">数量</div>
-            <select class="js-qty">
-              <option value="1" selected>1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5">5</option>
-            </select>
+            <div class="shop-list js-shopList">
+              <div class="shop-row">
+                <div class="shop-name">Amazon</div>
+                <input class="shop-input js-cost" type="number" step="1" placeholder="金額" />
+                <input class="shop-input js-qty" type="number" min="0" step="1" placeholder="個数" />
+                <button class="shop-remove" type="button" disabled>－</button>
+              </div>
+              <div class="shop-row">
+                <div class="shop-name">楽天</div>
+                <input class="shop-input js-shopAmount" type="number" step="1" placeholder="金額" />
+                <input class="shop-input js-shopQty" type="number" min="0" step="1" placeholder="個数" />
+                <button class="shop-remove" type="button" disabled>－</button>
+              </div>
+              <div class="shop-row">
+                <div class="shop-name">ヤフー</div>
+                <input class="shop-input js-shopAmount" type="number" step="1" placeholder="金額" />
+                <input class="shop-input js-shopQty" type="number" min="0" step="1" placeholder="個数" />
+                <button class="shop-remove" type="button" disabled>－</button>
+              </div>
+              <div class="shop-row js-customShop">
+                <input class="shop-name-input js-shopName" type="text" placeholder="ショップ名" />
+                <input class="shop-input js-shopAmount" type="number" step="1" placeholder="金額" />
+                <input class="shop-input js-shopQty" type="number" min="0" step="1" placeholder="個数" />
+                <button class="shop-remove" type="button">－</button>
+              </div>
+            </div>
 
-            <div class="buy-title">販売価格（$）</div>
-            <input class="js-sell" type="number" step="0.01" placeholder="例: 39.99" />
+            <div class="shop-actions">
+              <button class="shop-add js-addShop" type="button">＋</button>
+              <button class="ghost-btn js-more" type="button">もっと見る</button>
+              <button class="cart-btn js-addCart" type="button">仕入れリスト</button>
+              <button class="ghost-btn js-later" type="button">後で仕入れる</button>
+            </div>
 
-            <div class="buy-title">仕入れ額（￥）</div>
-            <input class="js-cost" type="number" step="1" placeholder="例: 3700" />
-
-            <button class="cart-btn js-addCart" type="button">カートに入れる</button>
+            <input class="js-sell" type="hidden" />
           </div>
         </div>
 
@@ -1388,14 +1407,33 @@ function createProductCard(asin, data) {
   // inputs
   const sellInput = card.querySelector(".js-sell");
   const costInput = card.querySelector(".js-cost");
+  const qtyInput = card.querySelector(".js-qty");
+  const shopList = card.querySelector(".js-shopList");
+  const addShopBtn = card.querySelector(".js-addShop");
 
   if (data["販売額（ドル）"]) {
     const s = String(data["販売額（ドル）"]).replace(/[^\d.]/g, "");
     if (s) sellInput.value = s;
   }
-  if (data["仕入れ目安単価"]) {
+  if (data["FBA最安値"]) {
+    const c = String(data["FBA最安値"]).replace(/[^\d]/g, "");
+    if (c) costInput.value = c;
+  } else if (data["仕入れ目安単価"]) {
     const c = String(data["仕入れ目安単価"]).replace(/[^\d]/g, "");
     if (c) costInput.value = c;
+  }
+  if (qtyInput && !qtyInput.value) qtyInput.value = "1";
+
+  if (shopList) {
+    const shopRows = shopList.querySelectorAll(".shop-row");
+    const rakutenAmount = shopRows[1]?.querySelector(".js-shopAmount");
+    const yahooAmount = shopRows[2]?.querySelector(".js-shopAmount");
+    if (rakutenAmount && data["日本最安値"]) {
+      rakutenAmount.value = String(data["日本最安値"]).replace(/[^\d]/g, "");
+    }
+    if (yahooAmount && data["日本自己発送最安値"]) {
+      yahooAmount.value = String(data["日本自己発送最安値"]).replace(/[^\d]/g, "");
+    }
   }
 
   
@@ -1440,7 +1478,7 @@ function createProductCard(asin, data) {
   updateVariableMetrics();
 
 card.querySelector(".js-addCart").addEventListener("click", () => {
-    const qty = Math.max(1, Number(card.querySelector(".js-qty").value || 1));
+    const qty = Math.max(1, Number(qtyInput?.value || 1));
     const sellUSD = num(sellInput.value);
     const costJPY = num(costInput.value);
 
@@ -1450,6 +1488,27 @@ card.querySelector(".js-addCart").addEventListener("click", () => {
     cart.set(asin, { qty, sellUSD, costJPY });
     updateCartSummary();
   });
+
+  if (addShopBtn && shopList) {
+    addShopBtn.addEventListener("click", () => {
+      const row = document.createElement("div");
+      row.className = "shop-row js-customShop";
+      row.innerHTML = `
+        <input class="shop-name-input js-shopName" type="text" placeholder="ショップ名" />
+        <input class="shop-input js-shopAmount" type="number" step="1" placeholder="金額" />
+        <input class="shop-input js-shopQty" type="number" min="0" step="1" placeholder="個数" />
+        <button class="shop-remove" type="button">－</button>
+      `;
+      row.querySelector(".shop-remove")?.addEventListener("click", () => row.remove());
+      shopList.appendChild(row);
+    });
+    shopList.querySelectorAll(".shop-remove").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        const row = e.currentTarget.closest(".shop-row");
+        if (row?.classList.contains("js-customShop")) row.remove();
+      });
+    });
+  }
 
   // ctx
   const jpAsin = data["日本ASIN"] || "－";
