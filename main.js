@@ -882,9 +882,7 @@ function renderChart(canvas, { redLineUSD } = {}) {
       strong: "rgba(239,68,68,0.24)"
     }
   };
-  const backgroundColor = isBlue
-    ? backgroundColorMap.blue[tier]
-    : backgroundColorMap.red[tier];
+  const backgroundColor = "#ffffff";
 
   const backgroundFillPlugin = {
     id: "backgroundFill",
@@ -949,7 +947,7 @@ function updateChartVisibility(chart, showDS, showSP) {
     if (ds.label === "ランキング") ds.hidden = !showDS;
     if (ds.label === "セラー数") ds.hidden = !(showDS || showSP);
     if (ds.label === "価格(USD)") ds.hidden = !showSP;
-    if (ds.label === "赤字ライン") ds.hidden = !chart.__redLineActive;
+    if (ds.label === "赤字ライン") ds.hidden = !(showSP && chart.__redLineActive);
   });
   chart.update();
 }
