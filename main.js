@@ -5,7 +5,7 @@
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const FX_RATE = 155;
-const APP_VERSION = "v2025.02.13";
+const APP_VERSION = "v2025.02.14";
 
 const fmtJPY = (n) => "￥" + Number(n || 0).toLocaleString("ja-JP");
 const num = (v) => {
@@ -805,6 +805,31 @@ function rerenderAllCards() {
 /* =========================
    チャート（既存）
 ========================= */
+function getDeviationTier(pct) {
+  if (pct < 5) return "light";
+  if (pct < 10) return "medium";
+  return "strong";
+}
+
+function resolveBackgroundColor(minValue, lineValue) {
+  if (!Number.isFinite(lineValue) || lineValue <= 0 || !Number.isFinite(minValue)) return "rgba(0,0,0,0)";
+  const diffPct = Math.abs(lineValue - minValue) / lineValue * 100;
+  const tier = getDeviationTier(diffPct);
+  const isBlue = minValue >= lineValue;
+  const backgroundColorMap = {
+    blue: {
+      light: "rgba(59,130,246,0.12)",
+      medium: "rgba(59,130,246,0.2)",
+      strong: "rgba(59,130,246,0.28)"
+    },
+    red: {
+      light: "rgba(239,68,68,0.12)",
+      medium: "rgba(239,68,68,0.2)",
+      strong: "rgba(239,68,68,0.28)"
+    }
+  };
+  return isBlue ? backgroundColorMap.blue[tier] : backgroundColorMap.red[tier];
+}
 function renderChart(canvas, { redLineUSD, priceUSD } = {}) {
   const labels = Array.from({ length: 180 }, (_, i) => `${180 - i}日`);
 
@@ -817,9 +842,10 @@ function renderChart(canvas, { redLineUSD, priceUSD } = {}) {
   let r = 58000 + (Math.random() - 0.5) * 12000;
   let s = Math.max(1, Math.round(3 + Math.random() * 4));
   const basePrice = Number.isFinite(priceUSD) && priceUSD > 0 ? priceUSD : 30 + (Math.random() - 0.5) * 6;
-  const p = basePrice;
+  let p = basePrice;
   const defaultRedLine = Number((basePrice * 0.95).toFixed(2));
   const resolvedRedLine = Number.isFinite(redLineUSD) && redLineUSD > 0 ? redLineUSD : defaultRedLine;
+  let nextPriceChangeIn = 1 + Math.floor(Math.random() * 4);
 
   for (let i = 0; i < labels.length; i++) {
     const prevR = r;
@@ -855,22 +881,7 @@ function renderChart(canvas, { redLineUSD, priceUSD } = {}) {
   }
 
   const minPrice = Math.min(...price);
-  const diffPct = resolvedRedLine > 0 ? Math.abs(resolvedRedLine - minPrice) / resolvedRedLine * 100 : 0;
-  const tier = diffPct < 5 ? "light" : diffPct < 10 ? "medium" : "strong";
-  const isBlue = minPrice >= resolvedRedLine;
-  const backgroundColorMap = {
-    blue: {
-      light: "rgba(59,130,246,0.12)",
-      medium: "rgba(59,130,246,0.2)",
-      strong: "rgba(59,130,246,0.28)"
-    },
-    red: {
-      light: "rgba(239,68,68,0.12)",
-      medium: "rgba(239,68,68,0.2)",
-      strong: "rgba(239,68,68,0.28)"
-    }
-  };
-  const backgroundColor = "#ffffff";
+  const backgroundColor = resolveBackgroundColor(minPrice, resolvedRedLine);
 
   const backgroundFillPlugin = {
     id: "backgroundFill",
@@ -936,6 +947,7 @@ function renderChart(canvas, { redLineUSD, priceUSD } = {}) {
 
   chart.__redLineActive = Number.isFinite(resolvedRedLine) && resolvedRedLine > 0;
   chart.__redLineValue = resolvedRedLine;
+  chart.__priceMin = minPrice;
   chart.__showPrice = false;
   return chart;
 }
@@ -965,6 +977,14 @@ function updateRedLine(chart, costJPY) {
   chart.__redLineActive = hasLine;
   chart.__redLineValue = hasLine ? redLineUSD : null;
   ds.data = Array.from({ length: chart.data.labels.length }, () => (hasLine ? redLineUSD : null));
+  const priceDataset = chart.data.datasets.find((d) => d.label === "価格(USD)");
+  const priceMin = Number.isFinite(chart.__priceMin)
+    ? chart.__priceMin
+    : Math.min(...(priceDataset?.data ?? []));
+  chart.__priceMin = priceMin;
+  if (chart.options?.plugins?.backgroundFill) {
+    chart.options.plugins.backgroundFill.color = resolveBackgroundColor(priceMin, hasLine ? redLineUSD : null);
+  }
   chart.update();
 }
 
