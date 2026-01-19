@@ -5,7 +5,7 @@
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const FX_RATE = 155;
-const APP_VERSION = "v2025.02.21";
+const APP_VERSION = "v2025.02.22";
 
 const fmtJPY = (n) => "￥" + Number(n || 0).toLocaleString("ja-JP");
 const fmtUSD = (n) => "＄" + Number(n || 0).toFixed(2);
@@ -1185,7 +1185,6 @@ function createProductCard(asin, data) {
                     </div>
                   </div>
                   <div class="shop-qty">
-                    <span>数量</span>
                     <input class="shop-qty-input js-qty" type="number" min="0" step="1" value="0" />
                   </div>
                 </div>
@@ -1200,7 +1199,6 @@ function createProductCard(asin, data) {
                     </div>
                   </div>
                   <div class="shop-qty">
-                    <span>数量</span>
                     <input class="shop-qty-input js-shopQty" type="number" min="0" step="1" value="0" />
                   </div>
                 </div>
@@ -1215,7 +1213,6 @@ function createProductCard(asin, data) {
                     </div>
                   </div>
                   <div class="shop-qty">
-                    <span>数量</span>
                     <input class="shop-qty-input js-shopQty" type="number" min="0" step="1" value="0" />
                   </div>
                 </div>
@@ -1239,7 +1236,6 @@ function createProductCard(asin, data) {
                     </div>
                   </div>
                   <div class="shop-qty">
-                    <span>数量</span>
                     <input class="shop-qty-input js-shopQty" type="number" min="0" step="1" value="0" />
                   </div>
                   <button class="shop-remove" type="button">－</button>
