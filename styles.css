@@ -1339,6 +1339,15 @@ body:is(.fourth-layout, .fifth-layout) .l4-buy .shop-input{
   font-weight:900;
   padding:6px 8px;
 }
+body:is(.fourth-layout, .fifth-layout) .l4-buy .shop-input{
+  width:80px;
+  text-align:right;
+  border:1px solid var(--line);
+  background:#fff;
+  border-radius:10px;
+  font-weight:900;
+  padding:6px 8px;
+}
 body:is(.fourth-layout, .fifth-layout) .l4-buy .shop-margin{
   display:flex;
   align-items:center;

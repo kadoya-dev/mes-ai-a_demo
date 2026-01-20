@@ -1432,6 +1432,18 @@ function createProductCard(asin, data) {
                 </div>
               </div>
               <button class="cart-btn js-addCart" type="button">仕入れリスト</button>
+              <div class="asin-summary js-asinSummary">
+                <div class="asin-summary-title">ASIN集計</div>
+                <div class="asin-summary-note">※販売額/入金/粗利益は仮計算</div>
+                <div class="asin-summary-grid">
+                  <div class="asin-summary-row"><span>合計仕入れ個数</span><b class="js-summaryQty">—</b></div>
+                  <div class="asin-summary-row"><span>仕入れ平均額</span><b class="js-summaryAvg">—</b></div>
+                  <div class="asin-summary-row"><span>仕入れ額合計</span><b class="js-summaryCost">—</b></div>
+                  <div class="asin-summary-row"><span>販売額合計</span><b class="js-summarySales">—</b></div>
+                  <div class="asin-summary-row"><span>入金額合計</span><b class="js-summaryPayment">—</b></div>
+                  <div class="asin-summary-row"><span>粗利益額合計（粗利益率）</span><b class="js-summaryProfit">—</b></div>
+                </div>
+              </div>
               <button class="ghost-btn js-later" type="button">後で仕入れる</button>
             </div>
 
