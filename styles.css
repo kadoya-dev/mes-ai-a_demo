@@ -59,9 +59,10 @@ a{ color:inherit; }
   flex-wrap:wrap;
 }
 .card-top .asin-memo{
-  flex:1 1 100%;
-  min-width:0;
-  max-width:none;
+  flex:0 1 220px;
+  width:220px;
+  min-width:180px;
+  max-width:240px;
   border:1px solid var(--line);
   border-radius:10px;
   padding:6px 10px;
@@ -1056,55 +1057,23 @@ body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-head{
   gap:12px;
   flex-wrap:wrap;
 }
-body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-head-label{
-  font-size:12px;
-  font-weight:800;
-  color:#475569;
-}
-body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-toggle-group{
+body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-action-group{
   display:flex;
   gap:8px;
   flex-wrap:wrap;
 }
-body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-toggle{
+body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-btn{
   display:inline-flex;
   align-items:center;
   gap:6px;
-  padding:4px 10px;
+  padding:6px 14px;
   border-radius:999px;
   border:1px solid #d1d5db;
   background:#fff;
   font-size:12px;
-  font-weight:700;
-  color:#475569;
+  font-weight:900;
+  color:#1f2937;
   cursor:pointer;
-}
-body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-toggle input{
-  appearance:none;
-  width:18px;
-  height:18px;
-  border-radius:6px;
-  border:2px solid #cbd5f5;
-  background:#fff;
-  position:relative;
-  display:inline-block;
-}
-body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-toggle input::after{
-  content:"";
-  position:absolute;
-  inset:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:12px;
-  color:#2563eb;
-}
-body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-toggle input:checked{
-  border-color:#6366f1;
-  background:#eef2ff;
-}
-body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-toggle input:checked::after{
-  content:"✓";
 }
 body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-cards{
   display:grid;
