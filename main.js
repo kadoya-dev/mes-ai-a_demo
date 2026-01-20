@@ -813,22 +813,11 @@ function buildRecommendBlock(data) {
     { id: "推奨仕入数(15日)", label: "15日間" }
   ];
 
-  const headerRow = document.createElement("div");
-  headerRow.className = "recommend-row recommend-row-head";
+  const columnsWrap = document.createElement("div");
+  columnsWrap.className = "recommend-columns";
 
-  const headerLabel = document.createElement("div");
-  headerLabel.className = "recommend-cell recommend-cell-label";
-  headerLabel.textContent = "";
-  headerRow.appendChild(headerLabel);
-
-  recommendDefs.forEach((rec) => {
-    const headerCell = document.createElement("div");
-    headerCell.className = "recommend-cell recommend-cell-head";
-    headerCell.dataset.card = rec.id;
-    headerCell.textContent = rec.label;
-    headerRow.appendChild(headerCell);
-  });
-  table.appendChild(headerRow);
+  const labelsCol = document.createElement("div");
+  labelsCol.className = "recommend-labels";
 
   const rowDefs = [
     { id: "stable", label: "🟢 安定", factor: 0.85 },
@@ -837,16 +826,24 @@ function buildRecommendBlock(data) {
   ];
 
   rowDefs.forEach((rowDef) => {
-    const rowEl = document.createElement("div");
-    rowEl.className = "recommend-row";
-    rowEl.dataset.mode = rowDef.id;
-
     const labelCell = document.createElement("div");
     labelCell.className = "recommend-cell recommend-cell-label";
     labelCell.textContent = rowDef.label;
-    rowEl.appendChild(labelCell);
+    labelsCol.appendChild(labelCell);
+  });
 
-    recommendDefs.forEach((rec) => {
+  recommendDefs.forEach((rec) => {
+    const col = document.createElement("div");
+    col.className = "recommend-col";
+    col.dataset.card = rec.id;
+
+    const headerCell = document.createElement("div");
+    headerCell.className = "recommend-cell recommend-cell-head";
+    headerCell.dataset.card = rec.id;
+    headerCell.textContent = rec.label;
+    col.appendChild(headerCell);
+
+    rowDefs.forEach((rowDef) => {
       const raw = data[rec.id];
       const hasValue = raw != null && raw !== "";
       const base = num(raw);
@@ -859,10 +856,14 @@ function buildRecommendBlock(data) {
       valueCell.dataset.card = rec.id;
       valueCell.dataset.mode = rowDef.id;
       valueCell.textContent = value;
-      rowEl.appendChild(valueCell);
+      col.appendChild(valueCell);
     });
-    table.appendChild(rowEl);
+
+    columnsWrap.appendChild(col);
   });
+
+  table.appendChild(labelsCol);
+  table.appendChild(columnsWrap);
 
   wrap.appendChild(heading);
   wrap.appendChild(head);
@@ -894,11 +895,8 @@ function buildRecommendBlock(data) {
       cardOrder.slice(windowStart, windowStart + windowSize)
     );
     wrap.style.setProperty("--recommend-cols", String(windowSize));
-    wrap.querySelectorAll(".recommend-cell-head").forEach((cell) => {
-      cell.classList.toggle("is-hidden", !visibleCards.has(cell.dataset.card));
-    });
-    wrap.querySelectorAll(".recommend-cell-value").forEach((cell) => {
-      cell.classList.toggle("is-hidden", !visibleCards.has(cell.dataset.card));
+    wrap.querySelectorAll(".recommend-col").forEach((col) => {
+      col.classList.toggle("is-hidden", !visibleCards.has(col.dataset.card));
     });
   };
 
@@ -942,10 +940,9 @@ function buildRecommendBlock(data) {
 
 function updateRecommendSelection(wrap, cardId, mode) {
   wrap.querySelectorAll(".recommend-cell-value").forEach((cell) => {
-    cell.classList.toggle(
-      "is-active",
-      cell.dataset.mode === mode && cell.dataset.card === cardId
-    );
+    const isActive = cell.dataset.mode === mode && cell.dataset.card === cardId;
+    cell.classList.toggle("is-active", isActive);
+    cell.classList.toggle("is-muted", !isActive);
   });
 }
 
