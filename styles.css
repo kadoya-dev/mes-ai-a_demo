@@ -59,9 +59,9 @@ a{ color:inherit; }
   flex-wrap:wrap;
 }
 .card-top .asin-memo{
-  flex:1;
-  min-width:180px;
-  max-width:280px;
+  flex:1 1 100%;
+  min-width:0;
+  max-width:none;
   border:1px solid var(--line);
   border-radius:10px;
   padding:6px 10px;
@@ -1294,7 +1294,7 @@ body:is(.fourth-layout, .fifth-layout) .l4-buy .shop-card.is-primary{
 body:is(.fourth-layout, .fifth-layout) .l4-buy .shop-card.is-secondary{
   background:#f7f3e0;
   border-radius:16px;
-  grid-template-columns: 1fr auto 32px;
+  grid-template-columns: 1fr auto auto;
   padding:10px;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-buy .shop-rank{
@@ -1398,6 +1398,21 @@ body:is(.fourth-layout, .fifth-layout) .l4-buy .shop-remove{
   font-weight:900;
   cursor:pointer;
 }
+body:is(.fourth-layout, .fifth-layout) .l4-buy .shop-row-actions{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+body:is(.fourth-layout, .fifth-layout) .l4-buy .shop-row-actions .shop-add,
+body:is(.fourth-layout, .fifth-layout) .l4-buy .shop-row-actions .shop-remove{
+  width:32px;
+  height:32px;
+  border-radius:999px;
+  border:1px solid var(--line);
+  background:#fff;
+  font-weight:900;
+  cursor:pointer;
+}
 body:is(.fourth-layout, .fifth-layout) .l4-buy .shop-actions{
   display:grid;
   grid-template-columns: 1fr 1fr;
@@ -1405,8 +1420,7 @@ body:is(.fourth-layout, .fifth-layout) .l4-buy .shop-actions{
   margin-top:12px;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-buy .shop-actions .ghost-btn,
-body:is(.fourth-layout, .fifth-layout) .l4-buy .shop-actions .cart-btn,
-body:is(.fourth-layout, .fifth-layout) .l4-buy .shop-actions .shop-add{
+body:is(.fourth-layout, .fifth-layout) .l4-buy .shop-actions .cart-btn{
   height:38px;
   border-radius:12px;
   font-weight:900;

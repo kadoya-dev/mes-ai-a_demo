@@ -1410,7 +1410,6 @@ function createProductCard(asin, data) {
                 <div class="shop-panel-title">その他のショップ</div>
                 <div class="shop-panel-note">※増えたら下だけスクロール</div>
               </div>
-              <button class="shop-add js-addShop" type="button">＋</button>
             </div>
               <div class="shop-list js-extraShopList">
                 <div class="shop-card is-secondary js-customShop">
@@ -1422,40 +1421,35 @@ function createProductCard(asin, data) {
                     </div>
                   </div>
                   <div class="shop-qty">
+                    <span>数量</span>
                     <input class="shop-qty-input js-shopQty" type="number" min="0" step="1" value="0" />
                   </div>
-                  <button class="shop-remove" type="button">－</button>
+                  <div class="shop-row-actions">
+                    <button class="shop-add js-addShop" type="button">＋</button>
+                    <button class="shop-remove" type="button">－</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="shop-panel">
+              <div class="asin-summary js-asinSummary">
+                <div class="asin-summary-title">ASIN集計</div>
+                <div class="asin-summary-note">※販売額/入金/粗利益は仮計算</div>
+                <div class="asin-summary-grid">
+                  <div class="asin-summary-row"><span>合計仕入れ個数</span><b class="js-summaryQty">—</b></div>
+                  <div class="asin-summary-row"><span>仕入れ平均額</span><b class="js-summaryAvg">—</b></div>
+                  <div class="asin-summary-row"><span>仕入れ額合計</span><b class="js-summaryCost">—</b></div>
+                  <div class="asin-summary-row"><span>販売額合計</span><b class="js-summarySales">—</b></div>
+                  <div class="asin-summary-row"><span>入金額合計</span><b class="js-summaryPayment">—</b></div>
+                  <div class="asin-summary-row"><span>粗利益額合計（粗利益率）</span><b class="js-summaryProfit">—</b></div>
                 </div>
               </div>
             </div>
 
             <div class="shop-actions">
-              <div class="asin-summary js-asinSummary">
-                <div class="asin-summary-title">ASIN集計</div>
-                <div class="asin-summary-note">※販売額/入金/粗利益は仮計算</div>
-                <div class="asin-summary-grid">
-                  <div class="asin-summary-row"><span>合計仕入れ個数</span><b class="js-summaryQty">—</b></div>
-                  <div class="asin-summary-row"><span>仕入れ平均額</span><b class="js-summaryAvg">—</b></div>
-                  <div class="asin-summary-row"><span>仕入れ額合計</span><b class="js-summaryCost">—</b></div>
-                  <div class="asin-summary-row"><span>販売額合計</span><b class="js-summarySales">—</b></div>
-                  <div class="asin-summary-row"><span>入金額合計</span><b class="js-summaryPayment">—</b></div>
-                  <div class="asin-summary-row"><span>粗利益額合計（粗利益率）</span><b class="js-summaryProfit">—</b></div>
-                </div>
-              </div>
-              <button class="cart-btn js-addCart" type="button">仕入れリスト</button>
-              <div class="asin-summary js-asinSummary">
-                <div class="asin-summary-title">ASIN集計</div>
-                <div class="asin-summary-note">※販売額/入金/粗利益は仮計算</div>
-                <div class="asin-summary-grid">
-                  <div class="asin-summary-row"><span>合計仕入れ個数</span><b class="js-summaryQty">—</b></div>
-                  <div class="asin-summary-row"><span>仕入れ平均額</span><b class="js-summaryAvg">—</b></div>
-                  <div class="asin-summary-row"><span>仕入れ額合計</span><b class="js-summaryCost">—</b></div>
-                  <div class="asin-summary-row"><span>販売額合計</span><b class="js-summarySales">—</b></div>
-                  <div class="asin-summary-row"><span>入金額合計</span><b class="js-summaryPayment">—</b></div>
-                  <div class="asin-summary-row"><span>粗利益額合計（粗利益率）</span><b class="js-summaryProfit">—</b></div>
-                </div>
-              </div>
               <button class="ghost-btn js-later" type="button">後で仕入れる</button>
+              <button class="cart-btn js-addCart" type="button">仕入れリスト</button>
             </div>
 
             <input class="js-sell" type="hidden" />
@@ -1668,7 +1662,6 @@ function createProductCard(asin, data) {
   const qtyInput = card.querySelector(".js-qty");
   const shopList = card.querySelector(".js-shopList");
   const extraShopList = card.querySelector(".js-extraShopList");
-  const addShopBtn = card.querySelector(".js-addShop");
 
   if (data["販売額（ドル）"]) {
     const s = String(data["販売額（ドル）"]).replace(/[^\d.]/g, "");
@@ -1827,40 +1820,66 @@ card.querySelector(".js-addCart").addEventListener("click", () => {
     updateCartSummary();
   });
 
-  if (addShopBtn && extraShopList) {
-    addShopBtn.addEventListener("click", () => {
-      const row = document.createElement("div");
-      row.className = "shop-card is-secondary js-customShop";
-      row.innerHTML = `
-        <div class="shop-info">
-          <input class="shop-name-input js-shopName" type="text" placeholder="ショップ名" />
-          <div class="shop-meta">
-            <input class="shop-input js-shopAmount" type="number" step="1" placeholder="金額" />
-            <span class="shop-margin js-shopMargin">0%</span>
-          </div>
+  const buildExtraShopRow = () => {
+    const row = document.createElement("div");
+    row.className = "shop-card is-secondary js-customShop";
+    row.innerHTML = `
+      <div class="shop-info">
+        <input class="shop-name-input js-shopName" type="text" placeholder="ショップ名" />
+        <div class="shop-meta">
+          <input class="shop-input js-shopAmount" type="number" step="1" placeholder="金額" />
+          <span class="shop-margin js-shopMargin">0%</span>
         </div>
-        <div class="shop-qty">
-          <span>数量</span>
-          <input class="shop-qty-input js-shopQty" type="number" min="0" step="1" value="0" />
-        </div>
+      </div>
+      <div class="shop-qty">
+        <span>数量</span>
+        <input class="shop-qty-input js-shopQty" type="number" min="0" step="1" value="0" />
+      </div>
+      <div class="shop-row-actions">
+        <button class="shop-add js-addShop" type="button">＋</button>
         <button class="shop-remove" type="button">－</button>
-      `;
-      row.querySelector(".shop-remove")?.addEventListener("click", () => row.remove());
-      row.querySelector(".js-shopAmount")?.addEventListener("input", () => {
+      </div>
+    `;
+
+    const amountInput = row.querySelector(".js-shopAmount");
+    const qtyInputEl = row.querySelector(".js-shopQty");
+    if (amountInput) {
+      amountInput.addEventListener("input", () => {
         updateShopMargins();
         updateAsinSummary();
       });
-      row.querySelector(".js-shopQty")?.addEventListener("input", updateAsinSummary);
-      extraShopList.appendChild(row);
-      updateShopMargins();
-      updateAsinSummary();
-    });
-    extraShopList.querySelectorAll(".shop-remove").forEach((btn) => {
-      btn.addEventListener("click", (e) => {
-        const row = e.currentTarget.closest(".shop-card");
-        if (row?.classList.contains("js-customShop")) row.remove();
+    }
+    if (qtyInputEl) qtyInputEl.addEventListener("input", updateAsinSummary);
+    return row;
+  };
+
+  if (extraShopList) {
+    extraShopList.querySelectorAll(".js-shopAmount").forEach((input) => {
+      input.addEventListener("input", () => {
+        updateShopMargins();
         updateAsinSummary();
       });
+    });
+    extraShopList.querySelectorAll(".js-shopQty").forEach((input) => {
+      input.addEventListener("input", updateAsinSummary);
+    });
+
+    extraShopList.addEventListener("click", (event) => {
+      const addBtn = event.target.closest(".js-addShop");
+      if (addBtn) {
+        const row = buildExtraShopRow();
+        extraShopList.appendChild(row);
+        updateShopMargins();
+        updateAsinSummary();
+        return;
+      }
+
+      const removeBtn = event.target.closest(".shop-remove");
+      if (removeBtn) {
+        const row = removeBtn.closest(".shop-card");
+        if (row?.classList.contains("js-customShop")) row.remove();
+        updateAsinSummary();
+      }
     });
   }
 
