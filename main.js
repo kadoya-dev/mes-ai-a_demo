@@ -79,7 +79,7 @@ const INFO_FIELDS_ALL = [
   { id: "SKU", label: "SKU", kind: "text", sourceKey: "SKU" },
 
   { id: "サイズ", label: "サイズ", kind: "computed" },
-  { id: "重量（容積重量）", label: "重量（容積重量）", kind: "computed" },
+  { id: "重量（容積重量）", label: "重量\n（容積重量）", kind: "computed" },
 
   { id: "カテゴリ", label: "カテゴリ", kind: "computed" },
   { id: "注意事項", label: "注意事項", kind: "computedTags" },
@@ -128,20 +128,20 @@ const DEFAULT_ZONES = {
     tokI("注意事項")
   ],
   center: [
-    tokM("予測30日販売数"),
-    tokM("予測60日販売数"),
-    tokM("予測90日販売数"),
     tokM("推奨仕入数(30日)"),
     tokM("推奨仕入数(60日)"),
     tokM("推奨仕入数(90日)"),
     tokM("在庫数"),
+    tokM("返品率"),
+    tokM("予測30日販売数"),
+    tokM("予測60日販売数"),
+    tokM("予測90日販売数"),
     tokM("30日販売数"),
     tokM("日本最安値"),
     tokM("過去3月FBA最安値"),
     tokM("FBA最安値")
   ],
   table: [
-    tokM("返品率"),
     tokM("想定送料"),
     tokM("送料"),
     tokM("関税"),
@@ -698,11 +698,53 @@ function buildCenterCards(container, ctx, data) {
   if (!container) return;
   container.innerHTML = "";
 
+  const recommendIds = [
+    "推奨仕入数(90日)",
+    "推奨仕入数(60日)",
+    "推奨仕入数(30日)"
+  ];
+  const compactIds = new Set([
+    "予測60日販売数",
+    "予測90日販売数",
+    "30日販売数",
+    "日本最安値",
+    "過去3月FBA最安値",
+    "FBA最安値"
+  ]);
+  let recommendInserted = false;
+
   zoneState.center.forEach((token) => {
     const { type, id } = parseToken(token);
     if (type !== "M") return;
     const m = METRIC_BY_ID[id];
     if (!m) return;
+
+    if (recommendIds.includes(id)) {
+      if (!recommendInserted) {
+        container.appendChild(buildRecommendBlock(data));
+        recommendInserted = true;
+      }
+      return;
+    }
+
+    if (compactIds.has(id)) {
+      const row = document.createElement("div");
+      row.className = "center-inline";
+
+      const k = document.createElement("span");
+      k.className = "k";
+      k.textContent = m.label;
+
+      const v = document.createElement("span");
+      v.className = "v";
+      const raw = data[m.sourceKey];
+      v.textContent = raw == null || raw === "" ? "－" : String(raw);
+
+      row.appendChild(k);
+      row.appendChild(v);
+      container.appendChild(row);
+      return;
+    }
 
     const card = document.createElement("div");
     card.className = "center-card";
@@ -724,6 +766,115 @@ function buildCenterCards(container, ctx, data) {
     card.appendChild(k);
     card.appendChild(v);
     container.appendChild(card);
+  });
+}
+
+function buildRecommendBlock(data) {
+  const wrap = document.createElement("div");
+  wrap.className = "recommend-wrap";
+
+  const head = document.createElement("div");
+  head.className = "recommend-head";
+
+  const toggleGroup = document.createElement("div");
+  toggleGroup.className = "recommend-toggle-group";
+
+  const groupId = `recommend-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+
+  const toggles = [
+    { id: "risk", label: "リスク重視🌿" },
+    { id: "profit", label: "利益ベース✨" },
+    { id: "attack", label: "攻め🔥" }
+  ];
+
+  toggles.forEach((toggle) => {
+    const label = document.createElement("label");
+    label.className = "recommend-toggle";
+
+    const input = document.createElement("input");
+    input.type = "radio";
+    input.name = groupId;
+    input.value = toggle.id;
+    if (toggle.id === "profit") input.checked = true;
+    input.addEventListener("change", () => {
+      if (input.checked) updateRecommendSelection(wrap, toggle.id);
+    });
+
+    const text = document.createElement("span");
+    text.textContent = toggle.label;
+
+    label.appendChild(input);
+    label.appendChild(text);
+    toggleGroup.appendChild(label);
+  });
+
+  head.appendChild(toggleGroup);
+
+  const cards = document.createElement("div");
+  cards.className = "recommend-cards";
+
+  const recommendDefs = [
+    { id: "推奨仕入数(90日)", label: "推奨仕入数（90日）" },
+    { id: "推奨仕入数(60日)", label: "推奨仕入数（60日）" },
+    { id: "推奨仕入数(30日)", label: "推奨仕入数（30日）" }
+  ];
+
+  recommendDefs.forEach((rec) => {
+    const card = document.createElement("div");
+    card.className = "recommend-card";
+
+    const title = document.createElement("div");
+    title.className = "recommend-card-title";
+    title.textContent = rec.label;
+
+    const list = document.createElement("div");
+    list.className = "recommend-list";
+
+    const raw = data[rec.id];
+    const hasValue = raw != null && raw !== "";
+    const base = num(raw);
+    const format = (value) =>
+      hasValue ? Math.round(value).toLocaleString("ja-JP") : "－";
+
+    const rows = [
+      { id: "risk", label: "リスク重視🌿", value: format(base * 0.85) },
+      { id: "profit", label: "利益ベース✨", value: format(base) },
+      { id: "attack", label: "攻め🔥", value: format(base * 1.2) }
+    ];
+
+    rows.forEach((row) => {
+      const rowEl = document.createElement("div");
+      rowEl.className = "recommend-row";
+      rowEl.dataset.mode = row.id;
+
+      const rowLabel = document.createElement("span");
+      rowLabel.className = "recommend-row-label";
+      rowLabel.textContent = row.label;
+
+      const rowValue = document.createElement("span");
+      rowValue.className = "recommend-row-value";
+      rowValue.textContent = row.value;
+
+      rowEl.appendChild(rowLabel);
+      rowEl.appendChild(rowValue);
+      list.appendChild(rowEl);
+    });
+
+    card.appendChild(title);
+    card.appendChild(list);
+    cards.appendChild(card);
+  });
+
+  wrap.appendChild(head);
+  wrap.appendChild(cards);
+  updateRecommendSelection(wrap, "profit");
+
+  return wrap;
+}
+
+function updateRecommendSelection(wrap, mode) {
+  wrap.querySelectorAll(".recommend-row").forEach((row) => {
+    row.classList.toggle("is-active", row.dataset.mode === mode);
   });
 }
 
@@ -1105,8 +1256,8 @@ function createProductCard(asin, data) {
           <div class="head">グラフ（180日）</div>
 
           <div class="graph-options js-graphOptions">
-            <label><input type="checkbox" class="js-chkDS" checked />《需要＆供給》</label>
-            <label><input type="checkbox" class="js-chkSP" />《供給＆価格》</label>
+            <label><input type="radio" name="graph-${asin}" class="js-chkDS" checked />《需要＆供給》</label>
+            <label><input type="radio" name="graph-${asin}" class="js-chkSP" />《供給＆価格》</label>
           </div>
 
           <div class="graph-body">
@@ -1246,6 +1397,18 @@ function createProductCard(asin, data) {
             <div class="shop-actions">
               <button class="shop-add js-addShop" type="button">＋</button>
               <button class="cart-btn js-addCart" type="button">仕入れリスト</button>
+              <div class="asin-summary js-asinSummary">
+                <div class="asin-summary-title">ASIN集計</div>
+                <div class="asin-summary-note">※販売額/入金/粗利益は仮計算</div>
+                <div class="asin-summary-grid">
+                  <div class="asin-summary-row"><span>合計仕入れ個数</span><b class="js-summaryQty">—</b></div>
+                  <div class="asin-summary-row"><span>仕入れ平均額</span><b class="js-summaryAvg">—</b></div>
+                  <div class="asin-summary-row"><span>仕入れ額合計</span><b class="js-summaryCost">—</b></div>
+                  <div class="asin-summary-row"><span>販売額合計</span><b class="js-summarySales">—</b></div>
+                  <div class="asin-summary-row"><span>入金額合計</span><b class="js-summaryPayment">—</b></div>
+                  <div class="asin-summary-row"><span>粗利益額合計（粗利益率）</span><b class="js-summaryProfit">—</b></div>
+                </div>
+              </div>
               <button class="ghost-btn js-later" type="button">後で仕入れる</button>
             </div>
 
@@ -1264,8 +1427,8 @@ function createProductCard(asin, data) {
           <div class="head">需要供給グラフ（180日）</div>
 
           <div class="graph-options js-graphOptions" style="margin-bottom:10px;">
-            <label><input type="checkbox" class="js-chkDS" checked />《需要＆供給》</label>
-            <label><input type="checkbox" class="js-chkSP" />《供給＆価格》</label>
+            <label><input type="radio" name="graph-${asin}" class="js-chkDS" checked />《需要＆供給》</label>
+            <label><input type="radio" name="graph-${asin}" class="js-chkSP" />《供給＆価格》</label>
           </div>
 
           <div class="mes-big">
@@ -1314,8 +1477,8 @@ function createProductCard(asin, data) {
           </div>
 
           <div class="graph-options js-graphOptions">
-            <label><input type="checkbox" class="js-chkDS" checked />《需要＆供給》</label>
-            <label><input type="checkbox" class="js-chkSP" />《供給＆価格》</label>
+            <label><input type="radio" name="graph-${asin}" class="js-chkDS" checked />《需要＆供給》</label>
+            <label><input type="radio" name="graph-${asin}" class="js-chkSP" />《供給＆価格》</label>
           </div>
 
           <div class="graph-body">
@@ -1410,8 +1573,8 @@ function createProductCard(asin, data) {
           </div>
 
           <div class="graph-options js-graphOptions">
-            <label><input type="checkbox" class="js-chkDS" checked />《需要＆供給》</label>
-            <label><input type="checkbox" class="js-chkSP" />《供給＆価格》</label>
+            <label><input type="radio" name="graph-${asin}" class="js-chkDS" checked />《需要＆供給》</label>
+            <label><input type="radio" name="graph-${asin}" class="js-chkSP" />《供給＆価格》</label>
           </div>
 
           <div class="graph-body">
@@ -1538,19 +1701,70 @@ function createProductCard(asin, data) {
     });
   };
 
+  const summaryEl = card.querySelector(".js-asinSummary");
+  const summaryQtyEl = summaryEl?.querySelector(".js-summaryQty");
+  const summaryAvgEl = summaryEl?.querySelector(".js-summaryAvg");
+  const summaryCostEl = summaryEl?.querySelector(".js-summaryCost");
+  const summarySalesEl = summaryEl?.querySelector(".js-summarySales");
+  const summaryPaymentEl = summaryEl?.querySelector(".js-summaryPayment");
+  const summaryProfitEl = summaryEl?.querySelector(".js-summaryProfit");
+
+  const updateAsinSummary = () => {
+    if (!summaryEl) return;
+    let totalQty = 0;
+    let totalCost = 0;
+    const shopCards = card.querySelectorAll(".l4-buy .shop-card");
+
+    shopCards.forEach((shopCard) => {
+      const amountInput = shopCard.querySelector(".js-cost, .js-shopAmount");
+      const qtyInputEl = shopCard.querySelector(".js-qty, .js-shopQty");
+      const amount = num(amountInput?.value);
+      const qty = num(qtyInputEl?.value);
+      if (qty > 0) {
+        totalQty += qty;
+        totalCost += amount * qty;
+      }
+    });
+
+    const sellUSD = num(sellInput.value);
+    const totalSalesUSD = sellUSD * totalQty;
+    const totalPaymentJPY = totalSalesUSD * FX_RATE;
+    const totalProfitJPY = totalPaymentJPY - totalCost;
+    const profitRate = totalPaymentJPY > 0 ? (totalProfitJPY / totalPaymentJPY) * 100 : 0;
+
+    summaryQtyEl.textContent = totalQty > 0 ? `${totalQty}` : "—";
+    summaryAvgEl.textContent = totalQty > 0 ? fmtJPY(Math.round(totalCost / totalQty)) : "—";
+    summaryCostEl.textContent = totalQty > 0 ? fmtJPY(Math.round(totalCost)) : "—";
+    summarySalesEl.textContent = totalQty > 0 && sellUSD > 0 ? fmtUSD(totalSalesUSD) : "—";
+    summaryPaymentEl.textContent = totalQty > 0 && sellUSD > 0 ? fmtJPY(Math.round(totalPaymentJPY)) : "—";
+    summaryProfitEl.textContent =
+      totalQty > 0 && sellUSD > 0
+        ? `${fmtJPY(Math.round(totalProfitJPY))}（${profitRate.toFixed(1)}%）`
+        : "—";
+  };
+
   sellInput.addEventListener("input", () => {
     updateVariableMetrics();
     updateShopMargins();
+    updateAsinSummary();
   });
   costInput.addEventListener("input", () => {
     updateVariableMetrics();
     updateShopMargins();
+    updateAsinSummary();
   });
   card.querySelectorAll(".js-shopAmount").forEach((input) => {
-    input.addEventListener("input", updateShopMargins);
+    input.addEventListener("input", () => {
+      updateShopMargins();
+      updateAsinSummary();
+    });
+  });
+  card.querySelectorAll(".shop-qty-input, .js-qty").forEach((input) => {
+    input.addEventListener("input", updateAsinSummary);
   });
   updateVariableMetrics();
   updateShopMargins();
+  updateAsinSummary();
 
 card.querySelector(".js-addCart").addEventListener("click", () => {
     const qty = Math.max(1, Number(qtyInput?.value || 0));
@@ -1584,14 +1798,20 @@ card.querySelector(".js-addCart").addEventListener("click", () => {
         <button class="shop-remove" type="button">－</button>
       `;
       row.querySelector(".shop-remove")?.addEventListener("click", () => row.remove());
-      row.querySelector(".js-shopAmount")?.addEventListener("input", updateShopMargins);
+      row.querySelector(".js-shopAmount")?.addEventListener("input", () => {
+        updateShopMargins();
+        updateAsinSummary();
+      });
+      row.querySelector(".js-shopQty")?.addEventListener("input", updateAsinSummary);
       extraShopList.appendChild(row);
       updateShopMargins();
+      updateAsinSummary();
     });
     extraShopList.querySelectorAll(".shop-remove").forEach((btn) => {
       btn.addEventListener("click", (e) => {
         const row = e.currentTarget.closest(".shop-card");
         if (row?.classList.contains("js-customShop")) row.remove();
+        updateAsinSummary();
       });
     });
   }
