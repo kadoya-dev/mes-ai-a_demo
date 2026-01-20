@@ -896,7 +896,7 @@ body:is(.fourth-layout, .fifth-layout) .layout4-grid{
   display:grid;
 
   /* 画像(細) / 商品情報 / 主要項目(広) / 主要項目(広) / カート */
-  grid-template-columns: 300px 260px 1.35fr 1.35fr 340px;
+  grid-template-columns: 250px 250px 1.35fr 1.35fr 410px;
 
   /* 1段目の行高さを固定＝主要項目の高さ基準 */
   grid-template-rows: var(--l4-top-h) auto;
@@ -977,13 +977,13 @@ body:is(.fourth-layout, .fifth-layout) .l4-center .center-cards{
   overflow:auto;
   display:grid;
   grid-template-columns: 1fr 1fr;
-  gap:10px;
+  gap:6px;
   padding-right: 4px;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-center .center-card{
   border:1px solid var(--line);
   border-radius:14px;
-  padding:12px;
+  padding:8px 10px;
   background:#fff;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-center .center-card .label{

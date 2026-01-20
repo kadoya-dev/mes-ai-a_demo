@@ -128,20 +128,20 @@ const DEFAULT_ZONES = {
     tokI("注意事項")
   ],
   center: [
-    tokM("予測30日販売数"),
-    tokM("予測60日販売数"),
-    tokM("予測90日販売数"),
     tokM("推奨仕入数(30日)"),
     tokM("推奨仕入数(60日)"),
     tokM("推奨仕入数(90日)"),
     tokM("在庫数"),
+    tokM("返品率"),
+    tokM("予測30日販売数"),
+    tokM("予測60日販売数"),
+    tokM("予測90日販売数"),
     tokM("30日販売数"),
     tokM("日本最安値"),
     tokM("過去3月FBA最安値"),
     tokM("FBA最安値")
   ],
   table: [
-    tokM("返品率"),
     tokM("想定送料"),
     tokM("送料"),
     tokM("関税"),
