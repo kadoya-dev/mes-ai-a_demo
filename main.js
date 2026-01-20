@@ -787,6 +787,11 @@ function buildRecommendBlock(data) {
   const actionGroup = document.createElement("div");
   actionGroup.className = "recommend-action-group";
 
+  const prevBtn = document.createElement("button");
+  prevBtn.type = "button";
+  prevBtn.className = "recommend-btn";
+  prevBtn.textContent = "＜";
+
   const attackBtn = document.createElement("button");
   attackBtn.type = "button";
   attackBtn.className = "recommend-btn";
@@ -797,8 +802,15 @@ function buildRecommendBlock(data) {
   guardBtn.className = "recommend-btn";
   guardBtn.textContent = "🟢 安定≫";
 
+  const nextBtn = document.createElement("button");
+  nextBtn.type = "button";
+  nextBtn.className = "recommend-btn";
+  nextBtn.textContent = "＞";
+
+  actionGroup.appendChild(prevBtn);
   actionGroup.appendChild(attackBtn);
   actionGroup.appendChild(guardBtn);
+  actionGroup.appendChild(nextBtn);
   head.appendChild(actionGroup);
 
   const table = document.createElement("div");
@@ -902,6 +914,8 @@ function buildRecommendBlock(data) {
     clampWindowStart();
     wrap.style.setProperty("--recommend-cols", String(windowSize));
     wrap.style.setProperty("--recommend-offset", String(windowStart));
+    prevBtn.disabled = windowStart <= 0;
+    nextBtn.disabled = windowStart >= cardOrder.length - windowSize;
   };
 
   const applySelection = () => {
@@ -940,6 +954,16 @@ function buildRecommendBlock(data) {
         (currentCardIndex - 1 + cardOrder.length) % cardOrder.length;
     }
     applySelection();
+  });
+
+  prevBtn.addEventListener("click", () => {
+    windowStart -= 1;
+    updateRecommendVisibility();
+  });
+
+  nextBtn.addEventListener("click", () => {
+    windowStart += 1;
+    updateRecommendVisibility();
   });
 
   applySelection();

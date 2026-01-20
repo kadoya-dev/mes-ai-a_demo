@@ -1082,11 +1082,11 @@ body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-btn{
   cursor:pointer;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-table{
-  --recommend-col-width: 110px;
+  --recommend-col-width: 70px;
   --recommend-gap: 8px;
   --recommend-peek: 24px;
   display:grid;
-  grid-template-columns: 120px 1fr;
+  grid-template-columns: 70px 1fr;
   gap:8px;
   align-items:start;
 }
@@ -1144,9 +1144,11 @@ body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-cell-label{
   padding-left:0;
   font-weight:900;
   color:#1f2937;
+  width: 70px;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-cell-head{
   text-align:center;
+  width: 70px;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-cell-value{
   text-align:right;
@@ -1154,6 +1156,7 @@ body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-cell-value{
   font-weight:900;
   color:#111827;
   transition:transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  width: 70px;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-cell-value.is-muted{
   opacity:0.5;
