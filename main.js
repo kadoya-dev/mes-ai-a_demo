@@ -708,7 +708,6 @@ function buildCenterCards(container, ctx, data) {
     "日本最安値",
     "過去3月FBA最安値",
     "FBA最安値",
-    "想定送料",
     "送料",
     "関税",
     "仕入れ目安単価",
@@ -825,10 +824,10 @@ function buildRecommendBlock(data) {
     const format = (value) =>
       hasValue ? Math.round(value).toLocaleString("ja-JP") : "－";
 
-    const rows = [
-      { id: "risk", label: "リスク重視🌿", value: format(base * 0.85) },
-      { id: "profit", label: "利益ベース✨", value: format(base) },
-      { id: "attack", label: "攻め🔥", value: format(base * 1.2) }
+  const rows = [
+      { id: "stable", label: "🟢 安定", value: format(base * 0.85) },
+      { id: "balance", label: "🟡 バランス", value: format(base) },
+      { id: "growth", label: "🔴 成長", value: format(base * 1.2) }
     ];
 
     rows.forEach((row) => {
@@ -859,9 +858,9 @@ function buildRecommendBlock(data) {
   wrap.appendChild(cards);
 
   const sequence = [
-    { card: "推奨仕入数(60日)", mode: "profit" },
-    { card: "推奨仕入数(60日)", mode: "attack" },
-    { card: "推奨仕入数(90日)", mode: "risk" }
+    { card: "推奨仕入数(60日)", mode: "balance" },
+    { card: "推奨仕入数(60日)", mode: "growth" },
+    { card: "推奨仕入数(90日)", mode: "stable" }
   ];
   let currentIndex = 0;
 
