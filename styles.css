@@ -1182,6 +1182,10 @@ body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .center-card.var-
   font-size:14px;
   white-space:nowrap;
 }
+body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .center-card.var-sell .v{
+  width:100%;
+  box-sizing:border-box;
+}
 /* layout4の主要項目カードと同じ見た目（k/vベース） */
 body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .center-card .k{
   font-size:11px;
@@ -1252,6 +1256,15 @@ body:is(.fourth-layout, .fifth-layout) .l4-buy .shop-panel-head{
   justify-content:space-between;
   gap:8px;
   margin-bottom:10px;
+}
+body:is(.fourth-layout, .fifth-layout) .l4-buy .shop-panel-head .shop-add{
+  width:38px;
+  height:38px;
+  border-radius:12px;
+  font-weight:900;
+  border:1px solid var(--line);
+  background:#fff;
+  cursor:pointer;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-buy .shop-panel-title{
   font-weight:900;
@@ -1339,15 +1352,6 @@ body:is(.fourth-layout, .fifth-layout) .l4-buy .shop-input{
   font-weight:900;
   padding:6px 8px;
 }
-body:is(.fourth-layout, .fifth-layout) .l4-buy .shop-input{
-  width:80px;
-  text-align:right;
-  border:1px solid var(--line);
-  background:#fff;
-  border-radius:10px;
-  font-weight:900;
-  padding:6px 8px;
-}
 body:is(.fourth-layout, .fifth-layout) .l4-buy .shop-margin{
   display:flex;
   align-items:center;
@@ -1396,7 +1400,7 @@ body:is(.fourth-layout, .fifth-layout) .l4-buy .shop-remove{
 }
 body:is(.fourth-layout, .fifth-layout) .l4-buy .shop-actions{
   display:grid;
-  grid-template-columns: 36px 1fr 2fr 1fr;
+  grid-template-columns: 1fr 1fr;
   gap:8px;
   margin-top:12px;
 }
@@ -1416,6 +1420,7 @@ body:is(.fourth-layout, .fifth-layout) .l4-buy .shop-actions .cart-btn{
   border-color:#111827;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-buy .asin-summary{
+  grid-column: 1 / -1;
   border:1px solid var(--line);
   border-radius:12px;
   background:#fff;

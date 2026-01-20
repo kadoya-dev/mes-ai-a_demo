@@ -139,9 +139,7 @@ const DEFAULT_ZONES = {
     tokM("30日販売数"),
     tokM("日本最安値"),
     tokM("過去3月FBA最安値"),
-    tokM("FBA最安値")
-  ],
-  table: [
+    tokM("FBA最安値"),
     tokM("想定送料"),
     tokM("送料"),
     tokM("関税"),
@@ -149,6 +147,9 @@ const DEFAULT_ZONES = {
     tokM("入金額予測"),
     tokM("入金額（円）"),
     tokM("入金額計（円）")
+  ],
+  table: [
+    tokM("想定送料")
   ],
   hidden: [
     tokI("SKU"),
@@ -704,12 +705,20 @@ function buildCenterCards(container, ctx, data) {
     "推奨仕入数(30日)"
   ];
   const compactIds = new Set([
+    "予測30日販売数",
     "予測60日販売数",
     "予測90日販売数",
     "30日販売数",
     "日本最安値",
     "過去3月FBA最安値",
-    "FBA最安値"
+    "FBA最安値",
+    "想定送料",
+    "送料",
+    "関税",
+    "仕入れ目安単価",
+    "入金額予測",
+    "入金額（円）",
+    "入金額計（円）"
   ]);
   let recommendInserted = false;
 
@@ -1396,10 +1405,13 @@ function createProductCard(asin, data) {
             </div>
 
             <div class="shop-panel">
-              <div class="shop-panel-head">
+            <div class="shop-panel-head">
+              <div>
                 <div class="shop-panel-title">その他のショップ</div>
                 <div class="shop-panel-note">※増えたら下だけスクロール</div>
               </div>
+              <button class="shop-add js-addShop" type="button">＋</button>
+            </div>
               <div class="shop-list js-extraShopList">
                 <div class="shop-card is-secondary js-customShop">
                   <div class="shop-info">
@@ -1418,7 +1430,6 @@ function createProductCard(asin, data) {
             </div>
 
             <div class="shop-actions">
-              <button class="shop-add js-addShop" type="button">＋</button>
               <div class="asin-summary js-asinSummary">
                 <div class="asin-summary-title">ASIN集計</div>
                 <div class="asin-summary-note">※販売額/入金/粗利益は仮計算</div>
