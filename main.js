@@ -60,7 +60,6 @@ const METRICS_ALL = [
   { id: "日本最安値", label: "日本最安値", sourceKey: "日本最安値" },
 
   { id: "仕入れ目安単価", label: "仕入れ目安単価", sourceKey: "仕入れ目安単価" },
-  { id: "想定送料", label: "想定送料", sourceKey: "想定送料" },
   { id: "送料", label: "送料", sourceKey: "送料" },
   { id: "関税", label: "関税", sourceKey: "関税" }
 ];
@@ -79,7 +78,7 @@ const INFO_FIELDS_ALL = [
   { id: "SKU", label: "SKU", kind: "text", sourceKey: "SKU" },
 
   { id: "サイズ", label: "サイズ", kind: "computed" },
-  { id: "重量（容積重量）", label: "重量（容積重量）", kind: "computed" },
+  { id: "重量（容積重量）", label: "重量\n（容積重量）", kind: "computed" },
 
   { id: "カテゴリ", label: "カテゴリ", kind: "computed" },
   { id: "注意事項", label: "注意事項", kind: "computedTags" },
@@ -128,21 +127,18 @@ const DEFAULT_ZONES = {
     tokI("注意事項")
   ],
   center: [
-    tokM("予測30日販売数"),
-    tokM("予測60日販売数"),
-    tokM("予測90日販売数"),
     tokM("推奨仕入数(30日)"),
     tokM("推奨仕入数(60日)"),
     tokM("推奨仕入数(90日)"),
     tokM("在庫数"),
+    tokM("返品率"),
+    tokM("予測30日販売数"),
+    tokM("予測60日販売数"),
+    tokM("予測90日販売数"),
     tokM("30日販売数"),
     tokM("日本最安値"),
     tokM("過去3月FBA最安値"),
-    tokM("FBA最安値")
-  ],
-  table: [
-    tokM("返品率"),
-    tokM("想定送料"),
+    tokM("FBA最安値"),
     tokM("送料"),
     tokM("関税"),
     tokM("仕入れ目安単価"),
@@ -150,6 +146,7 @@ const DEFAULT_ZONES = {
     tokM("入金額（円）"),
     tokM("入金額計（円）")
   ],
+  table: [],
   hidden: [
     tokI("SKU"),
     tokM("販売額（ドル）"),
@@ -698,11 +695,60 @@ function buildCenterCards(container, ctx, data) {
   if (!container) return;
   container.innerHTML = "";
 
+  const recommendIds = [
+    "推奨仕入数(90日)",
+    "推奨仕入数(60日)",
+    "推奨仕入数(30日)"
+  ];
+  const compactIds = new Set([
+    "予測30日販売数",
+    "予測60日販売数",
+    "予測90日販売数",
+    "30日販売数",
+    "日本最安値",
+    "過去3月FBA最安値",
+    "FBA最安値",
+    "送料",
+    "関税",
+    "仕入れ目安単価",
+    "入金額予測",
+    "入金額（円）",
+    "入金額計（円）"
+  ]);
+  let recommendInserted = false;
+
   zoneState.center.forEach((token) => {
     const { type, id } = parseToken(token);
     if (type !== "M") return;
     const m = METRIC_BY_ID[id];
     if (!m) return;
+
+    if (recommendIds.includes(id)) {
+      if (!recommendInserted) {
+        container.appendChild(buildRecommendBlock(data));
+        recommendInserted = true;
+      }
+      return;
+    }
+
+    if (compactIds.has(id)) {
+      const row = document.createElement("div");
+      row.className = "center-inline";
+
+      const k = document.createElement("span");
+      k.className = "k";
+      k.textContent = m.label;
+
+      const v = document.createElement("span");
+      v.className = "v";
+      const raw = data[m.sourceKey];
+      v.textContent = raw == null || raw === "" ? "－" : String(raw);
+
+      row.appendChild(k);
+      row.appendChild(v);
+      container.appendChild(row);
+      return;
+    }
 
     const card = document.createElement("div");
     card.className = "center-card";
@@ -727,42 +773,137 @@ function buildCenterCards(container, ctx, data) {
   });
 }
 
-function buildDetailTable(tableEl, ctx, data) {
-  if (!tableEl) return;
+function buildRecommendBlock(data) {
+  const wrap = document.createElement("div");
+  wrap.className = "recommend-wrap";
 
-  const theadRow = tableEl.querySelector("thead tr");
-  const tbodyRow = tableEl.querySelector("tbody tr");
-  theadRow.innerHTML = "";
-  tbodyRow.innerHTML = "";
+  const head = document.createElement("div");
+  head.className = "recommend-head";
 
-  zoneState.table.forEach((token) => {
-    const { type, id } = parseToken(token);
-    if (type !== "M") return;
-    const m = METRIC_BY_ID[id];
-    if (!m) return;
+  const actionGroup = document.createElement("div");
+  actionGroup.className = "recommend-action-group";
 
-    const th = document.createElement("th");
-    th.textContent = m.label;
-    theadRow.appendChild(th);
+  const attackBtn = document.createElement("button");
+  attackBtn.type = "button";
+  attackBtn.className = "recommend-btn";
+  attackBtn.textContent = "≪🔴 成長";
 
-    const td = document.createElement("td");
-    const raw = data[m.sourceKey];
-    const v = raw == null || raw === "" ? "－" : String(raw);
+  const guardBtn = document.createElement("button");
+  guardBtn.type = "button";
+  guardBtn.className = "recommend-btn";
+  guardBtn.textContent = "🟢 安定≫";
 
-    if (/^https?:\/\//.test(v)) {
-      const a = document.createElement("a");
-      a.href = v;
-      a.target = "_blank";
-      a.rel = "noreferrer";
-      a.textContent = "リンク";
-      td.appendChild(a);
-    } else {
-      const span = document.createElement("span");
-      span.textContent = v;
-      td.appendChild(span);
+  actionGroup.appendChild(attackBtn);
+  actionGroup.appendChild(guardBtn);
+  head.appendChild(actionGroup);
+
+  const cards = document.createElement("div");
+  cards.className = "recommend-cards";
+
+  const recommendDefs = [
+    { id: "推奨仕入数(90日)", label: "推奨仕入数（90日）" },
+    { id: "推奨仕入数(60日)", label: "推奨仕入数（60日）" },
+    { id: "推奨仕入数(30日)", label: "推奨仕入数（30日）" }
+  ];
+
+  recommendDefs.forEach((rec) => {
+    const card = document.createElement("div");
+    card.className = "recommend-card";
+    card.dataset.card = rec.id;
+
+    const title = document.createElement("div");
+    title.className = "recommend-card-title";
+    title.textContent = rec.label;
+
+    const list = document.createElement("div");
+    list.className = "recommend-list";
+
+    const raw = data[rec.id];
+    const hasValue = raw != null && raw !== "";
+    const base = num(raw);
+    const format = (value) =>
+      hasValue ? Math.round(value).toLocaleString("ja-JP") : "－";
+
+  const rows = [
+      { id: "stable", label: "🟢 安定", value: format(base * 0.85) },
+      { id: "balance", label: "🟡 バランス", value: format(base) },
+      { id: "growth", label: "🔴 成長", value: format(base * 1.2) }
+    ];
+
+    rows.forEach((row) => {
+      const rowEl = document.createElement("div");
+      rowEl.className = "recommend-row";
+      rowEl.dataset.mode = row.id;
+      rowEl.dataset.card = rec.id;
+
+      const rowLabel = document.createElement("span");
+      rowLabel.className = "recommend-row-label";
+      rowLabel.textContent = row.label;
+
+      const rowValue = document.createElement("span");
+      rowValue.className = "recommend-row-value";
+      rowValue.textContent = row.value;
+
+      rowEl.appendChild(rowLabel);
+      rowEl.appendChild(rowValue);
+      list.appendChild(rowEl);
+    });
+
+    card.appendChild(title);
+    card.appendChild(list);
+    cards.appendChild(card);
+  });
+
+  wrap.appendChild(head);
+  wrap.appendChild(cards);
+
+  const cardOrder = [
+    "推奨仕入数(90日)",
+    "推奨仕入数(60日)",
+    "推奨仕入数(30日)"
+  ];
+  const rowOrder = ["stable", "balance", "growth"];
+  let currentCardIndex = cardOrder.indexOf("推奨仕入数(60日)");
+  let currentRowIndex = rowOrder.indexOf("balance");
+
+  const applySelection = () => {
+    updateRecommendSelection(
+      wrap,
+      cardOrder[currentCardIndex],
+      rowOrder[currentRowIndex]
+    );
+  };
+
+  guardBtn.addEventListener("click", () => {
+    currentRowIndex -= 1;
+    if (currentRowIndex < 0) {
+      currentRowIndex = rowOrder.length - 1;
+      currentCardIndex = (currentCardIndex + 1) % cardOrder.length;
     }
+    applySelection();
+  });
 
-    tbodyRow.appendChild(td);
+  attackBtn.addEventListener("click", () => {
+    currentRowIndex += 1;
+    if (currentRowIndex >= rowOrder.length) {
+      currentRowIndex = 0;
+      currentCardIndex =
+        (currentCardIndex - 1 + cardOrder.length) % cardOrder.length;
+    }
+    applySelection();
+  });
+
+  applySelection();
+
+  return wrap;
+}
+
+function updateRecommendSelection(wrap, cardId, mode) {
+  wrap.querySelectorAll(".recommend-row").forEach((row) => {
+    row.classList.toggle(
+      "is-active",
+      row.dataset.mode === mode && row.dataset.card === cardId
+    );
   });
 }
 
@@ -801,7 +942,6 @@ function rerenderAllCards() {
     } else {
       buildCenterList(v.el.querySelector(".js-center"), ctx, v.data);
     }
-    buildDetailTable(v.el.querySelector(".js-detailTable"), ctx, v.data);
   });
 }
 
@@ -1056,6 +1196,7 @@ function createProductCard(asin, data) {
     card.innerHTML = `
       <div class="card-top">
         <div class="title">ASIN: ${asin}</div>
+        <input class="asin-memo" type="text" placeholder="メモ" />
         <button class="remove" type="button">この行を削除</button>
       </div>
 
@@ -1105,8 +1246,8 @@ function createProductCard(asin, data) {
           <div class="head">グラフ（180日）</div>
 
           <div class="graph-options js-graphOptions">
-            <label><input type="checkbox" class="js-chkDS" checked />《需要＆供給》</label>
-            <label><input type="checkbox" class="js-chkSP" />《供給＆価格》</label>
+            <label><input type="radio" name="graph-${asin}" class="js-chkDS" checked />《需要＆供給》</label>
+            <label><input type="radio" name="graph-${asin}" class="js-chkSP" />《供給＆価格》</label>
           </div>
 
           <div class="graph-body">
@@ -1117,20 +1258,12 @@ function createProductCard(asin, data) {
         </div>
       </div>
 
-      <div class="detail-wrap">
-        <div class="detail-head"><div class="t">その他項目</div></div>
-        <div class="detail-scroll">
-          <table class="detail-table js-detailTable">
-            <thead><tr></tr></thead>
-            <tbody><tr></tr></tbody>
-          </table>
-        </div>
-      </div>
     `;
   } else if (isFourthLayout) {
     card.innerHTML = `
       <div class="card-top">
         <div class="title">ASIN: ${asin}</div>
+        <input class="asin-memo" type="text" placeholder="メモ" />
         <button class="remove" type="button">この行を削除</button>
       </div>
 
@@ -1180,11 +1313,17 @@ function createProductCard(asin, data) {
                   <div class="shop-info">
                     <div class="shop-name">Amazon</div>
                     <div class="shop-meta">
-                      <input class="shop-input js-cost" type="number" step="1" placeholder="金額" />
-                      <span class="shop-margin js-shopMargin">0%</span>
+                      <label class="shop-field">
+                        <div class="shop-input-wrap">
+                          <input class="shop-input js-cost" type="number" step="1" placeholder="金額" />
+                          <span class="shop-unit">円</span>
+                        </div>
+                      </label>
+                      <span class="shop-margin"><span class="shop-margin-label">粗利益率</span><span class="js-shopMargin">0%</span></span>
                     </div>
                   </div>
                   <div class="shop-qty">
+                    <span>数量</span>
                     <input class="shop-qty-input js-qty" type="number" min="0" step="1" value="0" />
                   </div>
                 </div>
@@ -1194,11 +1333,17 @@ function createProductCard(asin, data) {
                   <div class="shop-info">
                     <div class="shop-name">Yahoo</div>
                     <div class="shop-meta">
-                      <input class="shop-input js-shopAmount" type="number" step="1" placeholder="金額" />
-                      <span class="shop-margin js-shopMargin">0%</span>
+                      <label class="shop-field">
+                        <div class="shop-input-wrap">
+                          <input class="shop-input js-shopAmount" type="number" step="1" placeholder="金額" />
+                          <span class="shop-unit">円</span>
+                        </div>
+                      </label>
+                      <span class="shop-margin"><span class="shop-margin-label">粗利益率</span><span class="js-shopMargin">0%</span></span>
                     </div>
                   </div>
                   <div class="shop-qty">
+                    <span>数量</span>
                     <input class="shop-qty-input js-shopQty" type="number" min="0" step="1" value="0" />
                   </div>
                 </div>
@@ -1208,11 +1353,17 @@ function createProductCard(asin, data) {
                   <div class="shop-info">
                     <div class="shop-name">楽天</div>
                     <div class="shop-meta">
-                      <input class="shop-input js-shopAmount" type="number" step="1" placeholder="金額" />
-                      <span class="shop-margin js-shopMargin">0%</span>
+                      <label class="shop-field">
+                        <div class="shop-input-wrap">
+                          <input class="shop-input js-shopAmount" type="number" step="1" placeholder="金額" />
+                          <span class="shop-unit">円</span>
+                        </div>
+                      </label>
+                      <span class="shop-margin"><span class="shop-margin-label">粗利益率</span><span class="js-shopMargin">0%</span></span>
                     </div>
                   </div>
                   <div class="shop-qty">
+                    <span>数量</span>
                     <input class="shop-qty-input js-shopQty" type="number" min="0" step="1" value="0" />
                   </div>
                 </div>
@@ -1222,10 +1373,11 @@ function createProductCard(asin, data) {
             </div>
 
             <div class="shop-panel">
-              <div class="shop-panel-head">
+            <div class="shop-panel-head">
+              <div>
                 <div class="shop-panel-title">その他のショップ</div>
-                <div class="shop-panel-note">※増えたら下だけスクロール</div>
               </div>
+            </div>
               <div class="shop-list js-extraShopList">
                 <div class="shop-card is-secondary js-customShop">
                   <div class="shop-info">
@@ -1236,17 +1388,35 @@ function createProductCard(asin, data) {
                     </div>
                   </div>
                   <div class="shop-qty">
+                    <span>数量</span>
                     <input class="shop-qty-input js-shopQty" type="number" min="0" step="1" value="0" />
                   </div>
-                  <button class="shop-remove" type="button">－</button>
+                  <div class="shop-row-actions">
+                    <button class="shop-add js-addShop" type="button">＋</button>
+                    <button class="shop-remove" type="button">－</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="shop-panel">
+              <div class="asin-summary js-asinSummary">
+                <div class="asin-summary-title">ASIN集計</div>
+                <div class="asin-summary-note">※販売額/入金/粗利益は仮計算</div>
+                <div class="asin-summary-grid">
+                  <div class="asin-summary-row"><span>合計仕入れ個数</span><b class="js-summaryQty">—</b></div>
+                  <div class="asin-summary-row"><span>仕入れ平均額</span><b class="js-summaryAvg">—</b></div>
+                  <div class="asin-summary-row"><span>仕入れ額合計</span><b class="js-summaryCost">—</b></div>
+                  <div class="asin-summary-row"><span>販売額合計</span><b class="js-summarySales">—</b></div>
+                  <div class="asin-summary-row"><span>入金額合計</span><b class="js-summaryPayment">—</b></div>
+                  <div class="asin-summary-row"><span>粗利益額合計（粗利益率）</span><b class="js-summaryProfit">—</b></div>
                 </div>
               </div>
             </div>
 
             <div class="shop-actions">
-              <button class="shop-add js-addShop" type="button">＋</button>
-              <button class="cart-btn js-addCart" type="button">仕入れリスト</button>
               <button class="ghost-btn js-later" type="button">後で仕入れる</button>
+              <button class="cart-btn js-addCart" type="button">仕入れリスト</button>
             </div>
 
             <input class="js-sell" type="hidden" />
@@ -1264,8 +1434,8 @@ function createProductCard(asin, data) {
           <div class="head">需要供給グラフ（180日）</div>
 
           <div class="graph-options js-graphOptions" style="margin-bottom:10px;">
-            <label><input type="checkbox" class="js-chkDS" checked />《需要＆供給》</label>
-            <label><input type="checkbox" class="js-chkSP" />《供給＆価格》</label>
+            <label><input type="radio" name="graph-${asin}" class="js-chkDS" checked />《需要＆供給》</label>
+            <label><input type="radio" name="graph-${asin}" class="js-chkSP" />《供給＆価格》</label>
           </div>
 
           <div class="mes-big">
@@ -1274,21 +1444,13 @@ function createProductCard(asin, data) {
         </div>
       </div>
 
-      <div class="detail-wrap">
-        <div class="detail-head"><div class="t">その他項目</div></div>
-        <div class="detail-scroll">
-          <table class="detail-table js-detailTable">
-            <thead><tr></tr></thead>
-            <tbody><tr></tr></tbody>
-          </table>
-        </div>
-      </div>
     `;
   } else {
     card.innerHTML = isAltLayout
       ? `
       <div class="card-top">
         <div class="title">ASIN: ${asin}</div>
+        <input class="asin-memo" type="text" placeholder="メモ" />
         <button class="remove" type="button">この行を削除</button>
       </div>
 
@@ -1314,8 +1476,8 @@ function createProductCard(asin, data) {
           </div>
 
           <div class="graph-options js-graphOptions">
-            <label><input type="checkbox" class="js-chkDS" checked />《需要＆供給》</label>
-            <label><input type="checkbox" class="js-chkSP" />《供給＆価格》</label>
+            <label><input type="radio" name="graph-${asin}" class="js-chkDS" checked />《需要＆供給》</label>
+            <label><input type="radio" name="graph-${asin}" class="js-chkSP" />《供給＆価格》</label>
           </div>
 
           <div class="graph-body">
@@ -1349,19 +1511,11 @@ function createProductCard(asin, data) {
         </div>
       </div>
 
-      <div class="detail-wrap">
-        <div class="detail-head"><div class="t">その他項目</div></div>
-        <div class="detail-scroll">
-          <table class="detail-table js-detailTable">
-            <thead><tr></tr></thead>
-            <tbody><tr></tr></tbody>
-          </table>
-        </div>
-      </div>
     `
       : `
       <div class="card-top">
         <div class="title">ASIN: ${asin}</div>
+        <input class="asin-memo" type="text" placeholder="メモ" />
         <button class="remove" type="button">この行を削除</button>
       </div>
 
@@ -1410,8 +1564,8 @@ function createProductCard(asin, data) {
           </div>
 
           <div class="graph-options js-graphOptions">
-            <label><input type="checkbox" class="js-chkDS" checked />《需要＆供給》</label>
-            <label><input type="checkbox" class="js-chkSP" />《供給＆価格》</label>
+            <label><input type="radio" name="graph-${asin}" class="js-chkDS" checked />《需要＆供給》</label>
+            <label><input type="radio" name="graph-${asin}" class="js-chkSP" />《供給＆価格》</label>
           </div>
 
           <div class="graph-body">
@@ -1425,15 +1579,6 @@ function createProductCard(asin, data) {
         </div>
       </div>
 
-      <div class="detail-wrap">
-        <div class="detail-head"><div class="t">その他項目</div></div>
-        <div class="detail-scroll">
-          <table class="detail-table js-detailTable">
-            <thead><tr></tr></thead>
-            <tbody><tr></tr></tbody>
-          </table>
-        </div>
-      </div>
     `;
   }
 
@@ -1457,7 +1602,6 @@ function createProductCard(asin, data) {
   const qtyInput = card.querySelector(".js-qty");
   const shopList = card.querySelector(".js-shopList");
   const extraShopList = card.querySelector(".js-extraShopList");
-  const addShopBtn = card.querySelector(".js-addShop");
 
   if (data["販売額（ドル）"]) {
     const s = String(data["販売額（ドル）"]).replace(/[^\d.]/g, "");
@@ -1538,19 +1682,70 @@ function createProductCard(asin, data) {
     });
   };
 
+  const summaryEl = card.querySelector(".js-asinSummary");
+  const summaryQtyEl = summaryEl?.querySelector(".js-summaryQty");
+  const summaryAvgEl = summaryEl?.querySelector(".js-summaryAvg");
+  const summaryCostEl = summaryEl?.querySelector(".js-summaryCost");
+  const summarySalesEl = summaryEl?.querySelector(".js-summarySales");
+  const summaryPaymentEl = summaryEl?.querySelector(".js-summaryPayment");
+  const summaryProfitEl = summaryEl?.querySelector(".js-summaryProfit");
+
+  const updateAsinSummary = () => {
+    if (!summaryEl) return;
+    let totalQty = 0;
+    let totalCost = 0;
+    const shopCards = card.querySelectorAll(".l4-buy .shop-card");
+
+    shopCards.forEach((shopCard) => {
+      const amountInput = shopCard.querySelector(".js-cost, .js-shopAmount");
+      const qtyInputEl = shopCard.querySelector(".js-qty, .js-shopQty");
+      const amount = num(amountInput?.value);
+      const qty = num(qtyInputEl?.value);
+      if (qty > 0) {
+        totalQty += qty;
+        totalCost += amount * qty;
+      }
+    });
+
+    const sellUSD = num(sellInput.value);
+    const totalSalesUSD = sellUSD * totalQty;
+    const totalPaymentJPY = totalSalesUSD * FX_RATE;
+    const totalProfitJPY = totalPaymentJPY - totalCost;
+    const profitRate = totalPaymentJPY > 0 ? (totalProfitJPY / totalPaymentJPY) * 100 : 0;
+
+    summaryQtyEl.textContent = totalQty > 0 ? `${totalQty}` : "—";
+    summaryAvgEl.textContent = totalQty > 0 ? fmtJPY(Math.round(totalCost / totalQty)) : "—";
+    summaryCostEl.textContent = totalQty > 0 ? fmtJPY(Math.round(totalCost)) : "—";
+    summarySalesEl.textContent = totalQty > 0 && sellUSD > 0 ? fmtUSD(totalSalesUSD) : "—";
+    summaryPaymentEl.textContent = totalQty > 0 && sellUSD > 0 ? fmtJPY(Math.round(totalPaymentJPY)) : "—";
+    summaryProfitEl.textContent =
+      totalQty > 0 && sellUSD > 0
+        ? `${fmtJPY(Math.round(totalProfitJPY))}（${profitRate.toFixed(1)}%）`
+        : "—";
+  };
+
   sellInput.addEventListener("input", () => {
     updateVariableMetrics();
     updateShopMargins();
+    updateAsinSummary();
   });
   costInput.addEventListener("input", () => {
     updateVariableMetrics();
     updateShopMargins();
+    updateAsinSummary();
   });
   card.querySelectorAll(".js-shopAmount").forEach((input) => {
-    input.addEventListener("input", updateShopMargins);
+    input.addEventListener("input", () => {
+      updateShopMargins();
+      updateAsinSummary();
+    });
+  });
+  card.querySelectorAll(".shop-qty-input, .js-qty").forEach((input) => {
+    input.addEventListener("input", updateAsinSummary);
   });
   updateVariableMetrics();
   updateShopMargins();
+  updateAsinSummary();
 
 card.querySelector(".js-addCart").addEventListener("click", () => {
     const qty = Math.max(1, Number(qtyInput?.value || 0));
@@ -1565,34 +1760,66 @@ card.querySelector(".js-addCart").addEventListener("click", () => {
     updateCartSummary();
   });
 
-  if (addShopBtn && extraShopList) {
-    addShopBtn.addEventListener("click", () => {
-      const row = document.createElement("div");
-      row.className = "shop-card is-secondary js-customShop";
-      row.innerHTML = `
-        <div class="shop-info">
-          <input class="shop-name-input js-shopName" type="text" placeholder="ショップ名" />
-          <div class="shop-meta">
-            <input class="shop-input js-shopAmount" type="number" step="1" placeholder="金額" />
-            <span class="shop-margin js-shopMargin">0%</span>
-          </div>
+  const buildExtraShopRow = () => {
+    const row = document.createElement("div");
+    row.className = "shop-card is-secondary js-customShop";
+    row.innerHTML = `
+      <div class="shop-info">
+        <input class="shop-name-input js-shopName" type="text" placeholder="ショップ名" />
+        <div class="shop-meta">
+          <input class="shop-input js-shopAmount" type="number" step="1" placeholder="金額" />
+          <span class="shop-margin js-shopMargin">0%</span>
         </div>
-        <div class="shop-qty">
-          <span>数量</span>
-          <input class="shop-qty-input js-shopQty" type="number" min="0" step="1" value="0" />
-        </div>
+      </div>
+      <div class="shop-qty">
+        <span>数量</span>
+        <input class="shop-qty-input js-shopQty" type="number" min="0" step="1" value="0" />
+      </div>
+      <div class="shop-row-actions">
+        <button class="shop-add js-addShop" type="button">＋</button>
         <button class="shop-remove" type="button">－</button>
-      `;
-      row.querySelector(".shop-remove")?.addEventListener("click", () => row.remove());
-      row.querySelector(".js-shopAmount")?.addEventListener("input", updateShopMargins);
-      extraShopList.appendChild(row);
-      updateShopMargins();
-    });
-    extraShopList.querySelectorAll(".shop-remove").forEach((btn) => {
-      btn.addEventListener("click", (e) => {
-        const row = e.currentTarget.closest(".shop-card");
-        if (row?.classList.contains("js-customShop")) row.remove();
+      </div>
+    `;
+
+    const amountInput = row.querySelector(".js-shopAmount");
+    const qtyInputEl = row.querySelector(".js-shopQty");
+    if (amountInput) {
+      amountInput.addEventListener("input", () => {
+        updateShopMargins();
+        updateAsinSummary();
       });
+    }
+    if (qtyInputEl) qtyInputEl.addEventListener("input", updateAsinSummary);
+    return row;
+  };
+
+  if (extraShopList) {
+    extraShopList.querySelectorAll(".js-shopAmount").forEach((input) => {
+      input.addEventListener("input", () => {
+        updateShopMargins();
+        updateAsinSummary();
+      });
+    });
+    extraShopList.querySelectorAll(".js-shopQty").forEach((input) => {
+      input.addEventListener("input", updateAsinSummary);
+    });
+
+    extraShopList.addEventListener("click", (event) => {
+      const addBtn = event.target.closest(".js-addShop");
+      if (addBtn) {
+        const row = buildExtraShopRow();
+        extraShopList.appendChild(row);
+        updateShopMargins();
+        updateAsinSummary();
+        return;
+      }
+
+      const removeBtn = event.target.closest(".shop-remove");
+      if (removeBtn) {
+        const row = removeBtn.closest(".shop-card");
+        if (row?.classList.contains("js-customShop")) row.remove();
+        updateAsinSummary();
+      }
     });
   }
 
@@ -1618,7 +1845,6 @@ card.querySelector(".js-addCart").addEventListener("click", () => {
   } else {
     buildCenterList(card.querySelector(".js-center"), ctx, data);
   }
-  buildDetailTable(card.querySelector(".js-detailTable"), ctx, data);
 
   // chart
   const canvas = card.querySelector(".js-chart");
