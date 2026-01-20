@@ -776,10 +776,6 @@ function buildRecommendBlock(data) {
   const head = document.createElement("div");
   head.className = "recommend-head";
 
-  const headLabel = document.createElement("div");
-  headLabel.className = "recommend-head-label";
-  headLabel.textContent = "表示：";
-
   const toggleGroup = document.createElement("div");
   toggleGroup.className = "recommend-toggle-group";
 
@@ -812,7 +808,6 @@ function buildRecommendBlock(data) {
     toggleGroup.appendChild(label);
   });
 
-  head.appendChild(headLabel);
   head.appendChild(toggleGroup);
 
   const cards = document.createElement("div");
@@ -1261,8 +1256,8 @@ function createProductCard(asin, data) {
           <div class="head">グラフ（180日）</div>
 
           <div class="graph-options js-graphOptions">
-            <label><input type="checkbox" class="js-chkDS" checked />《需要＆供給》</label>
-            <label><input type="checkbox" class="js-chkSP" />《供給＆価格》</label>
+            <label><input type="radio" name="graph-${asin}" class="js-chkDS" checked />《需要＆供給》</label>
+            <label><input type="radio" name="graph-${asin}" class="js-chkSP" />《供給＆価格》</label>
           </div>
 
           <div class="graph-body">
@@ -1420,8 +1415,8 @@ function createProductCard(asin, data) {
           <div class="head">需要供給グラフ（180日）</div>
 
           <div class="graph-options js-graphOptions" style="margin-bottom:10px;">
-            <label><input type="checkbox" class="js-chkDS" checked />《需要＆供給》</label>
-            <label><input type="checkbox" class="js-chkSP" />《供給＆価格》</label>
+            <label><input type="radio" name="graph-${asin}" class="js-chkDS" checked />《需要＆供給》</label>
+            <label><input type="radio" name="graph-${asin}" class="js-chkSP" />《供給＆価格》</label>
           </div>
 
           <div class="mes-big">
@@ -1470,8 +1465,8 @@ function createProductCard(asin, data) {
           </div>
 
           <div class="graph-options js-graphOptions">
-            <label><input type="checkbox" class="js-chkDS" checked />《需要＆供給》</label>
-            <label><input type="checkbox" class="js-chkSP" />《供給＆価格》</label>
+            <label><input type="radio" name="graph-${asin}" class="js-chkDS" checked />《需要＆供給》</label>
+            <label><input type="radio" name="graph-${asin}" class="js-chkSP" />《供給＆価格》</label>
           </div>
 
           <div class="graph-body">
@@ -1566,8 +1561,8 @@ function createProductCard(asin, data) {
           </div>
 
           <div class="graph-options js-graphOptions">
-            <label><input type="checkbox" class="js-chkDS" checked />《需要＆供給》</label>
-            <label><input type="checkbox" class="js-chkSP" />《供給＆価格》</label>
+            <label><input type="radio" name="graph-${asin}" class="js-chkDS" checked />《需要＆供給》</label>
+            <label><input type="radio" name="graph-${asin}" class="js-chkSP" />《供給＆価格》</label>
           </div>
 
           <div class="graph-body">

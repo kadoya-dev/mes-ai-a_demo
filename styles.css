@@ -1153,9 +1153,12 @@ body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .subhead{
   margin-bottom:6px;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .var-cards{
-  display:grid;
-  grid-template-columns: repeat(2, 1fr);
+  display:flex;
   gap:10px;
+}
+body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .center-card.var-sell,
+body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .center-card.var-profit{
+  flex:0 0 46%;
 }
 /* layout4の主要項目カードと同じ見た目（k/vベース） */
 body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .center-card .k{
