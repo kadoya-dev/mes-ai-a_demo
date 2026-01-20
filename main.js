@@ -777,6 +777,10 @@ function buildRecommendBlock(data) {
   const wrap = document.createElement("div");
   wrap.className = "recommend-wrap";
 
+  const heading = document.createElement("div");
+  heading.className = "recommend-title";
+  heading.textContent = "推奨仕入数";
+
   const head = document.createElement("div");
   head.className = "recommend-head";
 
@@ -797,65 +801,68 @@ function buildRecommendBlock(data) {
   actionGroup.appendChild(guardBtn);
   head.appendChild(actionGroup);
 
-  const cards = document.createElement("div");
-  cards.className = "recommend-cards";
+  const table = document.createElement("div");
+  table.className = "recommend-table";
 
   const recommendDefs = [
-    { id: "推奨仕入数(90日)", label: "推奨仕入数（90日）" },
-    { id: "推奨仕入数(60日)", label: "推奨仕入数（60日）" },
-    { id: "推奨仕入数(30日)", label: "推奨仕入数（30日）" }
+    { id: "推奨仕入数(90日)", label: "90日間" },
+    { id: "推奨仕入数(60日)", label: "60日間" },
+    { id: "推奨仕入数(30日)", label: "30日間" }
   ];
 
+  const headerRow = document.createElement("div");
+  headerRow.className = "recommend-row recommend-row-head";
+
+  const headerLabel = document.createElement("div");
+  headerLabel.className = "recommend-cell recommend-cell-label";
+  headerLabel.textContent = "";
+  headerRow.appendChild(headerLabel);
+
   recommendDefs.forEach((rec) => {
-    const card = document.createElement("div");
-    card.className = "recommend-card";
-    card.dataset.card = rec.id;
+    const headerCell = document.createElement("div");
+    headerCell.className = "recommend-cell recommend-cell-head";
+    headerCell.textContent = rec.label;
+    headerRow.appendChild(headerCell);
+  });
+  table.appendChild(headerRow);
 
-    const title = document.createElement("div");
-    title.className = "recommend-card-title";
-    title.textContent = rec.label;
+  const rowDefs = [
+    { id: "stable", label: "🟢 安定", factor: 0.85 },
+    { id: "balance", label: "🟡 バランス", factor: 1 },
+    { id: "growth", label: "🔴 成長", factor: 1.2 }
+  ];
 
-    const list = document.createElement("div");
-    list.className = "recommend-list";
+  rowDefs.forEach((rowDef) => {
+    const rowEl = document.createElement("div");
+    rowEl.className = "recommend-row";
+    rowEl.dataset.mode = rowDef.id;
 
-    const raw = data[rec.id];
-    const hasValue = raw != null && raw !== "";
-    const base = num(raw);
-    const format = (value) =>
-      hasValue ? Math.round(value).toLocaleString("ja-JP") : "－";
+    const labelCell = document.createElement("div");
+    labelCell.className = "recommend-cell recommend-cell-label";
+    labelCell.textContent = rowDef.label;
+    rowEl.appendChild(labelCell);
 
-  const rows = [
-      { id: "stable", label: "🟢 安定", value: format(base * 0.85) },
-      { id: "balance", label: "🟡 バランス", value: format(base) },
-      { id: "growth", label: "🔴 成長", value: format(base * 1.2) }
-    ];
+    recommendDefs.forEach((rec) => {
+      const raw = data[rec.id];
+      const hasValue = raw != null && raw !== "";
+      const base = num(raw);
+      const value = hasValue
+        ? Math.round(base * rowDef.factor).toLocaleString("ja-JP")
+        : "－";
 
-    rows.forEach((row) => {
-      const rowEl = document.createElement("div");
-      rowEl.className = "recommend-row";
-      rowEl.dataset.mode = row.id;
-      rowEl.dataset.card = rec.id;
-
-      const rowLabel = document.createElement("span");
-      rowLabel.className = "recommend-row-label";
-      rowLabel.textContent = row.label;
-
-      const rowValue = document.createElement("span");
-      rowValue.className = "recommend-row-value";
-      rowValue.textContent = row.value;
-
-      rowEl.appendChild(rowLabel);
-      rowEl.appendChild(rowValue);
-      list.appendChild(rowEl);
+      const valueCell = document.createElement("div");
+      valueCell.className = "recommend-cell recommend-cell-value";
+      valueCell.dataset.card = rec.id;
+      valueCell.dataset.mode = rowDef.id;
+      valueCell.textContent = value;
+      rowEl.appendChild(valueCell);
     });
-
-    card.appendChild(title);
-    card.appendChild(list);
-    cards.appendChild(card);
+    table.appendChild(rowEl);
   });
 
+  wrap.appendChild(heading);
   wrap.appendChild(head);
-  wrap.appendChild(cards);
+  wrap.appendChild(table);
 
   const cardOrder = [
     "推奨仕入数(90日)",
@@ -899,10 +906,10 @@ function buildRecommendBlock(data) {
 }
 
 function updateRecommendSelection(wrap, cardId, mode) {
-  wrap.querySelectorAll(".recommend-row").forEach((row) => {
-    row.classList.toggle(
+  wrap.querySelectorAll(".recommend-cell-value").forEach((cell) => {
+    cell.classList.toggle(
       "is-active",
-      row.dataset.mode === mode && row.dataset.card === cardId
+      cell.dataset.mode === mode && cell.dataset.card === cardId
     );
   });
 }
