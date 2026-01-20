@@ -31,7 +31,7 @@ a{ color:inherit; }
 }
 
 .page-body{
-  max-width: 1420px;
+  max-width: 1450px;
   margin: 16px auto 60px;
   padding: 0 16px;
 }
@@ -896,7 +896,7 @@ body:is(.fourth-layout, .fifth-layout) .layout4-grid{
   display:grid;
 
   /* 画像(細) / 商品情報 / 主要項目(広) / 主要項目(広) / カート */
-  grid-template-columns: 300px 320px 1.35fr 1.35fr 280px;
+  grid-template-columns: 300px 260px 1.35fr 1.35fr 340px;
 
   /* 1段目の行高さを固定＝主要項目の高さ基準 */
   grid-template-rows: var(--l4-top-h) auto;
