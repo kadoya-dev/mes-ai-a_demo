@@ -452,7 +452,7 @@ a{ color:inherit; }
 
 .info-grid{
   display:grid;
-  grid-template-columns: 150px 1fr;
+  grid-template-columns: 60px 150px;
   gap:8px 10px;
   align-items:start;
 }
@@ -460,6 +460,7 @@ a{ color:inherit; }
   font-size:12px;
   font-weight:900;
   color:#334155;
+  white-space:pre-line;
 }
 .info-grid .v{
   font-size:12px;

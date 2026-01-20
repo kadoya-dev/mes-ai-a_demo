@@ -79,7 +79,7 @@ const INFO_FIELDS_ALL = [
   { id: "SKU", label: "SKU", kind: "text", sourceKey: "SKU" },
 
   { id: "サイズ", label: "サイズ", kind: "computed" },
-  { id: "重量（容積重量）", label: "重量（容積重量）", kind: "computed" },
+  { id: "重量（容積重量）", label: "重量\n（容積重量）", kind: "computed" },
 
   { id: "カテゴリ", label: "カテゴリ", kind: "computed" },
   { id: "注意事項", label: "注意事項", kind: "computedTags" },
