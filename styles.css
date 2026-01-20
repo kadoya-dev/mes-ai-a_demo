@@ -316,7 +316,13 @@ a{ color:inherit; }
 /* =========================
    Cart summary
 ========================= */
-.cart-summary{ margin-top:12px; padding:12px; }
+.cart-summary{
+  margin-top:12px;
+  padding:12px;
+  position: sticky;
+  top: 72px;
+  z-index: 900;
+}
 .cart-head{
   display:flex;
   align-items:flex-end;

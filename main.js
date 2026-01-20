@@ -233,6 +233,7 @@ function init() {
 }
 
 function initPoolUI() {
+  if (!zonePool || !zoneInfo || !zoneCenter || !zoneTable || !zoneHidden) return;
   attachZoneDnD(zonePool, { zoneKey: "pool" });
   attachZoneDnD(zoneInfo, { zoneKey: "info" });
   attachZoneDnD(zoneCenter, { zoneKey: "center" });
@@ -316,6 +317,7 @@ function updateHeaderStatus() {
    上部5枠：レンダリング
 ========================= */
 function renderTopZones() {
+  if (!zonePool || !zoneInfo || !zoneCenter || !zoneTable || !zoneHidden) return;
   zonePool.innerHTML = "";
   zoneInfo.innerHTML = "";
   zoneCenter.innerHTML = "";
@@ -449,7 +451,7 @@ function refreshSortRuleOptions() {
 }
 
 function renderSortControls() {
-  if (!sortControls) return;
+  if (!sortControls || !sortBar) return;
   sortControls.innerHTML = "";
 
   if (!sortRules.length) {
