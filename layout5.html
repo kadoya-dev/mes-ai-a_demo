@@ -16,7 +16,7 @@
       <h1>MES-AI-A 商品分析 0116-13</h1>
       <div id="appVersion" class="header-version" aria-label="アプリのバージョン"></div>
     </div>
-    <div class="sub">ASINクリックでカード追加 → 上の5枠で「指標/商品情報」をまとめてカスタム</div>
+    <div class="sub">ASINクリックでカード追加</div>
   </div>
 
   <div class="header-right">
@@ -25,55 +25,6 @@
 </header>
 
 <main class="page-body">
-  <section class="metrics-bar card" id="metricsBar">
-    <div class="metrics-bar-head">
-      <div>
-        <div class="metrics-bar-title">配置カスタマイズ（ドラッグして配置）</div>
-        <div class="metrics-bar-help">同じ項目はどこか1枠のみ（重複配置できません）</div>
-      </div>
-      <button id="metricsCollapseBtn" class="ghost-btn" type="button">折りたたむ</button>
-    </div>
-
-    <div id="sortBar">
-      <div class="sort-title">表示中ASINのソート（真ん中の枠の指標）</div>
-      <div id="sortControls" class="sort-controls"></div>
-      <div class="sort-actions">
-        <button id="addSortRuleBtn" type="button">条件を追加</button>
-        <button id="applySortBtn" class="primary" type="button">ソート適用</button>
-        <button id="clearSortBtn" type="button">ソート解除</button>
-      </div>
-    </div>
-
-    <div class="metrics-row">
-      <div class="metrics-zone">
-        <div class="metrics-zone-title">プール</div>
-        <div id="metricsPoolZone" class="metrics-zone-list"></div>
-      </div>
-      <div class="metrics-zone">
-        <div class="metrics-zone-title">商品情報</div>
-        <div id="metricsInfoZone" class="metrics-zone-list"></div>
-      </div>
-      <div class="metrics-zone">
-        <div class="metrics-zone-title">真ん中の枠</div>
-        <div id="metricsCenterZone" class="metrics-zone-list"></div>
-      </div>
-      <div class="metrics-zone">
-        <div class="metrics-zone-title">下段テーブル</div>
-        <div id="metricsTableZone" class="metrics-zone-list"></div>
-      </div>
-      <div class="metrics-zone">
-        <div class="metrics-zone-title">非表示</div>
-        <div id="metricsHiddenZone" class="metrics-zone-list"></div>
-      </div>
-    </div>
-
-    <div class="metrics-bar-foot">
-      <button id="resetCurrentBtn" type="button">初期配置に戻す</button>
-      <button id="clearCardsBtn" type="button">表示カードをクリア</button>
-      <button id="clearCartBtn" type="button">カートを空にする</button>
-    </div>
-  </section>
-
   <section class="asin-catalog card">
     <div class="asin-catalog-head">
       <div class="asin-catalog-title">データがあるASIN（クリックで表示）</div>
