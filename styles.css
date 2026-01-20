@@ -317,10 +317,10 @@ a{ color:inherit; }
    Cart summary
 ========================= */
 .cart-summary{
-  margin-top:12px;
+  margin-top:0;
   padding:12px;
   position: sticky;
-  top: 72px;
+  top: 0;
   z-index: 900;
 }
 .cart-head{
