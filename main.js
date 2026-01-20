@@ -128,20 +128,20 @@ const DEFAULT_ZONES = {
     tokI("注意事項")
   ],
   center: [
-    tokM("予測30日販売数"),
-    tokM("予測60日販売数"),
-    tokM("予測90日販売数"),
     tokM("推奨仕入数(30日)"),
     tokM("推奨仕入数(60日)"),
     tokM("推奨仕入数(90日)"),
     tokM("在庫数"),
+    tokM("返品率"),
+    tokM("予測30日販売数"),
+    tokM("予測60日販売数"),
+    tokM("予測90日販売数"),
     tokM("30日販売数"),
     tokM("日本最安値"),
     tokM("過去3月FBA最安値"),
     tokM("FBA最安値")
   ],
   table: [
-    tokM("返品率"),
     tokM("想定送料"),
     tokM("送料"),
     tokM("関税"),
@@ -698,11 +698,26 @@ function buildCenterCards(container, ctx, data) {
   if (!container) return;
   container.innerHTML = "";
 
+  const recommendIds = [
+    "推奨仕入数(90日)",
+    "推奨仕入数(60日)",
+    "推奨仕入数(30日)"
+  ];
+  let recommendInserted = false;
+
   zoneState.center.forEach((token) => {
     const { type, id } = parseToken(token);
     if (type !== "M") return;
     const m = METRIC_BY_ID[id];
     if (!m) return;
+
+    if (recommendIds.includes(id)) {
+      if (!recommendInserted) {
+        container.appendChild(buildRecommendBlock(data));
+        recommendInserted = true;
+      }
+      return;
+    }
 
     const card = document.createElement("div");
     card.className = "center-card";
@@ -724,6 +739,120 @@ function buildCenterCards(container, ctx, data) {
     card.appendChild(k);
     card.appendChild(v);
     container.appendChild(card);
+  });
+}
+
+function buildRecommendBlock(data) {
+  const wrap = document.createElement("div");
+  wrap.className = "recommend-wrap";
+
+  const head = document.createElement("div");
+  head.className = "recommend-head";
+
+  const headLabel = document.createElement("div");
+  headLabel.className = "recommend-head-label";
+  headLabel.textContent = "表示：";
+
+  const toggleGroup = document.createElement("div");
+  toggleGroup.className = "recommend-toggle-group";
+
+  const groupId = `recommend-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+
+  const toggles = [
+    { id: "risk", label: "リスク重視🌿" },
+    { id: "profit", label: "利益ベース✨" },
+    { id: "attack", label: "攻め🔥" }
+  ];
+
+  toggles.forEach((toggle) => {
+    const label = document.createElement("label");
+    label.className = "recommend-toggle";
+
+    const input = document.createElement("input");
+    input.type = "radio";
+    input.name = groupId;
+    input.value = toggle.id;
+    if (toggle.id === "profit") input.checked = true;
+    input.addEventListener("change", () => {
+      if (input.checked) updateRecommendSelection(wrap, toggle.id);
+    });
+
+    const text = document.createElement("span");
+    text.textContent = toggle.label;
+
+    label.appendChild(input);
+    label.appendChild(text);
+    toggleGroup.appendChild(label);
+  });
+
+  head.appendChild(headLabel);
+  head.appendChild(toggleGroup);
+
+  const cards = document.createElement("div");
+  cards.className = "recommend-cards";
+
+  const recommendDefs = [
+    { id: "推奨仕入数(90日)", label: "推奨仕入数（90日）" },
+    { id: "推奨仕入数(60日)", label: "推奨仕入数（60日）" },
+    { id: "推奨仕入数(30日)", label: "推奨仕入数（30日）" }
+  ];
+
+  recommendDefs.forEach((rec) => {
+    const card = document.createElement("div");
+    card.className = "recommend-card";
+
+    const title = document.createElement("div");
+    title.className = "recommend-card-title";
+    title.textContent = rec.label;
+
+    const list = document.createElement("div");
+    list.className = "recommend-list";
+
+    const raw = data[rec.id];
+    const hasValue = raw != null && raw !== "";
+    const base = num(raw);
+    const format = (value) =>
+      hasValue ? Math.round(value).toLocaleString("ja-JP") : "－";
+
+    const rows = [
+      { id: "risk", label: "リスク重視🌿", value: format(base * 0.85) },
+      { id: "profit", label: "利益ベース✨", value: format(base) },
+      { id: "attack", label: "攻め🔥", value: format(base * 1.2) }
+    ];
+
+    rows.forEach((row) => {
+      const rowEl = document.createElement("div");
+      rowEl.className = "recommend-row";
+      rowEl.dataset.mode = row.id;
+
+      const rowLabel = document.createElement("span");
+      rowLabel.className = "recommend-row-label";
+      rowLabel.textContent = row.label;
+
+      const rowValue = document.createElement("span");
+      rowValue.className = "recommend-row-value";
+      rowValue.textContent = row.value;
+
+      rowEl.appendChild(rowLabel);
+      rowEl.appendChild(rowValue);
+      list.appendChild(rowEl);
+    });
+
+    card.appendChild(title);
+    card.appendChild(list);
+    cards.appendChild(card);
+  });
+
+  wrap.appendChild(head);
+  wrap.appendChild(cards);
+  updateRecommendSelection(wrap, "profit");
+
+  return wrap;
+}
+
+function updateRecommendSelection(wrap, mode) {
+  wrap.querySelectorAll(".recommend-row").forEach((row) => {
+    row.classList.toggle("is-active", row.dataset.mode === mode);
   });
 }
 
