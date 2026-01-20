@@ -1082,7 +1082,7 @@ body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-btn{
   cursor:pointer;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-table{
-  --recommend-col-width: 120px;
+  --recommend-col-width: 110px;
   --recommend-gap: 8px;
   --recommend-peek: 24px;
   display:grid;
@@ -1124,6 +1124,10 @@ body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-col{
   gap:6px;
   width: var(--recommend-col-width);
   min-width: var(--recommend-col-width);
+  background:#bcd6ff;
+  border:1px solid #93c5fd;
+  border-radius:16px;
+  padding:6px;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-cell{
   padding:6px 8px;
@@ -1142,13 +1146,9 @@ body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-cell-label{
   color:#1f2937;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-cell-head{
-  background:#bcd6ff;
-  border:1px solid #93c5fd;
   text-align:center;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-cell-value{
-  background:#bcd6ff;
-  border:1px solid #93c5fd;
   text-align:right;
   font-size:15px;
   font-weight:900;
@@ -1578,7 +1578,7 @@ body:is(.fourth-layout, .fifth-layout) .l4-variable .center-card.var-profit.is-n
    layout4: 主要項目を3列表示（幅を切り詰め）
    ───────────────────────────── */
 body:is(.fourth-layout, .fifth-layout) .l4-center .center-cards{
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
   padding-right: 2px;
 }
