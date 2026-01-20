@@ -1397,6 +1397,18 @@ function createProductCard(asin, data) {
             <div class="shop-actions">
               <button class="shop-add js-addShop" type="button">＋</button>
               <button class="cart-btn js-addCart" type="button">仕入れリスト</button>
+              <div class="asin-summary js-asinSummary">
+                <div class="asin-summary-title">ASIN集計</div>
+                <div class="asin-summary-note">※販売額/入金/粗利益は仮計算</div>
+                <div class="asin-summary-grid">
+                  <div class="asin-summary-row"><span>合計仕入れ個数</span><b class="js-summaryQty">—</b></div>
+                  <div class="asin-summary-row"><span>仕入れ平均額</span><b class="js-summaryAvg">—</b></div>
+                  <div class="asin-summary-row"><span>仕入れ額合計</span><b class="js-summaryCost">—</b></div>
+                  <div class="asin-summary-row"><span>販売額合計</span><b class="js-summarySales">—</b></div>
+                  <div class="asin-summary-row"><span>入金額合計</span><b class="js-summaryPayment">—</b></div>
+                  <div class="asin-summary-row"><span>粗利益額合計（粗利益率）</span><b class="js-summaryProfit">—</b></div>
+                </div>
+              </div>
               <button class="ghost-btn js-later" type="button">後で仕入れる</button>
             </div>
 
@@ -1689,19 +1701,70 @@ function createProductCard(asin, data) {
     });
   };
 
+  const summaryEl = card.querySelector(".js-asinSummary");
+  const summaryQtyEl = summaryEl?.querySelector(".js-summaryQty");
+  const summaryAvgEl = summaryEl?.querySelector(".js-summaryAvg");
+  const summaryCostEl = summaryEl?.querySelector(".js-summaryCost");
+  const summarySalesEl = summaryEl?.querySelector(".js-summarySales");
+  const summaryPaymentEl = summaryEl?.querySelector(".js-summaryPayment");
+  const summaryProfitEl = summaryEl?.querySelector(".js-summaryProfit");
+
+  const updateAsinSummary = () => {
+    if (!summaryEl) return;
+    let totalQty = 0;
+    let totalCost = 0;
+    const shopCards = card.querySelectorAll(".l4-buy .shop-card");
+
+    shopCards.forEach((shopCard) => {
+      const amountInput = shopCard.querySelector(".js-cost, .js-shopAmount");
+      const qtyInputEl = shopCard.querySelector(".js-qty, .js-shopQty");
+      const amount = num(amountInput?.value);
+      const qty = num(qtyInputEl?.value);
+      if (qty > 0) {
+        totalQty += qty;
+        totalCost += amount * qty;
+      }
+    });
+
+    const sellUSD = num(sellInput.value);
+    const totalSalesUSD = sellUSD * totalQty;
+    const totalPaymentJPY = totalSalesUSD * FX_RATE;
+    const totalProfitJPY = totalPaymentJPY - totalCost;
+    const profitRate = totalPaymentJPY > 0 ? (totalProfitJPY / totalPaymentJPY) * 100 : 0;
+
+    summaryQtyEl.textContent = totalQty > 0 ? `${totalQty}` : "—";
+    summaryAvgEl.textContent = totalQty > 0 ? fmtJPY(Math.round(totalCost / totalQty)) : "—";
+    summaryCostEl.textContent = totalQty > 0 ? fmtJPY(Math.round(totalCost)) : "—";
+    summarySalesEl.textContent = totalQty > 0 && sellUSD > 0 ? fmtUSD(totalSalesUSD) : "—";
+    summaryPaymentEl.textContent = totalQty > 0 && sellUSD > 0 ? fmtJPY(Math.round(totalPaymentJPY)) : "—";
+    summaryProfitEl.textContent =
+      totalQty > 0 && sellUSD > 0
+        ? `${fmtJPY(Math.round(totalProfitJPY))}（${profitRate.toFixed(1)}%）`
+        : "—";
+  };
+
   sellInput.addEventListener("input", () => {
     updateVariableMetrics();
     updateShopMargins();
+    updateAsinSummary();
   });
   costInput.addEventListener("input", () => {
     updateVariableMetrics();
     updateShopMargins();
+    updateAsinSummary();
   });
   card.querySelectorAll(".js-shopAmount").forEach((input) => {
-    input.addEventListener("input", updateShopMargins);
+    input.addEventListener("input", () => {
+      updateShopMargins();
+      updateAsinSummary();
+    });
+  });
+  card.querySelectorAll(".shop-qty-input, .js-qty").forEach((input) => {
+    input.addEventListener("input", updateAsinSummary);
   });
   updateVariableMetrics();
   updateShopMargins();
+  updateAsinSummary();
 
 card.querySelector(".js-addCart").addEventListener("click", () => {
     const qty = Math.max(1, Number(qtyInput?.value || 0));
@@ -1735,14 +1798,20 @@ card.querySelector(".js-addCart").addEventListener("click", () => {
         <button class="shop-remove" type="button">－</button>
       `;
       row.querySelector(".shop-remove")?.addEventListener("click", () => row.remove());
-      row.querySelector(".js-shopAmount")?.addEventListener("input", updateShopMargins);
+      row.querySelector(".js-shopAmount")?.addEventListener("input", () => {
+        updateShopMargins();
+        updateAsinSummary();
+      });
+      row.querySelector(".js-shopQty")?.addEventListener("input", updateAsinSummary);
       extraShopList.appendChild(row);
       updateShopMargins();
+      updateAsinSummary();
     });
     extraShopList.querySelectorAll(".shop-remove").forEach((btn) => {
       btn.addEventListener("click", (e) => {
         const row = e.currentTarget.closest(".shop-card");
         if (row?.classList.contains("js-customShop")) row.remove();
+        updateAsinSummary();
       });
     });
   }

@@ -1289,6 +1289,15 @@ body:is(.fourth-layout, .fifth-layout) .l4-buy .shop-meta{
   align-items:center;
   gap:8px;
 }
+body:is(.fourth-layout, .fifth-layout) .l4-buy .shop-input{
+  width:80px;
+  text-align:right;
+  border:1px solid var(--line);
+  background:#fff;
+  border-radius:10px;
+  font-weight:900;
+  padding:6px 8px;
+}
 body:is(.fourth-layout, .fifth-layout) .l4-buy .shop-margin{
   font-size:11px;
   font-weight:800;
@@ -1331,7 +1340,7 @@ body:is(.fourth-layout, .fifth-layout) .l4-buy .shop-remove{
 }
 body:is(.fourth-layout, .fifth-layout) .l4-buy .shop-actions{
   display:grid;
-  grid-template-columns: 36px 1fr 1fr 1fr;
+  grid-template-columns: 36px 1fr 2fr 1fr;
   gap:8px;
   margin-top:12px;
 }
@@ -1349,6 +1358,42 @@ body:is(.fourth-layout, .fifth-layout) .l4-buy .shop-actions .cart-btn{
   background:#111827;
   color:#fff;
   border-color:#111827;
+}
+body:is(.fourth-layout, .fifth-layout) .l4-buy .asin-summary{
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:#fff;
+  padding:8px 10px;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+body:is(.fourth-layout, .fifth-layout) .l4-buy .asin-summary-title{
+  font-size:12px;
+  font-weight:900;
+  color:#111827;
+}
+body:is(.fourth-layout, .fifth-layout) .l4-buy .asin-summary-note{
+  font-size:10px;
+  color:#6b7280;
+}
+body:is(.fourth-layout, .fifth-layout) .l4-buy .asin-summary-grid{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+body:is(.fourth-layout, .fifth-layout) .l4-buy .asin-summary-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  font-size:11px;
+  font-weight:700;
+  color:#1f2937;
+}
+body:is(.fourth-layout, .fifth-layout) .l4-buy .asin-summary-row b{
+  font-size:12px;
+  font-weight:900;
 }
 
 /* 端末幅が狭い時は縦積み */
