@@ -1122,7 +1122,7 @@ body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-labels{
   display:grid;
   grid-template-rows: auto repeat(3, var(--recommend-row-height, 36px));
   gap:6px;
-  padding-top:30px;
+  padding-top:34px;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-col{
   display:grid;
@@ -1155,9 +1155,10 @@ body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-cell-label{
 body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-labels .recommend-cell-label{
   display:flex;
   align-items:center;
-}
-body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-labels .recommend-cell-label:not(:last-child){
   border-bottom:1px solid rgba(30,58,138,0.3);
+}
+body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-labels .recommend-cell-label:last-child{
+  border-bottom:0;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-cell-head{
   text-align:center;
@@ -1170,9 +1171,10 @@ body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-cell-value{
   color:#111827;
   transition:transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
   width: 70px;
-}
-body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-cell-value:not(:last-child){
   border-bottom:1px solid rgba(30,58,138,0.3);
+}
+body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-col .recommend-cell-value:last-child{
+  border-bottom:0;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-col .recommend-cell-value{
   display:flex;
