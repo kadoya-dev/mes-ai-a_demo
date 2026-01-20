@@ -805,9 +805,12 @@ function buildRecommendBlock(data) {
   table.className = "recommend-table";
 
   const recommendDefs = [
+    { id: "推奨仕入数(180日)", label: "180日間" },
+    { id: "推奨仕入数(120日)", label: "120日間" },
     { id: "推奨仕入数(90日)", label: "90日間" },
     { id: "推奨仕入数(60日)", label: "60日間" },
-    { id: "推奨仕入数(30日)", label: "30日間" }
+    { id: "推奨仕入数(30日)", label: "30日間" },
+    { id: "推奨仕入数(15日)", label: "15日間" }
   ];
 
   const headerRow = document.createElement("div");
@@ -821,6 +824,7 @@ function buildRecommendBlock(data) {
   recommendDefs.forEach((rec) => {
     const headerCell = document.createElement("div");
     headerCell.className = "recommend-cell recommend-cell-head";
+    headerCell.dataset.card = rec.id;
     headerCell.textContent = rec.label;
     headerRow.appendChild(headerCell);
   });
@@ -865,13 +869,38 @@ function buildRecommendBlock(data) {
   wrap.appendChild(table);
 
   const cardOrder = [
+    "推奨仕入数(180日)",
+    "推奨仕入数(120日)",
     "推奨仕入数(90日)",
     "推奨仕入数(60日)",
-    "推奨仕入数(30日)"
+    "推奨仕入数(30日)",
+    "推奨仕入数(15日)"
   ];
+  const windowSize = 3;
   const rowOrder = ["stable", "balance", "growth"];
   let currentCardIndex = cardOrder.indexOf("推奨仕入数(60日)");
   let currentRowIndex = rowOrder.indexOf("balance");
+  let windowStart = cardOrder.indexOf("推奨仕入数(90日)");
+  if (windowStart < 0) windowStart = 0;
+
+  const clampWindowStart = () => {
+    const maxStart = Math.max(0, cardOrder.length - windowSize);
+    windowStart = Math.min(Math.max(windowStart, 0), maxStart);
+  };
+
+  const updateRecommendVisibility = () => {
+    clampWindowStart();
+    const visibleCards = new Set(
+      cardOrder.slice(windowStart, windowStart + windowSize)
+    );
+    wrap.style.setProperty("--recommend-cols", String(windowSize));
+    wrap.querySelectorAll(".recommend-cell-head").forEach((cell) => {
+      cell.classList.toggle("is-hidden", !visibleCards.has(cell.dataset.card));
+    });
+    wrap.querySelectorAll(".recommend-cell-value").forEach((cell) => {
+      cell.classList.toggle("is-hidden", !visibleCards.has(cell.dataset.card));
+    });
+  };
 
   const applySelection = () => {
     updateRecommendSelection(
@@ -879,6 +908,12 @@ function buildRecommendBlock(data) {
       cardOrder[currentCardIndex],
       rowOrder[currentRowIndex]
     );
+    if (currentCardIndex < windowStart) {
+      windowStart = currentCardIndex;
+    } else if (currentCardIndex > windowStart + windowSize - 1) {
+      windowStart = currentCardIndex - windowSize + 1;
+    }
+    updateRecommendVisibility();
   };
 
   guardBtn.addEventListener("click", () => {
@@ -1390,8 +1425,11 @@ function createProductCard(asin, data) {
                   <div class="shop-info">
                     <input class="shop-name-input js-shopName" type="text" placeholder="ショップ名" />
                     <div class="shop-meta">
-                      <input class="shop-input js-shopAmount" type="number" step="1" placeholder="金額" />
-                      <span class="shop-margin js-shopMargin">0%</span>
+                      <div class="shop-input-wrap">
+                        <input class="shop-input js-shopAmount" type="number" step="1" placeholder="金額" />
+                        <span class="shop-unit">円</span>
+                      </div>
+                      <span class="shop-margin"><span class="shop-margin-label">粗利益率</span><span class="js-shopMargin">0%</span></span>
                     </div>
                   </div>
                   <div class="shop-qty">
@@ -1774,8 +1812,11 @@ card.querySelector(".js-addCart").addEventListener("click", () => {
       <div class="shop-info">
         <input class="shop-name-input js-shopName" type="text" placeholder="ショップ名" />
         <div class="shop-meta">
-          <input class="shop-input js-shopAmount" type="number" step="1" placeholder="金額" />
-          <span class="shop-margin js-shopMargin">0%</span>
+          <div class="shop-input-wrap">
+            <input class="shop-input js-shopAmount" type="number" step="1" placeholder="金額" />
+            <span class="shop-unit">円</span>
+          </div>
+          <span class="shop-margin"><span class="shop-margin-label">粗利益率</span><span class="js-shopMargin">0%</span></span>
         </div>
       </div>
       <div class="shop-qty">

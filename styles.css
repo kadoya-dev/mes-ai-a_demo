@@ -1086,7 +1086,7 @@ body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-table{
 }
 body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-row{
   display:grid;
-  grid-template-columns: 120px repeat(3, minmax(0, 1fr));
+  grid-template-columns: 120px repeat(var(--recommend-cols, 3), minmax(0, 1fr));
   gap:8px;
   align-items:center;
 }
@@ -1101,6 +1101,9 @@ body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-cell{
   font-size:12px;
   font-weight:700;
   color:#1f2937;
+}
+body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-cell.is-hidden{
+  display:none;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-cell-label{
   background:transparent;
