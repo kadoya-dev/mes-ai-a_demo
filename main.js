@@ -816,6 +816,12 @@ function buildRecommendBlock(data) {
   const columnsWrap = document.createElement("div");
   columnsWrap.className = "recommend-columns";
 
+  const columnsViewport = document.createElement("div");
+  columnsViewport.className = "recommend-columns-viewport";
+
+  const columnsInner = document.createElement("div");
+  columnsInner.className = "recommend-columns-inner";
+
   const labelsCol = document.createElement("div");
   labelsCol.className = "recommend-labels";
 
@@ -859,8 +865,11 @@ function buildRecommendBlock(data) {
       col.appendChild(valueCell);
     });
 
-    columnsWrap.appendChild(col);
+    columnsInner.appendChild(col);
   });
+
+  columnsViewport.appendChild(columnsInner);
+  columnsWrap.appendChild(columnsViewport);
 
   table.appendChild(labelsCol);
   table.appendChild(columnsWrap);
@@ -891,13 +900,8 @@ function buildRecommendBlock(data) {
 
   const updateRecommendVisibility = () => {
     clampWindowStart();
-    const visibleCards = new Set(
-      cardOrder.slice(windowStart, windowStart + windowSize)
-    );
     wrap.style.setProperty("--recommend-cols", String(windowSize));
-    wrap.querySelectorAll(".recommend-col").forEach((col) => {
-      col.classList.toggle("is-hidden", !visibleCards.has(col.dataset.card));
-    });
+    wrap.style.setProperty("--recommend-offset", String(windowStart));
   };
 
   const applySelection = () => {
@@ -912,6 +916,11 @@ function buildRecommendBlock(data) {
       windowStart = currentCardIndex - windowSize + 1;
     }
     updateRecommendVisibility();
+    attackBtn.disabled =
+      currentCardIndex === 0 && rowOrder[currentRowIndex] === "growth";
+    guardBtn.disabled =
+      currentCardIndex === cardOrder.length - 1 &&
+      rowOrder[currentRowIndex] === "stable";
   };
 
   guardBtn.addEventListener("click", () => {

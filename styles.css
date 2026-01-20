@@ -1061,6 +1061,7 @@ body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-head{
   align-items:center;
   gap:12px;
   flex-wrap:wrap;
+  justify-content:flex-end;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-action-group{
   display:flex;
@@ -1081,15 +1082,35 @@ body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-btn{
   cursor:pointer;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-table{
+  --recommend-col-width: 120px;
+  --recommend-gap: 8px;
+  --recommend-peek: 24px;
   display:grid;
-  grid-template-columns: 120px repeat(var(--recommend-cols, 3), minmax(0, 1fr));
+  grid-template-columns: 120px 1fr;
   gap:8px;
   align-items:start;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-columns{
-  display:grid;
-  grid-template-columns: repeat(var(--recommend-cols, 3), minmax(0, 1fr));
-  gap:8px;
+  display:flex;
+}
+body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-columns-viewport{
+  overflow:hidden;
+  width: calc(
+    (var(--recommend-col-width) + var(--recommend-gap)) * var(--recommend-cols, 3)
+    - var(--recommend-gap)
+    + (var(--recommend-peek) * 2)
+  );
+}
+body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-columns-inner{
+  display:flex;
+  gap:var(--recommend-gap);
+  transform: translateX(
+    calc(
+      var(--recommend-peek)
+      - (var(--recommend-offset, 0) * (var(--recommend-col-width) + var(--recommend-gap)))
+    )
+  );
+  transition: transform 0.35s ease;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-labels{
   display:flex;
@@ -1101,6 +1122,8 @@ body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-col{
   display:flex;
   flex-direction:column;
   gap:6px;
+  width: var(--recommend-col-width);
+  min-width: var(--recommend-col-width);
 }
 body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-cell{
   padding:6px 8px;
@@ -1110,9 +1133,6 @@ body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-cell{
   color:#1f2937;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-cell.is-hidden{
-  display:none;
-}
-body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-col.is-hidden{
   display:none;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-cell-label{
