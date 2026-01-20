@@ -848,6 +848,7 @@ function buildRecommendBlock(data) {
   rowDefs.forEach((rowDef) => {
     const labelCell = document.createElement("div");
     labelCell.className = "recommend-cell recommend-cell-label";
+    labelCell.dataset.mode = rowDef.id;
     labelCell.textContent = rowDef.label;
     labelsCol.appendChild(labelCell);
   });
