@@ -783,18 +783,18 @@ function buildRecommendBlock(data) {
   const actionGroup = document.createElement("div");
   actionGroup.className = "recommend-action-group";
 
-  const guardBtn = document.createElement("button");
-  guardBtn.type = "button";
-  guardBtn.className = "recommend-btn";
-  guardBtn.textContent = "守";
-
   const attackBtn = document.createElement("button");
   attackBtn.type = "button";
   attackBtn.className = "recommend-btn";
-  attackBtn.textContent = "攻";
+  attackBtn.textContent = "≪🔴 成長";
 
-  actionGroup.appendChild(guardBtn);
+  const guardBtn = document.createElement("button");
+  guardBtn.type = "button";
+  guardBtn.className = "recommend-btn";
+  guardBtn.textContent = "🟢 安定≫";
+
   actionGroup.appendChild(attackBtn);
+  actionGroup.appendChild(guardBtn);
   head.appendChild(actionGroup);
 
   const cards = document.createElement("div");
@@ -857,25 +857,39 @@ function buildRecommendBlock(data) {
   wrap.appendChild(head);
   wrap.appendChild(cards);
 
-  const sequence = [
-    { card: "推奨仕入数(60日)", mode: "balance" },
-    { card: "推奨仕入数(60日)", mode: "growth" },
-    { card: "推奨仕入数(90日)", mode: "stable" }
+  const cardOrder = [
+    "推奨仕入数(90日)",
+    "推奨仕入数(60日)",
+    "推奨仕入数(30日)"
   ];
-  let currentIndex = 0;
+  const rowOrder = ["stable", "balance", "growth"];
+  let currentCardIndex = cardOrder.indexOf("推奨仕入数(60日)");
+  let currentRowIndex = rowOrder.indexOf("balance");
 
   const applySelection = () => {
-    const current = sequence[currentIndex];
-    updateRecommendSelection(wrap, current.card, current.mode);
+    updateRecommendSelection(
+      wrap,
+      cardOrder[currentCardIndex],
+      rowOrder[currentRowIndex]
+    );
   };
 
   guardBtn.addEventListener("click", () => {
-    currentIndex = (currentIndex - 1 + sequence.length) % sequence.length;
+    currentRowIndex -= 1;
+    if (currentRowIndex < 0) {
+      currentRowIndex = rowOrder.length - 1;
+      currentCardIndex = (currentCardIndex + 1) % cardOrder.length;
+    }
     applySelection();
   });
 
   attackBtn.addEventListener("click", () => {
-    currentIndex = (currentIndex + 1) % sequence.length;
+    currentRowIndex += 1;
+    if (currentRowIndex >= rowOrder.length) {
+      currentRowIndex = 0;
+      currentCardIndex =
+        (currentCardIndex - 1 + cardOrder.length) % cardOrder.length;
+    }
     applySelection();
   });
 
