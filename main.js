@@ -703,6 +703,14 @@ function buildCenterCards(container, ctx, data) {
     "推奨仕入数(60日)",
     "推奨仕入数(30日)"
   ];
+  const compactIds = new Set([
+    "予測60日販売数",
+    "予測90日販売数",
+    "30日販売数",
+    "日本最安値",
+    "過去3月FBA最安値",
+    "FBA最安値"
+  ]);
   let recommendInserted = false;
 
   zoneState.center.forEach((token) => {
@@ -716,6 +724,25 @@ function buildCenterCards(container, ctx, data) {
         container.appendChild(buildRecommendBlock(data));
         recommendInserted = true;
       }
+      return;
+    }
+
+    if (compactIds.has(id)) {
+      const row = document.createElement("div");
+      row.className = "center-inline";
+
+      const k = document.createElement("span");
+      k.className = "k";
+      k.textContent = m.label;
+
+      const v = document.createElement("span");
+      v.className = "v";
+      const raw = data[m.sourceKey];
+      v.textContent = raw == null || raw === "" ? "－" : String(raw);
+
+      row.appendChild(k);
+      row.appendChild(v);
+      container.appendChild(row);
       return;
     }
 

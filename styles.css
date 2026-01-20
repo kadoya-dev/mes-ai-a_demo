@@ -987,6 +987,28 @@ body:is(.fourth-layout, .fifth-layout) .l4-center .center-card{
   padding:8px 10px;
   background:#fff;
 }
+body:is(.fourth-layout, .fifth-layout) .l4-center .center-inline{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:4px 6px;
+  font-size:12px;
+  font-weight:800;
+  color:#1f2937;
+}
+body:is(.fourth-layout, .fifth-layout) .l4-center .center-inline .k{
+  font-size:11px;
+  font-weight:700;
+  color:#475569;
+  white-space:nowrap;
+}
+body:is(.fourth-layout, .fifth-layout) .l4-center .center-inline .v{
+  font-size:13px;
+  font-weight:900;
+  color:#0f172a;
+  white-space:nowrap;
+}
 body:is(.fourth-layout, .fifth-layout) .l4-center .center-card .label{
   font-size:12px;
   font-weight:900;
