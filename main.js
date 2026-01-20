@@ -708,6 +708,7 @@ function buildCenterCards(container, ctx, data) {
     "日本最安値",
     "過去3月FBA最安値",
     "FBA最安値",
+    "想定送料",
     "送料",
     "関税",
     "仕入れ目安単価",
