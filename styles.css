@@ -52,6 +52,23 @@ a{ color:inherit; }
   align-items:center;
   gap:12px;
 }
+.card-top{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.card-top .asin-memo{
+  flex:1;
+  min-width:180px;
+  max-width:280px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:6px 10px;
+  font-size:12px;
+  font-weight:700;
+  background:#fff;
+}
 .header-left h1{
   margin:0;
   font-size:16px;
@@ -1293,6 +1310,34 @@ body:is(.fourth-layout, .fifth-layout) .l4-buy .shop-meta{
   display:flex;
   align-items:center;
   gap:8px;
+  flex-wrap:wrap;
+}
+body:is(.fourth-layout, .fifth-layout) .l4-buy .shop-field{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-size:11px;
+  font-weight:800;
+  color:#374151;
+}
+body:is(.fourth-layout, .fifth-layout) .l4-buy .shop-input-wrap{
+  display:flex;
+  align-items:center;
+  gap:4px;
+}
+body:is(.fourth-layout, .fifth-layout) .l4-buy .shop-unit{
+  font-size:11px;
+  font-weight:800;
+  color:#4b5563;
+}
+body:is(.fourth-layout, .fifth-layout) .l4-buy .shop-input{
+  width:80px;
+  text-align:right;
+  border:1px solid var(--line);
+  background:#fff;
+  border-radius:10px;
+  font-weight:900;
+  padding:6px 8px;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-buy .shop-input{
   width:80px;
@@ -1304,9 +1349,15 @@ body:is(.fourth-layout, .fifth-layout) .l4-buy .shop-input{
   padding:6px 8px;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-buy .shop-margin{
+  display:flex;
+  align-items:center;
+  gap:4px;
   font-size:11px;
   font-weight:800;
   color:#374151;
+}
+body:is(.fourth-layout, .fifth-layout) .l4-buy .shop-margin-label{
+  color:#6b7280;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-buy .shop-qty{
   display:flex;
