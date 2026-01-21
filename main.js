@@ -69,19 +69,16 @@ const METRIC_BY_ID = Object.fromEntries(METRICS_ALL.map((m) => [m.id, m]));
    商品情報（項目）候補
 ========================= */
 const INFO_FIELDS_ALL = [
+  { id: "評価", label: "評価", kind: "text", sourceKey: "レビュー評価" },
+  { id: "注意事項", label: "注意事項", kind: "computedTags" },
   { id: "商品名", label: "商品名", kind: "computedTitle" },
   { id: "ブランド", label: "ブランド", kind: "text", sourceKey: "ブランド" },
-  { id: "評価", label: "評価", kind: "text", sourceKey: "レビュー評価" },
-
+  { id: "カテゴリ", label: "カテゴリ", kind: "computed" },
   { id: "各種ASIN", label: "各種ASIN", kind: "computed" },
   { id: "JAN", label: "JAN", kind: "text", sourceKey: "JAN" },
   { id: "SKU", label: "SKU", kind: "text", sourceKey: "SKU" },
-
   { id: "サイズ", label: "サイズ", kind: "computed" },
   { id: "重量（容積重量）", label: "重量\n（容積重量）", kind: "computed" },
-
-  { id: "カテゴリ", label: "カテゴリ", kind: "computed" },
-  { id: "注意事項", label: "注意事項", kind: "computedTags" },
   { id: "材質", label: "材質", kind: "text", sourceKey: "材質" }
 ];
 const INFO_BY_ID = Object.fromEntries(INFO_FIELDS_ALL.map((f) => [f.id, f]));
@@ -115,16 +112,16 @@ const DEFAULT_ZONES = {
     tokM("180日販売数")
   ],
   info: [
+    tokI("評価"),
+    tokI("注意事項"),
     tokI("商品名"),
     tokI("ブランド"),
-    tokI("評価"),
+    tokI("カテゴリ"),
     tokI("各種ASIN"),
     tokI("JAN"),
     tokI("サイズ"),
     tokI("重量（容積重量）"),
-    tokI("カテゴリ"),
-    tokI("材質"),
-    tokI("注意事項")
+    tokI("材質")
   ],
   center: [
     tokM("推奨仕入数(30日)"),
@@ -861,8 +858,7 @@ function buildRecommendBlock(data) {
     { id: "推奨仕入数(120日)", label: "120日間" },
     { id: "推奨仕入数(90日)", label: "90日間" },
     { id: "推奨仕入数(60日)", label: "60日間" },
-    { id: "推奨仕入数(30日)", label: "30日間" },
-    { id: "推奨仕入数(15日)", label: "15日間" }
+    { id: "推奨仕入数(30日)", label: "30日間" }
   ];
 
   const columnsWrap = document.createElement("div");
@@ -936,14 +932,13 @@ function buildRecommendBlock(data) {
     "推奨仕入数(120日)",
     "推奨仕入数(90日)",
     "推奨仕入数(60日)",
-    "推奨仕入数(30日)",
-    "推奨仕入数(15日)"
+    "推奨仕入数(30日)"
   ];
-  const windowSize = 3;
+  const windowSize = cardOrder.length;
   const rowOrder = ["stable", "balance", "growth"];
   const defaultCardId = "推奨仕入数(60日)";
   const defaultRowId = "balance";
-  const defaultWindowId = "推奨仕入数(90日)";
+  const defaultWindowId = "推奨仕入数(180日)";
   let currentCardIndex = cardOrder.indexOf(defaultCardId);
   let currentRowIndex = rowOrder.indexOf(defaultRowId);
   let windowStart = cardOrder.indexOf(defaultWindowId);
