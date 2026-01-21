@@ -79,7 +79,7 @@ const INFO_FIELDS_ALL = [
   { id: "JAN", label: "JAN", kind: "text", sourceKey: "JAN" },
   { id: "SKU", label: "SKU", kind: "text", sourceKey: "SKU" },
   { id: "サイズ", label: "サイズ", kind: "computed" },
-  { id: "重量（容積重量）", label: "重量（容積）", kind: "computed" },
+  { id: "重量（容積重量）", label: "重量(容積)", kind: "computed" },
   { id: "材質", label: "材質", kind: "text", sourceKey: "材質" }
 ];
 const INFO_BY_ID = Object.fromEntries(INFO_FIELDS_ALL.map((f) => [f.id, f]));
@@ -327,12 +327,11 @@ function initCatalog() {
       return;
     }
     asins.forEach((asin) => {
-      const b = document.createElement("button");
-      b.className = "asin-pill";
-      b.type = "button";
-      b.textContent = asin;
-      b.addEventListener("click", () => addOrFocusCard(asin));
-      asinCatalog.appendChild(b);
+      const item = document.createElement("div");
+      item.className = "asin-item";
+      item.textContent = asin;
+      item.addEventListener("click", () => addOrFocusCard(asin));
+      asinCatalog.appendChild(item);
     });
   };
 
@@ -955,14 +954,8 @@ function buildRecommendBlock(data) {
   guardBtn.className = "recommend-btn";
   guardBtn.textContent = "🟢 安定≫";
 
-  const resetRecommendBtn = document.createElement("button");
-  resetRecommendBtn.type = "button";
-  resetRecommendBtn.className = "recommend-btn recommend-btn-reset";
-  resetRecommendBtn.textContent = "標準に戻す";
-
   actionGroup.appendChild(attackBtn);
   actionGroup.appendChild(guardBtn);
-  actionGroup.appendChild(resetRecommendBtn);
   head.appendChild(heading);
   head.appendChild(actionGroup);
 
@@ -1027,6 +1020,7 @@ function buildRecommendBlock(data) {
       valueCell.dataset.card = rec.id;
       valueCell.dataset.mode = rowDef.id;
       valueCell.textContent = value;
+      valueCell.dataset.baseValue = value;
       col.appendChild(valueCell);
     });
 
@@ -1066,7 +1060,9 @@ function buildRecommendBlock(data) {
     updateRecommendSelection(
       wrap,
       cardOrder[currentCardIndex],
-      rowOrder[currentRowIndex]
+      rowOrder[currentRowIndex],
+      defaultCardId,
+      defaultRowId
     );
     updateRecommendVisibility();
     attackBtn.disabled =
@@ -1095,23 +1091,23 @@ function buildRecommendBlock(data) {
     applySelection();
   });
 
-  resetRecommendBtn.addEventListener("click", () => {
-    currentCardIndex = cardOrder.indexOf(defaultCardId);
-    currentRowIndex = rowOrder.indexOf(defaultRowId);
-    windowStart = 0;
-    applySelection();
-  });
-
   applySelection();
 
   return wrap;
 }
 
-function updateRecommendSelection(wrap, cardId, mode) {
+function updateRecommendSelection(wrap, cardId, mode, defaultCardId, defaultMode) {
   wrap.querySelectorAll(".recommend-cell-value").forEach((cell) => {
     const isActive = cell.dataset.mode === mode && cell.dataset.card === cardId;
     cell.classList.toggle("is-active", isActive);
     cell.classList.toggle("is-muted", !isActive);
+    const baseValue = cell.dataset.baseValue || cell.textContent || "";
+    const isDefault = cell.dataset.card === defaultCardId && cell.dataset.mode === defaultMode;
+    if (isActive && isDefault) {
+      cell.textContent = `🔥${baseValue}`;
+    } else {
+      cell.textContent = baseValue;
+    }
   });
 }
 
@@ -1146,7 +1142,7 @@ function rerenderAllCards() {
       const infoGrid = v.el.querySelector(".js-infoGrid");
       const topTokens = [tokI("評価"), tokI("注意事項")];
       const restTokens = zoneState.info.filter((token) => !topTokens.includes(token));
-      buildInfoGrid(infoTop, ctx, v.data, topTokens, { hideLabels: true });
+      buildInfoGrid(infoTop, ctx, v.data, topTokens);
       buildInfoGrid(infoGrid, ctx, v.data, restTokens);
     } else {
       buildInfoGrid(v.el.querySelector(".js-infoGrid"), ctx, v.data);
@@ -2086,7 +2082,7 @@ card.querySelector(".js-addCart").addEventListener("click", () => {
     const infoGrid = card.querySelector(".js-infoGrid");
     const topTokens = [tokI("評価"), tokI("注意事項")];
     const restTokens = zoneState.info.filter((token) => !topTokens.includes(token));
-    buildInfoGrid(infoTop, ctx, data, topTokens, { hideLabels: true });
+    buildInfoGrid(infoTop, ctx, data, topTokens);
     buildInfoGrid(infoGrid, ctx, data, restTokens);
   } else {
     buildInfoGrid(card.querySelector(".js-infoGrid"), ctx, data);

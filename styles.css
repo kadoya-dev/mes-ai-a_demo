@@ -330,12 +330,11 @@ a{ color:inherit; }
   font-weight:700;
   color:#64748b;
 }
-.asin-pill{
+.asin-item{
   border:1px solid var(--line);
   background:#fff;
-  border-radius:999px;
-  height:32px;
-  padding:0 12px;
+  border-radius:12px;
+  padding:8px 12px;
   font-weight:900;
   cursor:pointer;
   box-shadow: 0 4px 12px rgba(15,23,42,.06);
@@ -1013,13 +1012,13 @@ body:is(.fourth-layout, .fifth-layout) .l4-info .l4-info-media .image-box img{
 }
 body:is(.fourth-layout, .fifth-layout) .l4-info .info-top{
   display:grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 90px 1fr;
   gap:8px 10px;
   margin-bottom: 10px;
+  align-items:start;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-info .info-top .v-tags{
-  flex-wrap:nowrap;
-  overflow-x:auto;
+  flex-wrap:wrap;
   justify-content:flex-start;
 }
 .filter-field{
