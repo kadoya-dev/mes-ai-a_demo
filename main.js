@@ -54,6 +54,7 @@ const METRICS_ALL = [
   { id: "ライバル偏差2", label: "ライバル偏差2", sourceKey: "ライバル偏差2" },
   { id: "ライバル増加率", label: "ライバル増加率", sourceKey: "ライバル増加率" },
 
+  { id: "サイズ感", label: "サイズ感", sourceKey: "サイズ感" },
   { id: "在庫数", label: "在庫数", sourceKey: "在庫数" },
   { id: "返品率", label: "返品率", sourceKey: "返品率" },
 
@@ -127,6 +128,7 @@ const DEFAULT_ZONES = {
     tokM("推奨仕入数(30日)"),
     tokM("推奨仕入数(60日)"),
     tokM("推奨仕入数(90日)"),
+    tokM("サイズ感"),
     tokM("在庫数"),
     tokM("返品率"),
     tokM("予測30日販売数"),
@@ -975,13 +977,6 @@ function buildRecommendBlock(data) {
     applySelection();
   });
 
-  resetRecommendBtn.addEventListener("click", () => {
-    currentCardIndex = cardOrder.indexOf(defaultCardId);
-    currentRowIndex = rowOrder.indexOf(defaultRowId);
-    windowStart = cardOrder.indexOf(defaultWindowId);
-    applySelection();
-  });
-
   applySelection();
 
   return wrap;
@@ -1380,6 +1375,32 @@ function createProductCard(asin, data) {
 
           <div class="l4-variable">
             <div class="var-cards">
+              <div class="center-card var-risk">
+                <div class="k">危険度指数</div>
+                <div class="risk-index">
+                  <div class="risk-item warning">
+                    <div class="risk-ring" style="--risk-value: 62;">
+                      <div class="risk-num">62</div>
+                      <div class="risk-note">注意</div>
+                    </div>
+                    <div class="risk-caption">直近重視</div>
+                  </div>
+                  <div class="risk-item safe">
+                    <div class="risk-ring" style="--risk-value: 38;">
+                      <div class="risk-num">38</div>
+                      <div class="risk-note">安定</div>
+                    </div>
+                    <div class="risk-caption">回数重視</div>
+                  </div>
+                  <div class="risk-item warning">
+                    <div class="risk-ring" style="--risk-value: 54;">
+                      <div class="risk-num">54</div>
+                      <div class="risk-note">注意</div>
+                    </div>
+                    <div class="risk-caption">両方</div>
+                  </div>
+                </div>
+              </div>
               <div class="center-card var-sell">
                 <div class="k">販売価格（$）</div>
                 <input class="v js-sell js-sellInput" type="number" step="0.01" placeholder="例: 39.99" />
