@@ -196,6 +196,9 @@ const clearCartBtn = $("#clearCartBtn");
 const asinCatalog = $("#asinCatalog");
 const asinSearchInput = $("#asinSearchInput");
 const asinSearchBtn = $("#asinSearchBtn");
+const profitRateMin = $("#profitRateMin");
+const categoryFilters = $("#categoryFilters");
+const materialFilters = $("#materialFilters");
 const itemsContainer = $("#itemsContainer");
 const emptyState = $("#emptyState");
 const headerStatus = $("#headerStatus");
@@ -280,6 +283,39 @@ function initActions() {
 
 function initCatalog() {
   const allAsins = Object.keys(window.ASIN_DATA || {});
+  const categorySet = new Set();
+  const materialSet = new Set();
+
+  allAsins.forEach((asin) => {
+    const data = window.ASIN_DATA?.[asin] || {};
+    const category = String(data["親カテゴリ"] || data["カテゴリ"] || "").trim();
+    if (category) categorySet.add(category);
+    const materials = String(data["材質"] || "")
+      .split(/[,\s/]+/)
+      .map((item) => item.trim())
+      .filter(Boolean);
+    materials.forEach((material) => materialSet.add(material));
+  });
+
+  const buildFilterList = (items, container, name) => {
+    if (!container) return;
+    container.innerHTML = "";
+    items.forEach((item, idx) => {
+      const label = document.createElement("label");
+      label.className = "filter-item";
+      const input = document.createElement("input");
+      input.type = "checkbox";
+      input.name = name;
+      input.value = item;
+      input.checked = true;
+      input.addEventListener("change", runSearch);
+      const span = document.createElement("span");
+      span.textContent = item;
+      label.appendChild(input);
+      label.appendChild(span);
+      container.appendChild(label);
+    });
+  };
 
   const renderAsinList = (asins) => {
     asinCatalog.innerHTML = "";
@@ -300,28 +336,57 @@ function initCatalog() {
     });
   };
 
+  const getCheckedValues = (container) => {
+    if (!container) return new Set();
+    return new Set(
+      Array.from(container.querySelectorAll("input[type=checkbox]"))
+        .filter((input) => input.checked)
+        .map((input) => input.value)
+    );
+  };
+
   const runSearch = () => {
     const keyword = String(asinSearchInput?.value || "").trim().toLowerCase();
-    if (!keyword) {
-      asinCatalog.innerHTML = "";
-      const empty = document.createElement("div");
-      empty.className = "asin-empty";
-      empty.textContent = "検索条件を入力してください";
-      asinCatalog.appendChild(empty);
-      return;
-    }
+    const minProfitRate = num(profitRateMin?.value);
+    const selectedCategories = getCheckedValues(categoryFilters);
+    const selectedMaterials = getCheckedValues(materialFilters);
     const filtered = allAsins.filter((asin) => {
       const data = window.ASIN_DATA?.[asin] || {};
       const title = String(data["品名"] || data["商品名"] || data["商品タイトル"] || "").toLowerCase();
-      return asin.toLowerCase().includes(keyword) || title.includes(keyword);
+      const category = String(data["親カテゴリ"] || data["カテゴリ"] || "").trim();
+      const materials = String(data["材質"] || "")
+        .split(/[,\s/]+/)
+        .map((item) => item.trim())
+        .filter(Boolean);
+      const profitRate = num(data["粗利益率"]);
+
+      if (keyword && !(asin.toLowerCase().includes(keyword) || title.includes(keyword))) {
+        return false;
+      }
+      if (minProfitRate && profitRate < minProfitRate) {
+        return false;
+      }
+      if (selectedCategories.size && category && !selectedCategories.has(category)) {
+        return false;
+      }
+      if (selectedMaterials.size && materials.length && !materials.some((m) => selectedMaterials.has(m))) {
+        return false;
+      }
+      return true;
     });
     renderAsinList(filtered);
   };
+
+  const categories = Array.from(categorySet).sort((a, b) => a.localeCompare(b, "ja"));
+  const materials = Array.from(materialSet).sort((a, b) => a.localeCompare(b, "ja"));
+  buildFilterList(categories, categoryFilters, "categoryFilter");
+  buildFilterList(materials, materialFilters, "materialFilter");
 
   asinSearchBtn?.addEventListener("click", runSearch);
   asinSearchInput?.addEventListener("keydown", (event) => {
     if (event.key === "Enter") runSearch();
   });
+  profitRateMin?.addEventListener("change", runSearch);
 
   asinCatalog.innerHTML = "";
   const empty = document.createElement("div");
@@ -674,7 +739,7 @@ function resolveInfoValueById(id, ctx) {
 /* =========================
    Info / Center / Table build
 ========================= */
-function buildInfoGrid(container, ctx, data, tokens) {
+function buildInfoGrid(container, ctx, data, tokens, options = {}) {
   if (!container) return;
 
   container.scrollTop = 0;
@@ -694,14 +759,6 @@ function buildInfoGrid(container, ctx, data, tokens) {
   list.forEach((tok) => {
     const v = resolveTokenValue(tok, ctx, data);
 
-    const k = document.createElement("div");
-    k.className = "k";
-    k.textContent = v.label;
-
-    k.style.fontSize = "12px";
-    k.style.fontWeight = "700";
-    k.style.opacity = "0.60";
-
     const val = document.createElement("div");
     val.className = "v";
 
@@ -718,7 +775,16 @@ function buildInfoGrid(container, ctx, data, tokens) {
       val.textContent = v.text;
     }
 
-    container.appendChild(k);
+    if (!options.hideLabels) {
+      const k = document.createElement("div");
+      k.className = "k";
+      k.textContent = v.label;
+
+      k.style.fontSize = "12px";
+      k.style.fontWeight = "700";
+      k.style.opacity = "0.60";
+      container.appendChild(k);
+    }
     container.appendChild(val);
   });
 
@@ -1080,7 +1146,7 @@ function rerenderAllCards() {
       const infoGrid = v.el.querySelector(".js-infoGrid");
       const topTokens = [tokI("評価"), tokI("注意事項")];
       const restTokens = zoneState.info.filter((token) => !topTokens.includes(token));
-      buildInfoGrid(infoTop, ctx, v.data, topTokens);
+      buildInfoGrid(infoTop, ctx, v.data, topTokens, { hideLabels: true });
       buildInfoGrid(infoGrid, ctx, v.data, restTokens);
     } else {
       buildInfoGrid(v.el.querySelector(".js-infoGrid"), ctx, v.data);
@@ -2020,7 +2086,7 @@ card.querySelector(".js-addCart").addEventListener("click", () => {
     const infoGrid = card.querySelector(".js-infoGrid");
     const topTokens = [tokI("評価"), tokI("注意事項")];
     const restTokens = zoneState.info.filter((token) => !topTokens.includes(token));
-    buildInfoGrid(infoTop, ctx, data, topTokens);
+    buildInfoGrid(infoTop, ctx, data, topTokens, { hideLabels: true });
     buildInfoGrid(infoGrid, ctx, data, restTokens);
   } else {
     buildInfoGrid(card.querySelector(".js-infoGrid"), ctx, data);

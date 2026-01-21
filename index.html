@@ -33,6 +33,20 @@
         <button id="asinSearchBtn" type="button">検索実行</button>
       </div>
     </div>
+    <div class="asin-catalog-filters">
+      <label class="filter-field">
+        <span>粗利益率</span>
+        <input id="profitRateMin" type="number" min="0" step="0.1" placeholder="～以上" />
+      </label>
+      <div class="filter-group">
+        <div class="filter-title">カテゴリ（対象外はチェックを外す）</div>
+        <div id="categoryFilters" class="filter-list"></div>
+      </div>
+      <div class="filter-group">
+        <div class="filter-title">材質（対象外はチェックを外す）</div>
+        <div id="materialFilters" class="filter-list"></div>
+      </div>
+    </div>
     <div class="asin-catalog-body" id="asinCatalog"></div>
   </section>
 

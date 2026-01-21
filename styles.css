@@ -504,7 +504,7 @@ a{ color:inherit; }
 
 .info-grid{
   display:grid;
-  grid-template-columns: 60px 150px;
+  grid-template-columns: 90px 1fr;
   gap:8px 10px;
   align-items:start;
 }
@@ -1018,7 +1018,53 @@ body:is(.fourth-layout, .fifth-layout) .l4-info .info-top{
   margin-bottom: 10px;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-info .info-top .v-tags{
+  flex-wrap:nowrap;
+  overflow-x:auto;
   justify-content:flex-start;
+}
+.filter-field{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:12px;
+  font-weight:900;
+  color:#334155;
+}
+.filter-field input{
+  width:120px;
+  height:32px;
+  border-radius:999px;
+  border:1px solid var(--line);
+  padding:0 12px;
+  font-weight:900;
+  font-size:12px;
+}
+.asin-catalog-filters{
+  display:grid;
+  gap:12px;
+  margin-bottom:12px;
+}
+.filter-group{
+  display:grid;
+  gap:6px;
+}
+.filter-title{
+  font-size:12px;
+  font-weight:900;
+  color:#475569;
+}
+.filter-list{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px 12px;
+}
+.filter-item{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  font-size:12px;
+  font-weight:700;
+  color:#1f2937;
 }
 
 /* 商品情報：枠固定＋中スクロール */
