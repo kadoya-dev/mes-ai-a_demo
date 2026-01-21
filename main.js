@@ -79,7 +79,7 @@ const INFO_FIELDS_ALL = [
   { id: "JAN", label: "JAN", kind: "text", sourceKey: "JAN" },
   { id: "SKU", label: "SKU", kind: "text", sourceKey: "SKU" },
   { id: "サイズ", label: "サイズ", kind: "computed" },
-  { id: "重量（容積重量）", label: "重量\n（容積重量）", kind: "computed" },
+  { id: "重量（容積重量）", label: "重量（容積）", kind: "computed" },
   { id: "材質", label: "材質", kind: "text", sourceKey: "材質" }
 ];
 const INFO_BY_ID = Object.fromEntries(INFO_FIELDS_ALL.map((f) => [f.id, f]));
@@ -740,6 +740,15 @@ function buildCenterList(listEl, ctx, data) {
   if (!listEl) return;
   listEl.innerHTML = "";
 
+  const formatMetricValue = (metricId, rawValue) => {
+    if (rawValue == null || rawValue === "") return "－";
+    if (metricId === "サイズ感") {
+      const value = num(rawValue);
+      return Number.isFinite(value) ? String(value) : "－";
+    }
+    return String(rawValue);
+  };
+
   zoneState.center.forEach((token) => {
     const { type, id } = parseToken(token);
     if (type !== "M") return;
@@ -757,7 +766,7 @@ function buildCenterList(listEl, ctx, data) {
     const v = document.createElement("div");
     v.className = "v";
     const raw = data[m.sourceKey];
-    v.textContent = raw == null || raw === "" ? "－" : String(raw);
+    v.textContent = formatMetricValue(id, raw);
 
     row.appendChild(k);
     row.appendChild(v);
@@ -768,6 +777,15 @@ function buildCenterList(listEl, ctx, data) {
 function buildCenterCards(container, ctx, data) {
   if (!container) return;
   container.innerHTML = "";
+
+  const formatMetricValue = (metricId, rawValue) => {
+    if (rawValue == null || rawValue === "") return "－";
+    if (metricId === "サイズ感") {
+      const value = num(rawValue);
+      return Number.isFinite(value) ? String(value) : "－";
+    }
+    return String(rawValue);
+  };
 
   const recommendIds = [
     "推奨仕入数(90日)",
@@ -816,7 +834,7 @@ function buildCenterCards(container, ctx, data) {
       const v = document.createElement("span");
       v.className = "v";
       const raw = data[m.sourceKey];
-      v.textContent = raw == null || raw === "" ? "－" : String(raw);
+      v.textContent = formatMetricValue(id, raw);
 
       row.appendChild(k);
       row.appendChild(v);
@@ -834,7 +852,7 @@ function buildCenterCards(container, ctx, data) {
     const v = document.createElement("div");
     v.className = "v";
     const raw = data[m.sourceKey];
-    v.textContent = raw == null || raw === "" ? "－" : String(raw);
+    v.textContent = formatMetricValue(id, raw);
 
     k.style.fontSize = "11px";
     k.style.opacity = "0.55";

@@ -1001,13 +1001,13 @@ body:is(.fourth-layout, .fifth-layout) .l4-info .l4-info-media{
 }
 body:is(.fourth-layout, .fifth-layout) .l4-info .l4-info-media .image-box{
   padding: 8px;
-  min-height: 230px;
+  min-height: 160px;
   display:flex;
   align-items:center;
   justify-content:center;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-info .l4-info-media .image-box img{
-  height: 230px;
+  height: 160px;
   width:100%;
   object-fit:cover;
 }
