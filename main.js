@@ -69,19 +69,16 @@ const METRIC_BY_ID = Object.fromEntries(METRICS_ALL.map((m) => [m.id, m]));
    商品情報（項目）候補
 ========================= */
 const INFO_FIELDS_ALL = [
+  { id: "評価", label: "評価", kind: "text", sourceKey: "レビュー評価" },
+  { id: "注意事項", label: "注意事項", kind: "computedTags" },
   { id: "商品名", label: "商品名", kind: "computedTitle" },
   { id: "ブランド", label: "ブランド", kind: "text", sourceKey: "ブランド" },
-  { id: "評価", label: "評価", kind: "text", sourceKey: "レビュー評価" },
-
+  { id: "カテゴリ", label: "カテゴリ", kind: "computed" },
   { id: "各種ASIN", label: "各種ASIN", kind: "computed" },
   { id: "JAN", label: "JAN", kind: "text", sourceKey: "JAN" },
   { id: "SKU", label: "SKU", kind: "text", sourceKey: "SKU" },
-
   { id: "サイズ", label: "サイズ", kind: "computed" },
   { id: "重量（容積重量）", label: "重量\n（容積重量）", kind: "computed" },
-
-  { id: "カテゴリ", label: "カテゴリ", kind: "computed" },
-  { id: "注意事項", label: "注意事項", kind: "computedTags" },
   { id: "材質", label: "材質", kind: "text", sourceKey: "材質" }
 ];
 const INFO_BY_ID = Object.fromEntries(INFO_FIELDS_ALL.map((f) => [f.id, f]));
@@ -115,16 +112,16 @@ const DEFAULT_ZONES = {
     tokM("180日販売数")
   ],
   info: [
+    tokI("評価"),
+    tokI("注意事項"),
     tokI("商品名"),
     tokI("ブランド"),
-    tokI("評価"),
+    tokI("カテゴリ"),
     tokI("各種ASIN"),
     tokI("JAN"),
     tokI("サイズ"),
     tokI("重量（容積重量）"),
-    tokI("カテゴリ"),
-    tokI("材質"),
-    tokI("注意事項")
+    tokI("材質")
   ],
   center: [
     tokM("推奨仕入数(30日)"),
@@ -555,26 +552,58 @@ function resolveTokenValue(token, ctx, data) {
   return { kind: "text", label: id, text: "－" };
 }
 
-function renderWarningTags(raw) {
-  const str = String(raw || "").trim();
-  if (!str) return "－";
+const NOTICE_DEFS = [
+  {
+    id: "intellectual",
+    label: "知財",
+    className: "info",
+    match: /知財|IP|権利/,
+    fields: ["注意事項（知財）"]
+  },
+  {
+    id: "oversize",
+    label: "大型",
+    className: "warn",
+    match: /大型|危険|要承認|承認要/,
+    fields: ["注意事項（大型）"]
+  },
+  {
+    id: "shipping",
+    label: "出荷制限",
+    className: "danger",
+    match: /輸出不可|出荷禁止|禁止/,
+    fields: ["注意事項（出荷制限）"]
+  }
+];
 
-  const parts = str
-    .split(/[,\s]+/)
-    .map((s) => s.trim())
-    .filter(Boolean);
+function resolveNoticeFlag(value) {
+  if (value == null) return null;
+  const raw = String(value).trim();
+  if (!raw) return null;
+  if (/^(?:なし|無し|無|対象外|0|no|off|false)$/i.test(raw)) return false;
+  if (/^(?:あり|有|対象|1|yes|on|true)$/i.test(raw)) return true;
+  return true;
+}
 
-  if (!parts.length) return "－";
+function hasNoticeFlag(data, def, warningText) {
+  let hasExplicitOff = false;
+  for (const field of def.fields ?? []) {
+    const resolved = resolveNoticeFlag(data[field]);
+    if (resolved === true) return true;
+    if (resolved === false) hasExplicitOff = true;
+  }
+  if (hasExplicitOff) return false;
+  return def.match.test(warningText);
+}
 
-  const clsOf = (t) => {
-    if (/輸出不可|出荷禁止|禁止/.test(t)) return "tag danger";
-    if (/知財|IP|権利/.test(t)) return "tag info";
-    if (/大型|危険|要承認|承認要/.test(t)) return "tag warn";
-    if (/バリエーション/.test(t)) return "tag primary";
-    return "tag";
-  };
-
-  return parts.map((t) => `<span class="${clsOf(t)}">${t}</span>`).join("");
+function renderNoticeTags(data) {
+  const warningText = String(data?.["注意事項（警告系）"] ?? data?.["注意事項"] ?? "");
+  const tags = NOTICE_DEFS.map((def) => {
+    const isActive = hasNoticeFlag(data, def, warningText);
+    const cls = isActive ? `tag ${def.className}` : "tag muted";
+    return `<span class="${cls}" data-state="${isActive ? "on" : "off"}">${def.label}</span>`;
+  });
+  return tags.join("");
 }
 
 function resolveInfoValueById(id, ctx) {
@@ -589,7 +618,7 @@ function resolveInfoValueById(id, ctx) {
     サイズ: size,
     "重量（容積重量）": weight,
     カテゴリ: `${data["親カテゴリ"] || "－"} / ${data["サブカテゴリ"] || "－"}`,
-    注意事項: renderWarningTags(data["注意事項（警告系）"])
+    注意事項: renderNoticeTags(data)
   };
 
   if (f.kind === "computedTags") return { type: "tags", html: computed[id] || "－" };
@@ -804,6 +833,11 @@ function buildRecommendBlock(data) {
   guardBtn.className = "recommend-btn";
   guardBtn.textContent = "🟢 安定≫";
 
+  const resetRecommendBtn = document.createElement("button");
+  resetRecommendBtn.type = "button";
+  resetRecommendBtn.className = "recommend-btn recommend-btn-reset";
+  resetRecommendBtn.textContent = "標準に戻す";
+
   const nextBtn = document.createElement("button");
   nextBtn.type = "button";
   nextBtn.className = "recommend-btn";
@@ -812,6 +846,7 @@ function buildRecommendBlock(data) {
   actionGroup.appendChild(prevBtn);
   actionGroup.appendChild(attackBtn);
   actionGroup.appendChild(guardBtn);
+  actionGroup.appendChild(resetRecommendBtn);
   actionGroup.appendChild(nextBtn);
   head.appendChild(actionGroup);
 
@@ -823,8 +858,7 @@ function buildRecommendBlock(data) {
     { id: "推奨仕入数(120日)", label: "120日間" },
     { id: "推奨仕入数(90日)", label: "90日間" },
     { id: "推奨仕入数(60日)", label: "60日間" },
-    { id: "推奨仕入数(30日)", label: "30日間" },
-    { id: "推奨仕入数(15日)", label: "15日間" }
+    { id: "推奨仕入数(30日)", label: "30日間" }
   ];
 
   const columnsWrap = document.createElement("div");
@@ -898,14 +932,16 @@ function buildRecommendBlock(data) {
     "推奨仕入数(120日)",
     "推奨仕入数(90日)",
     "推奨仕入数(60日)",
-    "推奨仕入数(30日)",
-    "推奨仕入数(15日)"
+    "推奨仕入数(30日)"
   ];
-  const windowSize = 3;
+  const windowSize = cardOrder.length;
   const rowOrder = ["stable", "balance", "growth"];
-  let currentCardIndex = cardOrder.indexOf("推奨仕入数(60日)");
-  let currentRowIndex = rowOrder.indexOf("balance");
-  let windowStart = cardOrder.indexOf("推奨仕入数(90日)");
+  const defaultCardId = "推奨仕入数(60日)";
+  const defaultRowId = "balance";
+  const defaultWindowId = "推奨仕入数(180日)";
+  let currentCardIndex = cardOrder.indexOf(defaultCardId);
+  let currentRowIndex = rowOrder.indexOf(defaultRowId);
+  let windowStart = cardOrder.indexOf(defaultWindowId);
   if (windowStart < 0) windowStart = 0;
 
   const clampWindowStart = () => {
@@ -967,6 +1003,13 @@ function buildRecommendBlock(data) {
   nextBtn.addEventListener("click", () => {
     windowStart += 1;
     updateRecommendVisibility();
+  });
+
+  resetRecommendBtn.addEventListener("click", () => {
+    currentCardIndex = cardOrder.indexOf(defaultCardId);
+    currentRowIndex = rowOrder.indexOf(defaultRowId);
+    windowStart = cardOrder.indexOf(defaultWindowId);
+    applySelection();
   });
 
   applySelection();
@@ -1343,15 +1386,13 @@ function createProductCard(asin, data) {
       </div>
 
       <div class="layout4-grid">
-        <div class="l4-image l4-block">
-          <div class="head">商品画像</div>
-          <div class="image-box">
-            <img src="${data["商品画像"] || ""}" alt="商品画像" onerror="this.style.display='none';" />
-          </div>
-        </div>
-
         <div class="l4-info l4-block">
           <div class="head">商品情報</div>
+          <div class="l4-info-media">
+            <div class="image-box">
+              <img src="${data["商品画像"] || ""}" alt="商品画像" onerror="this.style.display='none';" />
+            </div>
+          </div>
           <div class="info-grid js-infoGrid"></div>
         </div>
 
