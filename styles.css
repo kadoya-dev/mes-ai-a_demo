@@ -297,10 +297,38 @@ a{ color:inherit; }
   margin-bottom:10px;
 }
 .asin-catalog-title{ font-size:13px; font-weight:900; }
+.asin-catalog-controls{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.asin-catalog-controls input{
+  height:32px;
+  border-radius:999px;
+  border:1px solid var(--line);
+  padding:0 12px;
+  font-weight:900;
+  font-size:12px;
+  min-width:220px;
+}
+.asin-catalog-controls button{
+  height:32px;
+  border-radius:999px;
+  border:1px solid var(--line);
+  background:#fff;
+  padding:0 14px;
+  font-weight:900;
+  cursor:pointer;
+}
 .asin-catalog-body{
   display:flex;
   gap:8px;
   flex-wrap:wrap;
+}
+.asin-empty{
+  font-size:12px;
+  font-weight:700;
+  color:#64748b;
 }
 .asin-pill{
   border:1px solid var(--line);
@@ -524,6 +552,11 @@ a{ color:inherit; }
   border-color: rgba(59,130,246,.35);
   background: rgba(59,130,246,.12);
   color:#1d4ed8;
+}
+.tag.muted{
+  border-color: rgba(148,163,184,.3);
+  background: rgba(148,163,184,.08);
+  color:#94a3b8;
 }
 
 .center-box{
@@ -907,34 +940,33 @@ body.third-layout .l3-mes canvas{
 /* =========================
    Layout4（fourth-layout）
    - 主要項目（l4-center）の高さを基準にして
-     商品画像（l4-image）/商品情報（l4-info）の高さを揃える
+     商品情報（l4-info）の高さを揃える
    - 主要項目は枠固定＋中スクロール
    ※ ここ以外は一切変更しない
 ========================= */
 
 body:is(.fourth-layout, .fifth-layout){
-  /* 1段目（画像/商品情報/主要項目）の高さを統一（=主要項目の枠高さ） */
+  /* 1段目（商品情報/主要項目）の高さを統一（=主要項目の枠高さ） */
   --l4-top-h: 460px;
 }
 
 body:is(.fourth-layout, .fifth-layout) .layout4-grid{
   display:grid;
 
-  /* 画像(細) / 商品情報 / 主要項目(広) / 主要項目(広) / カート */
-  grid-template-columns: 250px 250px 1.35fr 1.35fr 410px;
+  /* 商品情報 / 主要項目(広) / 主要項目(広) / カート */
+  grid-template-columns: 320px 1.9fr 1.9fr 410px;
 
   /* 1段目の行高さを固定＝主要項目の高さ基準 */
   grid-template-rows: var(--l4-top-h) auto;
 
   grid-template-areas:
-    "image info center center cart"
-    "keepa mes  mes    mes    cart";
+    "info center center cart"
+    "keepa mes  mes    cart";
   gap:14px;
   align-items:stretch;
 }
 
 /* 各ブロックの配置 */
-body:is(.fourth-layout, .fifth-layout) .l4-image{ grid-area: image; }
 body:is(.fourth-layout, .fifth-layout) .l4-info{ grid-area: info; }
 body:is(.fourth-layout, .fifth-layout) .l4-center{ grid-area: center; }
 body:is(.fourth-layout, .fifth-layout) .l4-keepa{ grid-area: keepa; }
@@ -956,7 +988,6 @@ body:is(.fourth-layout, .fifth-layout) .l4-block .head{
 }
 
 /* 高さ統一：1段目の3つは必ず同じ高さ */
-body:is(.fourth-layout, .fifth-layout) .l4-image,
 body:is(.fourth-layout, .fifth-layout) .l4-info,
 body:is(.fourth-layout, .fifth-layout) .l4-center{
   height: 100%;
@@ -965,27 +996,29 @@ body:is(.fourth-layout, .fifth-layout) .l4-center{
   min-height: 0;
 }
 
-/* 商品画像：上の1枚だけ表示（枠内にフィット） */
-body:is(.fourth-layout, .fifth-layout) .l4-image .image-grid{
-  flex: 1;
-  min-height: 0;
-  display:grid;
-  grid-template-columns: 1fr;
-  grid-template-rows: 1fr;
+body:is(.fourth-layout, .fifth-layout) .l4-info .l4-info-media{
+  margin-bottom: 10px;
 }
-
-/* 複数画像がDOMにある想定で、1枚だけ残す */
-body:is(.fourth-layout, .fifth-layout) .l4-image .image-grid img{ display:none; }
-body:is(.fourth-layout, .fifth-layout) .l4-image .image-grid img.main{ display:block; }
-body:is(.fourth-layout, .fifth-layout) .l4-image .image-grid img:first-child{ display:block; }
-
-body:is(.fourth-layout, .fifth-layout) .l4-image .image-grid img{
+body:is(.fourth-layout, .fifth-layout) .l4-info .l4-info-media .image-box{
+  padding: 8px;
+  min-height: 230px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+body:is(.fourth-layout, .fifth-layout) .l4-info .l4-info-media .image-box img{
+  height: 230px;
   width:100%;
-  height:100%;
   object-fit:cover;
-  border-radius:14px;
-  border:1px solid var(--line);
-  background:#fff;
+}
+body:is(.fourth-layout, .fifth-layout) .l4-info .info-top{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:8px 10px;
+  margin-bottom: 10px;
+}
+body:is(.fourth-layout, .fifth-layout) .l4-info .info-top .v-tags{
+  justify-content:flex-start;
 }
 
 /* 商品情報：枠固定＋中スクロール */
@@ -1001,7 +1034,7 @@ body:is(.fourth-layout, .fifth-layout) .l4-center .center-cards{
   min-height:0;
   overflow:auto;
   display:grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap:6px;
   padding-right: 4px;
 }
@@ -1051,11 +1084,11 @@ body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-wrap{
   grid-column: 1 / -1;
   border:1px solid #c7d2fe;
   border-radius:18px;
-  padding:12px;
+  padding:10px 12px 8px;
   background:#e0edff;
   display:flex;
   flex-direction:column;
-  gap:10px;
+  gap:8px;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-title{
   font-size:13px;
@@ -1067,7 +1100,7 @@ body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-head{
   align-items:center;
   gap:12px;
   flex-wrap:wrap;
-  justify-content:flex-end;
+  justify-content:space-between;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-action-group{
   display:flex;
@@ -1087,10 +1120,16 @@ body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-btn{
   color:#1f2937;
   cursor:pointer;
 }
+body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-btn-reset{
+  background:#f1f5f9;
+  border-color:#cbd5f5;
+  color:#334155;
+  font-size:11px;
+}
 body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-table{
-  --recommend-col-width: 70px;
+  --recommend-col-width: 86px;
   --recommend-gap: 8px;
-  --recommend-peek: 24px;
+  --recommend-peek: 0px;
   display:grid;
   grid-template-columns: 70px 1fr;
   gap:8px;
@@ -1100,7 +1139,8 @@ body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-columns{
   display:flex;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-columns-viewport{
-  overflow:hidden;
+  overflow-x:auto;
+  overflow-y:hidden;
   width: calc(
     (var(--recommend-col-width) + var(--recommend-gap)) * var(--recommend-cols, 3)
     - var(--recommend-gap)
@@ -1205,8 +1245,71 @@ body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .subhead{
 }
 body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .var-cards{
   display:grid;
-  grid-template-columns: 0.45fr 0.55fr;
+  grid-template-columns: 1.2fr 0.9fr 0.9fr;
   gap:10px;
+}
+body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .center-card.var-risk{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .risk-index{
+  display:grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap:6px;
+  align-items:center;
+  justify-items:center;
+}
+body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .risk-item{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:4px;
+  text-align:center;
+}
+body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .risk-ring{
+  --risk-color: #f59e0b;
+  position:relative;
+  width:58px;
+  height:58px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:
+    conic-gradient(var(--risk-color) calc(var(--risk-value) * 1%), #e5e7eb 0);
+}
+body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .risk-item.safe .risk-ring{
+  --risk-color: #22c55e;
+}
+body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .risk-ring::after{
+  content:"";
+  position:absolute;
+  inset:6px;
+  background:#fff;
+  border-radius:50%;
+  box-shadow: inset 0 0 0 1px #e2e8f0;
+}
+body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .risk-num,
+body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .risk-note{
+  position:relative;
+  z-index:1;
+  line-height:1;
+}
+body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .risk-num{
+  font-size:15px;
+  font-weight:900;
+  color:#0f172a;
+}
+body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .risk-note{
+  font-size:10px;
+  font-weight:900;
+  color:#64748b;
+}
+body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .risk-caption{
+  font-size:10px;
+  font-weight:900;
+  color:#475569;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .center-card.var-sell,
 body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .center-card.var-profit{
