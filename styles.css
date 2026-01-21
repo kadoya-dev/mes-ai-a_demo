@@ -973,9 +973,24 @@ body:is(.fourth-layout, .fifth-layout) .l4-info .l4-info-media{
 }
 body:is(.fourth-layout, .fifth-layout) .l4-info .l4-info-media .image-box{
   padding: 8px;
+  min-height: 230px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-info .l4-info-media .image-box img{
   height: 230px;
+  width:100%;
+  object-fit:cover;
+}
+body:is(.fourth-layout, .fifth-layout) .l4-info .info-top{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:8px 10px;
+  margin-bottom: 10px;
+}
+body:is(.fourth-layout, .fifth-layout) .l4-info .info-top .v-tags{
+  justify-content:flex-start;
 }
 
 /* 商品情報：枠固定＋中スクロール */
@@ -991,7 +1006,7 @@ body:is(.fourth-layout, .fifth-layout) .l4-center .center-cards{
   min-height:0;
   overflow:auto;
   display:grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap:6px;
   padding-right: 4px;
 }
@@ -1096,7 +1111,8 @@ body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-columns{
   display:flex;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-columns-viewport{
-  overflow:hidden;
+  overflow-x:auto;
+  overflow-y:hidden;
   width: calc(
     (var(--recommend-col-width) + var(--recommend-gap)) * var(--recommend-cols, 3)
     - var(--recommend-gap)

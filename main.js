@@ -818,11 +818,6 @@ function buildRecommendBlock(data) {
   const actionGroup = document.createElement("div");
   actionGroup.className = "recommend-action-group";
 
-  const prevBtn = document.createElement("button");
-  prevBtn.type = "button";
-  prevBtn.className = "recommend-btn";
-  prevBtn.textContent = "＜";
-
   const attackBtn = document.createElement("button");
   attackBtn.type = "button";
   attackBtn.className = "recommend-btn";
@@ -838,16 +833,9 @@ function buildRecommendBlock(data) {
   resetRecommendBtn.className = "recommend-btn recommend-btn-reset";
   resetRecommendBtn.textContent = "標準に戻す";
 
-  const nextBtn = document.createElement("button");
-  nextBtn.type = "button";
-  nextBtn.className = "recommend-btn";
-  nextBtn.textContent = "＞";
-
-  actionGroup.appendChild(prevBtn);
   actionGroup.appendChild(attackBtn);
   actionGroup.appendChild(guardBtn);
   actionGroup.appendChild(resetRecommendBtn);
-  actionGroup.appendChild(nextBtn);
   head.appendChild(actionGroup);
 
   const table = document.createElement("div");
@@ -938,23 +926,13 @@ function buildRecommendBlock(data) {
   const rowOrder = ["stable", "balance", "growth"];
   const defaultCardId = "推奨仕入数(60日)";
   const defaultRowId = "balance";
-  const defaultWindowId = "推奨仕入数(180日)";
   let currentCardIndex = cardOrder.indexOf(defaultCardId);
   let currentRowIndex = rowOrder.indexOf(defaultRowId);
-  let windowStart = cardOrder.indexOf(defaultWindowId);
-  if (windowStart < 0) windowStart = 0;
-
-  const clampWindowStart = () => {
-    const maxStart = Math.max(0, cardOrder.length - windowSize);
-    windowStart = Math.min(Math.max(windowStart, 0), maxStart);
-  };
+  let windowStart = 0;
 
   const updateRecommendVisibility = () => {
-    clampWindowStart();
     wrap.style.setProperty("--recommend-cols", String(windowSize));
     wrap.style.setProperty("--recommend-offset", String(windowStart));
-    prevBtn.disabled = windowStart <= 0;
-    nextBtn.disabled = windowStart >= cardOrder.length - windowSize;
   };
 
   const applySelection = () => {
@@ -963,11 +941,6 @@ function buildRecommendBlock(data) {
       cardOrder[currentCardIndex],
       rowOrder[currentRowIndex]
     );
-    if (currentCardIndex < windowStart) {
-      windowStart = currentCardIndex;
-    } else if (currentCardIndex > windowStart + windowSize - 1) {
-      windowStart = currentCardIndex - windowSize + 1;
-    }
     updateRecommendVisibility();
     attackBtn.disabled =
       currentCardIndex === 0 && rowOrder[currentRowIndex] === "growth";
@@ -995,14 +968,11 @@ function buildRecommendBlock(data) {
     applySelection();
   });
 
-  prevBtn.addEventListener("click", () => {
-    windowStart -= 1;
-    updateRecommendVisibility();
-  });
-
-  nextBtn.addEventListener("click", () => {
-    windowStart += 1;
-    updateRecommendVisibility();
+  resetRecommendBtn.addEventListener("click", () => {
+    currentCardIndex = cardOrder.indexOf(defaultCardId);
+    currentRowIndex = rowOrder.indexOf(defaultRowId);
+    windowStart = 0;
+    applySelection();
   });
 
   resetRecommendBtn.addEventListener("click", () => {
@@ -1051,6 +1021,13 @@ function rerenderAllCards() {
         ctx,
         v.data
       );
+    } else if (isFourth) {
+      const infoTop = v.el.querySelector(".js-infoTop");
+      const infoGrid = v.el.querySelector(".js-infoGrid");
+      const topTokens = [tokI("評価"), tokI("注意事項")];
+      const restTokens = zoneState.info.filter((token) => !topTokens.includes(token));
+      buildInfoGrid(infoTop, ctx, v.data, topTokens);
+      buildInfoGrid(infoGrid, ctx, v.data, restTokens);
     } else {
       buildInfoGrid(v.el.querySelector(".js-infoGrid"), ctx, v.data);
     }
@@ -1388,6 +1365,7 @@ function createProductCard(asin, data) {
       <div class="layout4-grid">
         <div class="l4-info l4-block">
           <div class="head">商品情報</div>
+          <div class="info-top js-infoTop"></div>
           <div class="l4-info-media">
             <div class="image-box">
               <img src="${data["商品画像"] || ""}" alt="商品画像" onerror="this.style.display='none';" />
@@ -1957,6 +1935,13 @@ card.querySelector(".js-addCart").addEventListener("click", () => {
   // info
   if (isThirdLayout) {
     buildInfoGridSplit(card.querySelector(".js-infoGridA"), card.querySelector(".js-infoGridB"), ctx, data);
+  } else if (isFourthLayout) {
+    const infoTop = card.querySelector(".js-infoTop");
+    const infoGrid = card.querySelector(".js-infoGrid");
+    const topTokens = [tokI("評価"), tokI("注意事項")];
+    const restTokens = zoneState.info.filter((token) => !topTokens.includes(token));
+    buildInfoGrid(infoTop, ctx, data, topTokens);
+    buildInfoGrid(infoGrid, ctx, data, restTokens);
   } else {
     buildInfoGrid(card.querySelector(".js-infoGrid"), ctx, data);
   }
