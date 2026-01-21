@@ -194,6 +194,8 @@ const clearCartBtn = $("#clearCartBtn");
 
 /* catalog */
 const asinCatalog = $("#asinCatalog");
+const asinSearchInput = $("#asinSearchInput");
+const asinSearchBtn = $("#asinSearchBtn");
 const itemsContainer = $("#itemsContainer");
 const emptyState = $("#emptyState");
 const headerStatus = $("#headerStatus");
@@ -277,16 +279,55 @@ function initActions() {
 }
 
 function initCatalog() {
-  const asins = Object.keys(window.ASIN_DATA || {});
-  asinCatalog.innerHTML = "";
-  asins.forEach((asin) => {
-    const b = document.createElement("button");
-    b.className = "asin-pill";
-    b.type = "button";
-    b.textContent = asin;
-    b.addEventListener("click", () => addOrFocusCard(asin));
-    asinCatalog.appendChild(b);
+  const allAsins = Object.keys(window.ASIN_DATA || {});
+
+  const renderAsinList = (asins) => {
+    asinCatalog.innerHTML = "";
+    if (!asins.length) {
+      const empty = document.createElement("div");
+      empty.className = "asin-empty";
+      empty.textContent = "該当するASINがありません";
+      asinCatalog.appendChild(empty);
+      return;
+    }
+    asins.forEach((asin) => {
+      const b = document.createElement("button");
+      b.className = "asin-pill";
+      b.type = "button";
+      b.textContent = asin;
+      b.addEventListener("click", () => addOrFocusCard(asin));
+      asinCatalog.appendChild(b);
+    });
+  };
+
+  const runSearch = () => {
+    const keyword = String(asinSearchInput?.value || "").trim().toLowerCase();
+    if (!keyword) {
+      asinCatalog.innerHTML = "";
+      const empty = document.createElement("div");
+      empty.className = "asin-empty";
+      empty.textContent = "検索条件を入力してください";
+      asinCatalog.appendChild(empty);
+      return;
+    }
+    const filtered = allAsins.filter((asin) => {
+      const data = window.ASIN_DATA?.[asin] || {};
+      const title = String(data["品名"] || data["商品名"] || data["商品タイトル"] || "").toLowerCase();
+      return asin.toLowerCase().includes(keyword) || title.includes(keyword);
+    });
+    renderAsinList(filtered);
+  };
+
+  asinSearchBtn?.addEventListener("click", runSearch);
+  asinSearchInput?.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") runSearch();
   });
+
+  asinCatalog.innerHTML = "";
+  const empty = document.createElement("div");
+  empty.className = "asin-empty";
+  empty.textContent = "検索条件を入力して実行してください";
+  asinCatalog.appendChild(empty);
 }
 
 function addOrFocusCard(asin) {
@@ -810,12 +851,12 @@ function buildRecommendBlock(data) {
   const wrap = document.createElement("div");
   wrap.className = "recommend-wrap";
 
+  const head = document.createElement("div");
+  head.className = "recommend-head";
+
   const heading = document.createElement("div");
   heading.className = "recommend-title";
   heading.textContent = "推奨仕入数";
-
-  const head = document.createElement("div");
-  head.className = "recommend-head";
 
   const actionGroup = document.createElement("div");
   actionGroup.className = "recommend-action-group";
@@ -838,6 +879,7 @@ function buildRecommendBlock(data) {
   actionGroup.appendChild(attackBtn);
   actionGroup.appendChild(guardBtn);
   actionGroup.appendChild(resetRecommendBtn);
+  head.appendChild(heading);
   head.appendChild(actionGroup);
 
   const table = document.createElement("div");
@@ -913,7 +955,6 @@ function buildRecommendBlock(data) {
   table.appendChild(labelsCol);
   table.appendChild(columnsWrap);
 
-  wrap.appendChild(heading);
   wrap.appendChild(head);
   wrap.appendChild(table);
 

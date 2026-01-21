@@ -27,7 +27,11 @@
 <main class="page-body">
   <section class="asin-catalog card">
     <div class="asin-catalog-head">
-      <div class="asin-catalog-title">データがあるASIN（クリックで表示）</div>
+      <div class="asin-catalog-title">検索条件</div>
+      <div class="asin-catalog-controls">
+        <input id="asinSearchInput" type="text" placeholder="ASIN / 商品名で検索" />
+        <button id="asinSearchBtn" type="button">検索実行</button>
+      </div>
     </div>
     <div class="asin-catalog-body" id="asinCatalog"></div>
   </section>
@@ -48,7 +52,7 @@
   </section>
 
   <div id="emptyState" class="empty card">
-    ASINをクリックして商品を表示してください
+    検索後にASINをクリックして商品を表示してください
   </div>
 
   <div id="itemsContainer" class="items-stack"></div>
