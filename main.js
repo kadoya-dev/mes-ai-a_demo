@@ -975,6 +975,13 @@ function buildRecommendBlock(data) {
     applySelection();
   });
 
+  resetRecommendBtn.addEventListener("click", () => {
+    currentCardIndex = cardOrder.indexOf(defaultCardId);
+    currentRowIndex = rowOrder.indexOf(defaultRowId);
+    windowStart = cardOrder.indexOf(defaultWindowId);
+    applySelection();
+  });
+
   applySelection();
 
   return wrap;
