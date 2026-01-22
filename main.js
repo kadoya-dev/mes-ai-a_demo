@@ -286,6 +286,18 @@ function initActions() {
 }
 
 function initCatalog() {
+  if (!window.ASIN_DATA || Object.keys(window.ASIN_DATA).length === 0) {
+    if (asinCatalog) {
+      asinCatalog.innerHTML = "";
+      const empty = document.createElement("div");
+      empty.className = "asin-empty";
+      empty.textContent = "ASINデータを読み込み中...";
+      asinCatalog.appendChild(empty);
+    }
+    window.setTimeout(initCatalog, 100);
+    return;
+  }
+
   const allAsins = Object.keys(window.ASIN_DATA || {});
   const categorySet = new Set();
   const materialSet = new Set();
@@ -353,6 +365,10 @@ function initCatalog() {
     const minProfitRate = num(profitRateMin?.value);
     const selectedCategories = getCheckedValues(categoryFilters);
     const selectedMaterials = getCheckedValues(materialFilters);
+    if (!keyword && !minProfitRate && selectedCategories.size === 0 && selectedMaterials.size === 0) {
+      renderAsinList(allAsins);
+      return;
+    }
     const filtered = allAsins.filter((asin) => {
       const data = window.ASIN_DATA?.[asin] || {};
       const title = String(data["品名"] || data["商品名"] || data["商品タイトル"] || "").toLowerCase();
