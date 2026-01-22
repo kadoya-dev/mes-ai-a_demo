@@ -196,6 +196,7 @@ const clearCartBtn = $("#clearCartBtn");
 const asinCatalog = $("#asinCatalog");
 const asinSearchInput = $("#asinSearchInput");
 const asinSearchBtn = $("#asinSearchBtn");
+const asinLoadBtn = $("#asinLoadBtn");
 const profitRateMin = $("#profitRateMin");
 const categoryFilters = $("#categoryFilters");
 const materialFilters = $("#materialFilters");
@@ -282,6 +283,21 @@ function initActions() {
 }
 
 function initCatalog() {
+  if (!window.ASIN_DATA || Object.keys(window.ASIN_DATA).length === 0) {
+    if (asinCatalog) {
+      asinCatalog.innerHTML = "";
+      const empty = document.createElement("div");
+      empty.className = "asin-empty";
+      empty.textContent = "ASINデータを読み込み中...";
+      asinCatalog.appendChild(empty);
+    }
+    if (asinLoadBtn) {
+      asinLoadBtn.disabled = true;
+    }
+    window.setTimeout(initCatalog, 200);
+    return;
+  }
+
   const allAsins = Object.keys(window.ASIN_DATA || {});
   const categorySet = new Set();
   const materialSet = new Set();
@@ -387,11 +403,7 @@ function initCatalog() {
   });
   profitRateMin?.addEventListener("change", runSearch);
 
-  asinCatalog.innerHTML = "";
-  const empty = document.createElement("div");
-  empty.className = "asin-empty";
-  empty.textContent = "検索条件を入力して実行してください";
-  asinCatalog.appendChild(empty);
+  renderAsinList(allAsins);
 }
 
 function addOrFocusCard(asin) {
