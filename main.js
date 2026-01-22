@@ -38,6 +38,7 @@ const METRICS_ALL = [
   { id: "入金額計（円）", label: "入金額計（円）", sourceKey: "入金額計（円）" },
 
   { id: "30日販売数", label: "30日販売数（実績）", sourceKey: "30日販売数" },
+  { id: "60日販売数", label: "60日販売数（実績）", sourceKey: "60日販売数" },
   { id: "90日販売数", label: "90日販売数（実績）", sourceKey: "90日販売数" },
   { id: "180日販売数", label: "180日販売数（実績）", sourceKey: "180日販売数" },
   { id: "予測30日販売数", label: "予測30日販売数", sourceKey: "予測30日販売数" },
@@ -135,9 +136,11 @@ const DEFAULT_ZONES = {
     tokM("サイズ感"),
     tokM("在庫数"),
     tokM("返品率"),
-    tokM("予測30日販売数"),
-    tokM("予測60日販売数"),
     tokM("予測90日販売数"),
+    tokM("予測60日販売数"),
+    tokM("予測30日販売数"),
+    tokM("90日販売数"),
+    tokM("60日販売数"),
     tokM("30日販売数"),
     tokM("日本最安値"),
     tokM("過去3月FBA最安値"),
@@ -905,9 +908,11 @@ function buildCenterCards(container, ctx, data) {
     "推奨仕入数(30日)"
   ];
   const compactIds = new Set([
-    "予測30日販売数",
-    "予測60日販売数",
     "予測90日販売数",
+    "予測60日販売数",
+    "予測30日販売数",
+    "90日販売数",
+    "60日販売数",
     "30日販売数",
     "日本最安値",
     "過去3月FBA最安値",

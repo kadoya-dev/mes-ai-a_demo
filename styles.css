@@ -1368,8 +1368,8 @@ body:is(.fourth-layout, .fifth-layout) .l4-mes .risk-item{
 body:is(.fourth-layout, .fifth-layout) .l4-mes .risk-ring{
   --risk-color: #f59e0b;
   position:relative;
-  width:64px;
-  height:64px;
+  width:52px;
+  height:52px;
   border-radius:50%;
   display:flex;
   align-items:center;
