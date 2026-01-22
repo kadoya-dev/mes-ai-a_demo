@@ -294,7 +294,7 @@ function initCatalog() {
       empty.textContent = "ASINデータを読み込み中...";
       asinCatalog.appendChild(empty);
     }
-    window.setTimeout(initCatalog, 100);
+    window.setTimeout(initCatalog, 200);
     return;
   }
 
