@@ -387,11 +387,7 @@ function initCatalog() {
   });
   profitRateMin?.addEventListener("change", runSearch);
 
-  asinCatalog.innerHTML = "";
-  const empty = document.createElement("div");
-  empty.className = "asin-empty";
-  empty.textContent = "検索条件を入力して実行してください";
-  asinCatalog.appendChild(empty);
+  renderAsinList(allAsins);
 }
 
 function addOrFocusCard(asin) {
