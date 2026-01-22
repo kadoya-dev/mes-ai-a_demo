@@ -330,6 +330,19 @@ a{ color:inherit; }
   font-weight:900;
   cursor:pointer;
 }
+.asin-load-btn{
+  height:32px;
+  border-radius:999px;
+  border:1px solid var(--line);
+  background:#fff;
+  padding:0 14px;
+  font-weight:900;
+  cursor:pointer;
+}
+.asin-load-btn:disabled{
+  cursor:not-allowed;
+  opacity:0.6;
+}
 .asin-catalog-body{
   display:flex;
   gap:8px;

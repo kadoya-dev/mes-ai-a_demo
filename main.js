@@ -200,6 +200,7 @@ const clearCartBtn = $("#clearCartBtn");
 const asinCatalog = $("#asinCatalog");
 const asinSearchInput = $("#asinSearchInput");
 const asinSearchBtn = $("#asinSearchBtn");
+const asinLoadBtn = $("#asinLoadBtn");
 const profitRateMin = $("#profitRateMin");
 const categoryFilters = $("#categoryFilters");
 const materialFilters = $("#materialFilters");
@@ -293,6 +294,9 @@ function initCatalog() {
       empty.className = "asin-empty";
       empty.textContent = "ASINデータを読み込み中...";
       asinCatalog.appendChild(empty);
+    }
+    if (asinLoadBtn) {
+      asinLoadBtn.disabled = true;
     }
     window.setTimeout(initCatalog, 200);
     return;
@@ -407,7 +411,17 @@ function initCatalog() {
   });
   profitRateMin?.addEventListener("change", runSearch);
 
-  renderAsinList(allAsins);
+  if (asinLoadBtn && !asinLoadBtn.dataset.ready) {
+    asinLoadBtn.disabled = false;
+    asinLoadBtn.dataset.ready = "true";
+    asinLoadBtn.addEventListener("click", () => {
+      renderAsinList(allAsins);
+    });
+  }
+
+  if (!asinLoadBtn) {
+    renderAsinList(allAsins);
+  }
 }
 
 function addOrFocusCard(asin) {
