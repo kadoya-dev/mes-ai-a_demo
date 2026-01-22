@@ -411,6 +411,16 @@ function initCatalog() {
   });
   profitRateMin?.addEventListener("change", runSearch);
 
+  if (asinLoadBtn && !asinLoadBtn.dataset.ready) {
+    asinLoadBtn.dataset.ready = "true";
+    asinLoadBtn.disabled = false;
+    asinLoadBtn.addEventListener("click", () => {
+      renderAsinList(allAsins);
+    });
+  } else if (asinLoadBtn) {
+    asinLoadBtn.disabled = false;
+  }
+
   renderAsinList(allAsins);
 }
 
