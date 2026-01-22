@@ -62,6 +62,7 @@ const METRICS_ALL = [
 
   { id: "仕入れ目安単価", label: "仕入れ目安単価", sourceKey: "仕入れ目安単価" },
   { id: "送料", label: "送料", sourceKey: "送料" },
+  { id: "見込み送料", label: "見込み送料", sourceKey: "見込み送料" },
   { id: "関税", label: "関税", sourceKey: "関税" }
 ];
 const METRIC_BY_ID = Object.fromEntries(METRICS_ALL.map((m) => [m.id, m]));
@@ -75,8 +76,9 @@ const INFO_FIELDS_ALL = [
   { id: "商品名", label: "商品名", kind: "computedTitle" },
   { id: "ブランド", label: "ブランド", kind: "text", sourceKey: "ブランド" },
   { id: "カテゴリ", label: "カテゴリ", kind: "computed" },
-  { id: "各種ASIN", label: "各種ASIN", kind: "computed" },
-  { id: "JAN", label: "JAN", kind: "text", sourceKey: "JAN" },
+  { id: "日本ASIN", label: "日本ASIN", kind: "computedHtml" },
+  { id: "米ASIN", label: "米ASIN", kind: "computedHtml" },
+  { id: "JAN", label: "JAN", kind: "computedHtml", sourceKey: "JAN" },
   { id: "SKU", label: "SKU", kind: "text", sourceKey: "SKU" },
   { id: "サイズ", label: "サイズ", kind: "computed" },
   { id: "重量（容積重量）", label: "重量(容積)", kind: "computed" },
@@ -118,7 +120,8 @@ const DEFAULT_ZONES = {
     tokI("商品名"),
     tokI("ブランド"),
     tokI("カテゴリ"),
-    tokI("各種ASIN"),
+    tokI("日本ASIN"),
+    tokI("米ASIN"),
     tokI("JAN"),
     tokI("サイズ"),
     tokI("重量（容積重量）"),
@@ -139,6 +142,7 @@ const DEFAULT_ZONES = {
     tokM("過去3月FBA最安値"),
     tokM("FBA最安値"),
     tokM("送料"),
+    tokM("見込み送料"),
     tokM("関税"),
     tokM("仕入れ目安単価"),
     tokM("入金額予測"),
@@ -361,6 +365,10 @@ function initCatalog() {
     const minProfitRate = num(profitRateMin?.value);
     const selectedCategories = getCheckedValues(categoryFilters);
     const selectedMaterials = getCheckedValues(materialFilters);
+    if (!keyword && !minProfitRate && selectedCategories.size === 0 && selectedMaterials.size === 0) {
+      renderAsinList(allAsins);
+      return;
+    }
     const filtered = allAsins.filter((asin) => {
       const data = window.ASIN_DATA?.[asin] || {};
       const title = String(data["品名"] || data["商品名"] || data["商品タイトル"] || "").toLowerCase();
@@ -661,6 +669,7 @@ function resolveTokenValue(token, ctx, data) {
   if (type === "I") {
     const rv = resolveInfoValueById(id, ctx);
     if (rv.type === "tags") return { kind: "tags", label: INFO_BY_ID[id]?.label || id, html: rv.html };
+    if (rv.type === "html") return { kind: "html", label: INFO_BY_ID[id]?.label || id, html: rv.html };
     return { kind: "text", label: INFO_BY_ID[id]?.label || id, text: rv.text };
   }
 
@@ -721,6 +730,20 @@ function renderNoticeTags(data) {
   return tags.join("");
 }
 
+function buildAsinLink(asin, baseUrl) {
+  const value = String(asin ?? "").trim();
+  if (!value || value === "－") return "－";
+  const href = `${baseUrl}${encodeURIComponent(value)}`;
+  return `<a class="asin-link" href="${href}" target="_blank" rel="noopener">${value}</a>`;
+}
+
+function buildImageSearchLink(value) {
+  const raw = String(value ?? "").trim();
+  if (!raw || raw === "－") return "－";
+  const href = `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(raw)}`;
+  return `<a class="asin-link" href="${href}" target="_blank" rel="noopener">${raw}</a>`;
+}
+
 function resolveInfoValueById(id, ctx) {
   const f = INFO_BY_ID[id];
   if (!f) return { type: "text", text: "－" };
@@ -729,7 +752,9 @@ function resolveInfoValueById(id, ctx) {
 
   const computed = {
     商品名: data["品名"] || data["商品名"] || data["商品タイトル"] || "－",
-    各種ASIN: `日本: ${jpAsin} / US: ${usAsin}`,
+    日本ASIN: buildAsinLink(jpAsin, "https://www.amazon.co.jp/s?k="),
+    米ASIN: buildAsinLink(usAsin, "https://www.amazon.com/s?k="),
+    JAN: buildImageSearchLink(data["JAN"]),
     サイズ: size,
     "重量（容積重量）": weight,
     カテゴリ: `${data["親カテゴリ"] || "－"} / ${data["サブカテゴリ"] || "－"}`,
@@ -737,6 +762,7 @@ function resolveInfoValueById(id, ctx) {
   };
 
   if (f.kind === "computedTags") return { type: "tags", html: computed[id] || "－" };
+  if (f.kind === "computedHtml") return { type: "html", html: computed[id] || "－" };
   if (f.kind === "computed" || f.kind === "computedTitle") return { type: "text", text: computed[id] || "－" };
 
   const sourceKey = f.sourceKey || f.id;
@@ -777,6 +803,9 @@ function buildInfoGrid(container, ctx, data, tokens, options = {}) {
 
     if (v.kind === "tags") {
       val.classList.add("v-tags");
+      val.innerHTML = v.html;
+    } else if (v.kind === "html") {
+      val.classList.add("v-html");
       val.innerHTML = v.html;
     } else {
       val.textContent = v.text;
@@ -965,7 +994,6 @@ function buildRecommendBlock(data) {
   actionGroup.appendChild(attackBtn);
   actionGroup.appendChild(guardBtn);
   head.appendChild(heading);
-  head.appendChild(actionGroup);
 
   const table = document.createElement("div");
   table.className = "recommend-table";
@@ -989,6 +1017,11 @@ function buildRecommendBlock(data) {
 
   const labelsCol = document.createElement("div");
   labelsCol.className = "recommend-labels";
+
+  const actionsRow = document.createElement("div");
+  actionsRow.className = "recommend-actions-left";
+  actionsRow.appendChild(actionGroup);
+  labelsCol.appendChild(actionsRow);
 
   const rowDefs = [
     { id: "stable", label: "🟢 安定", factor: 0.85 },
@@ -1038,6 +1071,10 @@ function buildRecommendBlock(data) {
   columnsViewport.appendChild(columnsInner);
   columnsWrap.appendChild(columnsViewport);
 
+  const actionsRow = document.createElement("div");
+  actionsRow.className = "recommend-actions-row";
+  actionsRow.appendChild(actionGroup);
+  table.appendChild(actionsRow);
   table.appendChild(labelsCol);
   table.appendChild(columnsWrap);
 
@@ -1099,6 +1136,22 @@ function buildRecommendBlock(data) {
     applySelection();
   });
 
+  wrap.addEventListener("click", (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) return;
+    const cell = target.closest(".recommend-cell-value");
+    if (!cell) return;
+    const cardId = cell.dataset.card;
+    const modeId = cell.dataset.mode;
+    if (!cardId || !modeId) return;
+    const cardIndex = cardOrder.indexOf(cardId);
+    const rowIndex = rowOrder.indexOf(modeId);
+    if (cardIndex === -1 || rowIndex === -1) return;
+    currentCardIndex = cardIndex;
+    currentRowIndex = rowIndex;
+    applySelection();
+  });
+
   applySelection();
 
   return wrap;
@@ -1111,7 +1164,11 @@ function updateRecommendSelection(wrap, cardId, mode, defaultCardId, defaultMode
     cell.classList.toggle("is-muted", !isActive);
     const baseValue = cell.dataset.baseValue || cell.textContent || "";
     const isDefault = cell.dataset.card === defaultCardId && cell.dataset.mode === defaultMode;
+    const hasFire = cell.dataset.hasFire === "true" || String(cell.textContent || "").startsWith("🔥");
     if (isActive && isDefault) {
+      cell.dataset.hasFire = "true";
+      cell.textContent = `🔥${baseValue}`;
+    } else if (hasFire) {
       cell.textContent = `🔥${baseValue}`;
     } else {
       cell.textContent = baseValue;
@@ -1416,6 +1473,7 @@ function createProductCard(asin, data) {
       <div class="card-top">
         <div class="title">ASIN: ${asin}</div>
         <input class="asin-memo" type="text" placeholder="メモ" />
+        <button class="memo-save" type="button">保存</button>
         <button class="remove" type="button">この行を削除</button>
       </div>
 
@@ -1438,7 +1496,6 @@ function createProductCard(asin, data) {
         </div>
 
         <div class="l3-center l3-block">
-          <div class="head">主要項目</div>
           <div class="center-list js-center"></div>
         </div>
 
@@ -1483,6 +1540,7 @@ function createProductCard(asin, data) {
       <div class="card-top">
         <div class="title">ASIN: ${asin}</div>
         <input class="asin-memo" type="text" placeholder="メモ" />
+        <button class="memo-save" type="button">保存</button>
         <button class="remove" type="button">この行を削除</button>
       </div>
 
@@ -1499,37 +1557,10 @@ function createProductCard(asin, data) {
         </div>
 
         <div class="l4-center l4-block">
-          <div class="head">主要項目</div>
           <div class="center-cards js-centerCards"></div>
 
           <div class="l4-variable">
             <div class="var-cards">
-              <div class="center-card var-risk">
-                <div class="k">危険度指数</div>
-                <div class="risk-index">
-                  <div class="risk-item warning">
-                    <div class="risk-ring" style="--risk-value: 62;">
-                      <div class="risk-num">62</div>
-                      <div class="risk-note">注意</div>
-                    </div>
-                    <div class="risk-caption">直近重視</div>
-                  </div>
-                  <div class="risk-item safe">
-                    <div class="risk-ring" style="--risk-value: 38;">
-                      <div class="risk-num">38</div>
-                      <div class="risk-note">安定</div>
-                    </div>
-                    <div class="risk-caption">回数重視</div>
-                  </div>
-                  <div class="risk-item warning">
-                    <div class="risk-ring" style="--risk-value: 54;">
-                      <div class="risk-num">54</div>
-                      <div class="risk-note">注意</div>
-                    </div>
-                    <div class="risk-caption">両方</div>
-                  </div>
-                </div>
-              </div>
               <div class="center-card var-sell">
                 <div class="k">販売価格（$）</div>
                 <input class="v js-sell js-sellInput" type="number" step="0.01" placeholder="例: 39.99" />
@@ -1673,12 +1704,37 @@ function createProductCard(asin, data) {
         <div class="l4-keepa l4-block">
           <div class="head">keepaグラフ</div>
           <div class="keepa-mini">
-            <iframe class="js-keepaFrame" src="" loading="lazy"></iframe>
+            <img class="keepa-image" src="keepa2graph.png" alt="keepaグラフ" />
           </div>
         </div>
 
         <div class="l4-mes l4-block">
-          <div class="head">需要供給グラフ（180日）</div>
+          <div class="head">
+            <span>需要供給グラフ（180日）</span>
+            <div class="risk-index">
+              <div class="risk-item warning">
+                <div class="risk-ring" style="--risk-value: 62;">
+                  <div class="risk-num">62</div>
+                  <div class="risk-note">注意</div>
+                </div>
+                <div class="risk-caption">直近重視</div>
+              </div>
+              <div class="risk-item safe">
+                <div class="risk-ring" style="--risk-value: 38;">
+                  <div class="risk-num">38</div>
+                  <div class="risk-note">安定</div>
+                </div>
+                <div class="risk-caption">回数重視</div>
+              </div>
+              <div class="risk-item warning">
+                <div class="risk-ring" style="--risk-value: 54;">
+                  <div class="risk-num">54</div>
+                  <div class="risk-note">注意</div>
+                </div>
+                <div class="risk-caption">両方</div>
+              </div>
+            </div>
+          </div>
 
           <div class="graph-options js-graphOptions" style="margin-bottom:10px;">
             <label><input type="radio" name="graph-${asin}" class="js-chkDS" checked />《需要＆供給》</label>
@@ -1698,6 +1754,7 @@ function createProductCard(asin, data) {
       <div class="card-top">
         <div class="title">ASIN: ${asin}</div>
         <input class="asin-memo" type="text" placeholder="メモ" />
+        <button class="memo-save" type="button">保存</button>
         <button class="remove" type="button">この行を削除</button>
       </div>
 
@@ -1713,7 +1770,6 @@ function createProductCard(asin, data) {
         </div>
 
         <div class="alt-center center-box">
-          <div class="center-head">主要項目</div>
           <div class="center-list js-center"></div>
         </div>
 
@@ -1729,7 +1785,7 @@ function createProductCard(asin, data) {
 
           <div class="graph-body">
             <div class="keepa-wrap js-keepaWrap">
-              <iframe class="js-keepaFrame" src="" loading="lazy"></iframe>
+              <img class="keepa-image" src="keepa2graph.png" alt="keepaグラフ" />
             </div>
 
             <div class="canvas-wrap js-mesWrap">
@@ -1763,6 +1819,7 @@ function createProductCard(asin, data) {
       <div class="card-top">
         <div class="title">ASIN: ${asin}</div>
         <input class="asin-memo" type="text" placeholder="メモ" />
+        <button class="memo-save" type="button">保存</button>
         <button class="remove" type="button">この行を削除</button>
       </div>
 
@@ -1797,7 +1854,6 @@ function createProductCard(asin, data) {
         </div>
 
         <div class="center-box">
-          <div class="center-head">主要項目</div>
           <div class="center-list js-center"></div>
         </div>
 
@@ -1820,7 +1876,7 @@ function createProductCard(asin, data) {
               <canvas class="js-chart"></canvas>
             </div>
             <div class="keepa-wrap js-keepaWrap" style="display:none;">
-              <iframe class="js-keepaFrame" src="" loading="lazy"></iframe>
+              <img class="keepa-image" src="keepa2graph.png" alt="keepaグラフ" />
             </div>
           </div>
         </div>
@@ -2120,10 +2176,6 @@ card.querySelector(".js-addCart").addEventListener("click", () => {
   chkSP?.addEventListener("change", refreshVis);
   updateChartVisibility(chart, true, false);
   updateRedLine(chart, initialCostJPY);
-
-  // keepa
-  const keepaFrame = card.querySelector(".js-keepaFrame");
-  if (keepaFrame) keepaFrame.src = `https://keepa.com/#!product/1-${asin}`;
 
   // 通常レイアウトのみ：トグル維持
   if (!isAltLayout && !isThirdLayout && !isFourthLayout) {
