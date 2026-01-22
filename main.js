@@ -38,6 +38,7 @@ const METRICS_ALL = [
   { id: "入金額計（円）", label: "入金額計（円）", sourceKey: "入金額計（円）" },
 
   { id: "30日販売数", label: "30日販売数（実績）", sourceKey: "30日販売数" },
+  { id: "60日販売数", label: "60日販売数（実績）", sourceKey: "60日販売数" },
   { id: "90日販売数", label: "90日販売数（実績）", sourceKey: "90日販売数" },
   { id: "180日販売数", label: "180日販売数（実績）", sourceKey: "180日販売数" },
   { id: "予測30日販売数", label: "予測30日販売数", sourceKey: "予測30日販売数" },
@@ -55,6 +56,7 @@ const METRICS_ALL = [
   { id: "ライバル増加率", label: "ライバル増加率", sourceKey: "ライバル増加率" },
 
   { id: "サイズ感", label: "サイズ感", sourceKey: "サイズ感" },
+  { id: "セラー数", label: "セラー数", sourceKey: "セラー数" },
   { id: "在庫数", label: "在庫数", sourceKey: "在庫数" },
   { id: "返品率", label: "返品率", sourceKey: "返品率" },
 
@@ -128,12 +130,15 @@ const DEFAULT_ZONES = {
     tokM("推奨仕入数(30日)"),
     tokM("推奨仕入数(60日)"),
     tokM("推奨仕入数(90日)"),
+    tokM("セラー数"),
     tokM("サイズ感"),
     tokM("在庫数"),
     tokM("返品率"),
-    tokM("予測30日販売数"),
-    tokM("予測60日販売数"),
     tokM("予測90日販売数"),
+    tokM("予測60日販売数"),
+    tokM("予測30日販売数"),
+    tokM("90日販売数"),
+    tokM("60日販売数"),
     tokM("30日販売数"),
     tokM("日本最安値"),
     tokM("過去3月FBA最安値"),
@@ -196,6 +201,7 @@ const clearCartBtn = $("#clearCartBtn");
 const asinCatalog = $("#asinCatalog");
 const asinSearchInput = $("#asinSearchInput");
 const asinSearchBtn = $("#asinSearchBtn");
+const asinLoadBtn = $("#asinLoadBtn");
 const profitRateMin = $("#profitRateMin");
 const categoryFilters = $("#categoryFilters");
 const materialFilters = $("#materialFilters");
@@ -282,6 +288,21 @@ function initActions() {
 }
 
 function initCatalog() {
+  if (!window.ASIN_DATA || Object.keys(window.ASIN_DATA).length === 0) {
+    if (asinCatalog) {
+      asinCatalog.innerHTML = "";
+      const empty = document.createElement("div");
+      empty.className = "asin-empty";
+      empty.textContent = "ASINデータを読み込み中...";
+      asinCatalog.appendChild(empty);
+    }
+    if (asinLoadBtn) {
+      asinLoadBtn.disabled = true;
+    }
+    window.setTimeout(initCatalog, 200);
+    return;
+  }
+
   const allAsins = Object.keys(window.ASIN_DATA || {});
   const categorySet = new Set();
   const materialSet = new Set();
@@ -387,11 +408,17 @@ function initCatalog() {
   });
   profitRateMin?.addEventListener("change", runSearch);
 
-  asinCatalog.innerHTML = "";
-  const empty = document.createElement("div");
-  empty.className = "asin-empty";
-  empty.textContent = "検索条件を入力して実行してください";
-  asinCatalog.appendChild(empty);
+  if (asinLoadBtn && !asinLoadBtn.dataset.ready) {
+    asinLoadBtn.dataset.ready = "true";
+    asinLoadBtn.disabled = false;
+    asinLoadBtn.addEventListener("click", () => {
+      renderAsinList(allAsins);
+    });
+  } else if (asinLoadBtn) {
+    asinLoadBtn.disabled = false;
+  }
+
+  renderAsinList(allAsins);
 }
 
 function addOrFocusCard(asin) {
@@ -858,9 +885,11 @@ function buildCenterCards(container, ctx, data) {
     "推奨仕入数(30日)"
   ];
   const compactIds = new Set([
-    "予測30日販売数",
-    "予測60日販売数",
     "予測90日販売数",
+    "予測60日販売数",
+    "予測30日販売数",
+    "90日販売数",
+    "60日販売数",
     "30日販売数",
     "日本最安値",
     "過去3月FBA最安値",
@@ -872,6 +901,8 @@ function buildCenterCards(container, ctx, data) {
     "入金額（円）",
     "入金額計（円）"
   ]);
+  const inlineGroupIds = ["セラー数", "サイズ感", "在庫数", "返品率"];
+  let inlineGroupWrap = null;
   let recommendInserted = false;
 
   zoneState.center.forEach((token) => {
@@ -885,6 +916,30 @@ function buildCenterCards(container, ctx, data) {
         container.appendChild(buildRecommendBlock(data));
         recommendInserted = true;
       }
+      return;
+    }
+
+    if (inlineGroupIds.includes(id)) {
+      if (!inlineGroupWrap) {
+        inlineGroupWrap = document.createElement("div");
+        inlineGroupWrap.className = "center-inline-group";
+        container.appendChild(inlineGroupWrap);
+      }
+      const row = document.createElement("div");
+      row.className = "center-inline";
+
+      const k = document.createElement("span");
+      k.className = "k";
+      k.textContent = m.label;
+
+      const v = document.createElement("span");
+      v.className = "v";
+      const raw = data[m.sourceKey];
+      v.textContent = formatMetricValue(id, raw);
+
+      row.appendChild(k);
+      row.appendChild(v);
+      inlineGroupWrap.appendChild(row);
       return;
     }
 
@@ -957,7 +1012,6 @@ function buildRecommendBlock(data) {
   actionGroup.appendChild(attackBtn);
   actionGroup.appendChild(guardBtn);
   head.appendChild(heading);
-  head.appendChild(actionGroup);
 
   const table = document.createElement("div");
   table.className = "recommend-table";
@@ -1030,6 +1084,10 @@ function buildRecommendBlock(data) {
   columnsViewport.appendChild(columnsInner);
   columnsWrap.appendChild(columnsViewport);
 
+  const actionRow = document.createElement("div");
+  actionRow.className = "recommend-actions-row";
+  actionRow.appendChild(actionGroup);
+  table.appendChild(actionRow);
   table.appendChild(labelsCol);
   table.appendChild(columnsWrap);
 
