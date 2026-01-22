@@ -62,6 +62,7 @@ const METRICS_ALL = [
 
   { id: "仕入れ目安単価", label: "仕入れ目安単価", sourceKey: "仕入れ目安単価" },
   { id: "送料", label: "送料", sourceKey: "送料" },
+  { id: "見込み送料", label: "見込み送料", sourceKey: "見込み送料" },
   { id: "関税", label: "関税", sourceKey: "関税" }
 ];
 const METRIC_BY_ID = Object.fromEntries(METRICS_ALL.map((m) => [m.id, m]));
@@ -141,6 +142,7 @@ const DEFAULT_ZONES = {
     tokM("過去3月FBA最安値"),
     tokM("FBA最安値"),
     tokM("送料"),
+    tokM("見込み送料"),
     tokM("関税"),
     tokM("仕入れ目安単価"),
     tokM("入金額予測"),
@@ -1053,6 +1055,10 @@ function buildRecommendBlock(data) {
   columnsViewport.appendChild(columnsInner);
   columnsWrap.appendChild(columnsViewport);
 
+  const actionsRow = document.createElement("div");
+  actionsRow.className = "recommend-actions-row";
+  actionsRow.appendChild(actionGroup);
+  table.appendChild(actionsRow);
   table.appendChild(labelsCol);
   table.appendChild(columnsWrap);
 
