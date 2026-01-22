@@ -77,7 +77,7 @@ const INFO_FIELDS_ALL = [
   { id: "カテゴリ", label: "カテゴリ", kind: "computed" },
   { id: "日本ASIN", label: "日本ASIN", kind: "computedHtml" },
   { id: "米ASIN", label: "米ASIN", kind: "computedHtml" },
-  { id: "JAN", label: "JAN", kind: "text", sourceKey: "JAN" },
+  { id: "JAN", label: "JAN", kind: "computedHtml", sourceKey: "JAN" },
   { id: "SKU", label: "SKU", kind: "text", sourceKey: "SKU" },
   { id: "サイズ", label: "サイズ", kind: "computed" },
   { id: "重量（容積重量）", label: "重量(容積)", kind: "computed" },
@@ -389,11 +389,7 @@ function initCatalog() {
   });
   profitRateMin?.addEventListener("change", runSearch);
 
-  asinCatalog.innerHTML = "";
-  const empty = document.createElement("div");
-  empty.className = "asin-empty";
-  empty.textContent = "検索条件を入力して実行してください";
-  asinCatalog.appendChild(empty);
+  runSearch();
 }
 
 function addOrFocusCard(asin) {
@@ -723,6 +719,13 @@ function buildAsinLink(asin, baseUrl) {
   return `<a class="asin-link" href="${href}" target="_blank" rel="noopener">${value}</a>`;
 }
 
+function buildImageSearchLink(value) {
+  const raw = String(value ?? "").trim();
+  if (!raw || raw === "－") return "－";
+  const href = `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(raw)}`;
+  return `<a class="asin-link" href="${href}" target="_blank" rel="noopener">${raw}</a>`;
+}
+
 function resolveInfoValueById(id, ctx) {
   const f = INFO_BY_ID[id];
   if (!f) return { type: "text", text: "－" };
@@ -733,6 +736,7 @@ function resolveInfoValueById(id, ctx) {
     商品名: data["品名"] || data["商品名"] || data["商品タイトル"] || "－",
     日本ASIN: buildAsinLink(jpAsin, "https://www.amazon.co.jp/s?k="),
     米ASIN: buildAsinLink(usAsin, "https://www.amazon.com/s?k="),
+    JAN: buildImageSearchLink(data["JAN"]),
     サイズ: size,
     "重量（容積重量）": weight,
     カテゴリ: `${data["親カテゴリ"] || "－"} / ${data["サブカテゴリ"] || "－"}`,
@@ -972,7 +976,6 @@ function buildRecommendBlock(data) {
   actionGroup.appendChild(attackBtn);
   actionGroup.appendChild(guardBtn);
   head.appendChild(heading);
-  head.appendChild(actionGroup);
 
   const table = document.createElement("div");
   table.className = "recommend-table";
@@ -996,6 +999,11 @@ function buildRecommendBlock(data) {
 
   const labelsCol = document.createElement("div");
   labelsCol.className = "recommend-labels";
+
+  const actionsRow = document.createElement("div");
+  actionsRow.className = "recommend-actions-left";
+  actionsRow.appendChild(actionGroup);
+  labelsCol.appendChild(actionsRow);
 
   const rowDefs = [
     { id: "stable", label: "🟢 安定", factor: 0.85 },
@@ -1103,6 +1111,22 @@ function buildRecommendBlock(data) {
       currentCardIndex =
         (currentCardIndex - 1 + cardOrder.length) % cardOrder.length;
     }
+    applySelection();
+  });
+
+  wrap.addEventListener("click", (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) return;
+    const cell = target.closest(".recommend-cell-value");
+    if (!cell) return;
+    const cardId = cell.dataset.card;
+    const modeId = cell.dataset.mode;
+    if (!cardId || !modeId) return;
+    const cardIndex = cardOrder.indexOf(cardId);
+    const rowIndex = rowOrder.indexOf(modeId);
+    if (cardIndex === -1 || rowIndex === -1) return;
+    currentCardIndex = cardIndex;
+    currentRowIndex = rowIndex;
     applySelection();
   });
 
