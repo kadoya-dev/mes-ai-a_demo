@@ -407,7 +407,7 @@ function initCatalog() {
   });
   profitRateMin?.addEventListener("change", runSearch);
 
-  runSearch();
+  renderAsinList(allAsins);
 }
 
 function addOrFocusCard(asin) {
