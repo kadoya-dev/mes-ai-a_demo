@@ -330,6 +330,19 @@ a{ color:inherit; }
   font-weight:900;
   cursor:pointer;
 }
+.asin-load-btn{
+  height:32px;
+  border-radius:999px;
+  border:1px solid var(--line);
+  background:#fff;
+  padding:0 14px;
+  font-weight:900;
+  cursor:pointer;
+}
+.asin-load-btn:disabled{
+  cursor:not-allowed;
+  opacity:0.6;
+}
 .asin-catalog-body{
   display:flex;
   gap:8px;
@@ -1131,6 +1144,19 @@ body:is(.fourth-layout, .fifth-layout) .l4-center .center-inline .v{
   color:#0f172a;
   white-space:nowrap;
 }
+body:is(.fourth-layout, .fifth-layout) .l4-center .center-inline-group{
+  grid-column: 1 / -1;
+  display:grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap:8px;
+}
+body:is(.fourth-layout, .fifth-layout) .l4-center .center-inline-group .center-inline{
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:6px 8px;
+  background:#fff;
+  justify-content:space-between;
+}
 body:is(.fourth-layout, .fifth-layout) .l4-center .center-card .label{
   font-size:12px;
   font-weight:900;
@@ -1171,11 +1197,12 @@ body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-action-group{
   gap:8px;
   flex-wrap:wrap;
 }
-body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-actions-left{
+body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-actions-row{
+  grid-column: 1 / -1;
   display:flex;
+  justify-content:center;
   align-items:center;
-  justify-content:flex-start;
-  min-height: 32px;
+  min-height:32px;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-btn{
   display:inline-flex;
@@ -1230,7 +1257,7 @@ body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-columns-inner{
 }
 body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-labels{
   display:grid;
-  grid-template-rows: auto repeat(3, var(--recommend-row-height, 36px));
+  grid-template-rows: repeat(3, var(--recommend-row-height, 36px));
   gap:6px;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-col{
@@ -1303,8 +1330,9 @@ body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-cell-value.is-activ
 /* 変動項目（主要項目の下） */
 body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable{
   border-top:1px solid var(--line);
-  margin-top:10px;
-  padding-top:10px;
+  margin-top:6px;
+  padding-top:6px;
+  padding-bottom:4px;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .subhead{
   font-size:12px;
@@ -1326,7 +1354,7 @@ body:is(.fourth-layout, .fifth-layout) .l4-mes .head{
 body:is(.fourth-layout, .fifth-layout) .l4-mes .risk-index{
   display:grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap:6px;
+  gap:8px;
   align-items:center;
   justify-items:center;
 }
@@ -1334,14 +1362,14 @@ body:is(.fourth-layout, .fifth-layout) .l4-mes .risk-item{
   display:flex;
   flex-direction:column;
   align-items:center;
-  gap:4px;
+  gap:6px;
   text-align:center;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-mes .risk-ring{
   --risk-color: #f59e0b;
   position:relative;
-  width:46px;
-  height:46px;
+  width:64px;
+  height:64px;
   border-radius:50%;
   display:flex;
   align-items:center;
@@ -1355,7 +1383,7 @@ body:is(.fourth-layout, .fifth-layout) .l4-mes .risk-item.safe .risk-ring{
 body:is(.fourth-layout, .fifth-layout) .l4-mes .risk-ring::after{
   content:"";
   position:absolute;
-  inset:5px;
+  inset:7px;
   background:#fff;
   border-radius:50%;
   box-shadow: inset 0 0 0 1px #e2e8f0;
@@ -1364,7 +1392,7 @@ body:is(.fourth-layout, .fifth-layout) .l4-mes .risk-num,
 body:is(.fourth-layout, .fifth-layout) .l4-mes .risk-note{
   position:relative;
   z-index:1;
-  line-height:1;
+  line-height:1.1;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .risk-num{
   font-size:13px;
@@ -1372,12 +1400,12 @@ body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .risk-num{
   color:#0f172a;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .risk-note{
-  font-size:9px;
+  font-size:11px;
   font-weight:900;
   color:#64748b;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .risk-caption{
-  font-size:9px;
+  font-size:11px;
   font-weight:900;
   color:#475569;
 }
