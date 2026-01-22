@@ -1314,29 +1314,30 @@ body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .subhead{
 }
 body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .var-cards{
   display:grid;
-  grid-template-columns: 1.2fr 0.9fr 0.9fr;
+  grid-template-columns: 1fr 1fr;
   gap:10px;
 }
-body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .center-card.var-risk{
+body:is(.fourth-layout, .fifth-layout) .l4-mes .head{
   display:flex;
-  flex-direction:column;
-  gap:8px;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
 }
-body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .risk-index{
+body:is(.fourth-layout, .fifth-layout) .l4-mes .risk-index{
   display:grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap:6px;
   align-items:center;
   justify-items:center;
 }
-body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .risk-item{
+body:is(.fourth-layout, .fifth-layout) .l4-mes .risk-item{
   display:flex;
   flex-direction:column;
   align-items:center;
   gap:4px;
   text-align:center;
 }
-body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .risk-ring{
+body:is(.fourth-layout, .fifth-layout) .l4-mes .risk-ring{
   --risk-color: #f59e0b;
   position:relative;
   width:46px;
@@ -1348,10 +1349,10 @@ body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .risk-ring{
   background:
     conic-gradient(var(--risk-color) calc(var(--risk-value) * 1%), #e5e7eb 0);
 }
-body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .risk-item.safe .risk-ring{
+body:is(.fourth-layout, .fifth-layout) .l4-mes .risk-item.safe .risk-ring{
   --risk-color: #22c55e;
 }
-body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .risk-ring::after{
+body:is(.fourth-layout, .fifth-layout) .l4-mes .risk-ring::after{
   content:"";
   position:absolute;
   inset:5px;
@@ -1359,8 +1360,8 @@ body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .risk-ring::after
   border-radius:50%;
   box-shadow: inset 0 0 0 1px #e2e8f0;
 }
-body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .risk-num,
-body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .risk-note{
+body:is(.fourth-layout, .fifth-layout) .l4-mes .risk-num,
+body:is(.fourth-layout, .fifth-layout) .l4-mes .risk-note{
   position:relative;
   z-index:1;
   line-height:1;
