@@ -1450,7 +1450,6 @@ function createProductCard(asin, data) {
         </div>
 
         <div class="l3-center l3-block">
-          <div class="head">主要項目</div>
           <div class="center-list js-center"></div>
         </div>
 
@@ -1512,37 +1511,10 @@ function createProductCard(asin, data) {
         </div>
 
         <div class="l4-center l4-block">
-          <div class="head">主要項目</div>
           <div class="center-cards js-centerCards"></div>
 
           <div class="l4-variable">
             <div class="var-cards">
-              <div class="center-card var-risk">
-                <div class="k">危険度指数</div>
-                <div class="risk-index">
-                  <div class="risk-item warning">
-                    <div class="risk-ring" style="--risk-value: 62;">
-                      <div class="risk-num">62</div>
-                      <div class="risk-note">注意</div>
-                    </div>
-                    <div class="risk-caption">直近重視</div>
-                  </div>
-                  <div class="risk-item safe">
-                    <div class="risk-ring" style="--risk-value: 38;">
-                      <div class="risk-num">38</div>
-                      <div class="risk-note">安定</div>
-                    </div>
-                    <div class="risk-caption">回数重視</div>
-                  </div>
-                  <div class="risk-item warning">
-                    <div class="risk-ring" style="--risk-value: 54;">
-                      <div class="risk-num">54</div>
-                      <div class="risk-note">注意</div>
-                    </div>
-                    <div class="risk-caption">両方</div>
-                  </div>
-                </div>
-              </div>
               <div class="center-card var-sell">
                 <div class="k">販売価格（$）</div>
                 <input class="v js-sell js-sellInput" type="number" step="0.01" placeholder="例: 39.99" />
@@ -1691,7 +1663,32 @@ function createProductCard(asin, data) {
         </div>
 
         <div class="l4-mes l4-block">
-          <div class="head">需要供給グラフ（180日）</div>
+          <div class="head">
+            <span>需要供給グラフ（180日）</span>
+            <div class="risk-index">
+              <div class="risk-item warning">
+                <div class="risk-ring" style="--risk-value: 62;">
+                  <div class="risk-num">62</div>
+                  <div class="risk-note">注意</div>
+                </div>
+                <div class="risk-caption">直近重視</div>
+              </div>
+              <div class="risk-item safe">
+                <div class="risk-ring" style="--risk-value: 38;">
+                  <div class="risk-num">38</div>
+                  <div class="risk-note">安定</div>
+                </div>
+                <div class="risk-caption">回数重視</div>
+              </div>
+              <div class="risk-item warning">
+                <div class="risk-ring" style="--risk-value: 54;">
+                  <div class="risk-num">54</div>
+                  <div class="risk-note">注意</div>
+                </div>
+                <div class="risk-caption">両方</div>
+              </div>
+            </div>
+          </div>
 
           <div class="graph-options js-graphOptions" style="margin-bottom:10px;">
             <label><input type="radio" name="graph-${asin}" class="js-chkDS" checked />《需要＆供給》</label>
@@ -1727,7 +1724,6 @@ function createProductCard(asin, data) {
         </div>
 
         <div class="alt-center center-box">
-          <div class="center-head">主要項目</div>
           <div class="center-list js-center"></div>
         </div>
 
@@ -1812,7 +1808,6 @@ function createProductCard(asin, data) {
         </div>
 
         <div class="center-box">
-          <div class="center-head">主要項目</div>
           <div class="center-list js-center"></div>
         </div>
 
