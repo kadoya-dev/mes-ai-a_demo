@@ -411,17 +411,7 @@ function initCatalog() {
   });
   profitRateMin?.addEventListener("change", runSearch);
 
-  if (asinLoadBtn && !asinLoadBtn.dataset.ready) {
-    asinLoadBtn.disabled = false;
-    asinLoadBtn.dataset.ready = "true";
-    asinLoadBtn.addEventListener("click", () => {
-      renderAsinList(allAsins);
-    });
-  }
-
-  if (!asinLoadBtn) {
-    renderAsinList(allAsins);
-  }
+  renderAsinList(allAsins);
 }
 
 function addOrFocusCard(asin) {
