@@ -320,6 +320,19 @@ a{ color:inherit; }
   font-weight:900;
   cursor:pointer;
 }
+.asin-load-btn{
+  height:32px;
+  border-radius:999px;
+  border:1px solid var(--line);
+  background:#fff;
+  padding:0 14px;
+  font-weight:900;
+  cursor:pointer;
+}
+.asin-load-btn:disabled{
+  cursor:not-allowed;
+  opacity:0.6;
+}
 .asin-catalog-body{
   display:flex;
   gap:8px;
@@ -1111,6 +1124,19 @@ body:is(.fourth-layout, .fifth-layout) .l4-center .center-inline .v{
   color:#0f172a;
   white-space:nowrap;
 }
+body:is(.fourth-layout, .fifth-layout) .l4-center .center-inline-group{
+  grid-column: 1 / -1;
+  display:grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap:8px;
+}
+body:is(.fourth-layout, .fifth-layout) .l4-center .center-inline-group .center-inline{
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:6px 8px;
+  background:#fff;
+  justify-content:space-between;
+}
 body:is(.fourth-layout, .fifth-layout) .l4-center .center-card .label{
   font-size:12px;
   font-weight:900;
@@ -1151,6 +1177,13 @@ body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-action-group{
   display:flex;
   gap:8px;
   flex-wrap:wrap;
+}
+body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-actions-row{
+  grid-column: 1 / -1;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  min-height:32px;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-btn{
   display:inline-flex;
@@ -1205,9 +1238,8 @@ body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-columns-inner{
 }
 body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-labels{
   display:grid;
-  grid-template-rows: auto repeat(3, var(--recommend-row-height, 36px));
+  grid-template-rows: repeat(3, var(--recommend-row-height, 36px));
   gap:6px;
-  padding-top:34px;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-col{
   display:grid;
@@ -1280,7 +1312,8 @@ body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-cell-value.is-activ
 body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable{
   border-top:1px solid var(--line);
   margin-top:10px;
-  padding-top:10px;
+  padding-top:8px;
+  padding-bottom:0;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .subhead{
   font-size:12px;
@@ -1290,71 +1323,8 @@ body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .subhead{
 }
 body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .var-cards{
   display:grid;
-  grid-template-columns: 1.2fr 0.9fr 0.9fr;
-  gap:10px;
-}
-body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .center-card.var-risk{
-  display:flex;
-  flex-direction:column;
+  grid-template-columns: 1fr 1fr;
   gap:8px;
-}
-body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .risk-index{
-  display:grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap:6px;
-  align-items:center;
-  justify-items:center;
-}
-body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .risk-item{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:4px;
-  text-align:center;
-}
-body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .risk-ring{
-  --risk-color: #f59e0b;
-  position:relative;
-  width:58px;
-  height:58px;
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:
-    conic-gradient(var(--risk-color) calc(var(--risk-value) * 1%), #e5e7eb 0);
-}
-body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .risk-item.safe .risk-ring{
-  --risk-color: #22c55e;
-}
-body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .risk-ring::after{
-  content:"";
-  position:absolute;
-  inset:6px;
-  background:#fff;
-  border-radius:50%;
-  box-shadow: inset 0 0 0 1px #e2e8f0;
-}
-body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .risk-num,
-body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .risk-note{
-  position:relative;
-  z-index:1;
-  line-height:1;
-}
-body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .risk-num{
-  font-size:15px;
-  font-weight:900;
-  color:#0f172a;
-}
-body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .risk-note{
-  font-size:10px;
-  font-weight:900;
-  color:#64748b;
-}
-body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .risk-caption{
-  font-size:10px;
-  font-weight:900;
-  color:#475569;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .center-card.var-sell,
 body:is(.fourth-layout, .fifth-layout) .l4-center .l4-variable .center-card.var-profit{
@@ -1390,6 +1360,67 @@ body:is(.fourth-layout, .fifth-layout) .l4-keepa .keepa-mini{
   overflow:hidden;
   border:1px solid var(--line);
   background:#fff;
+}
+body:is(.fourth-layout, .fifth-layout) .l4-keepa .keepa-risk{
+  margin-bottom:6px;
+}
+body:is(.fourth-layout, .fifth-layout) .l4-keepa .risk-index{
+  display:grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap:8px;
+  align-items:center;
+  justify-items:center;
+}
+body:is(.fourth-layout, .fifth-layout) .l4-keepa .risk-item{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:6px;
+  text-align:center;
+}
+body:is(.fourth-layout, .fifth-layout) .l4-keepa .risk-ring{
+  --risk-color: #f59e0b;
+  position:relative;
+  width:52px;
+  height:52px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:
+    conic-gradient(var(--risk-color) calc(var(--risk-value) * 1%), #e5e7eb 0);
+}
+body:is(.fourth-layout, .fifth-layout) .l4-keepa .risk-item.safe .risk-ring{
+  --risk-color: #22c55e;
+}
+body:is(.fourth-layout, .fifth-layout) .l4-keepa .risk-ring::after{
+  content:"";
+  position:absolute;
+  inset:6px;
+  background:#fff;
+  border-radius:50%;
+  box-shadow: inset 0 0 0 1px #e2e8f0;
+}
+body:is(.fourth-layout, .fifth-layout) .l4-keepa .risk-num,
+body:is(.fourth-layout, .fifth-layout) .l4-keepa .risk-note{
+  position:relative;
+  z-index:1;
+  line-height:1.1;
+}
+body:is(.fourth-layout, .fifth-layout) .l4-keepa .risk-num{
+  font-size:13px;
+  font-weight:900;
+  color:#0f172a;
+}
+body:is(.fourth-layout, .fifth-layout) .l4-keepa .risk-note{
+  font-size:10px;
+  font-weight:900;
+  color:#64748b;
+}
+body:is(.fourth-layout, .fifth-layout) .l4-keepa .risk-caption{
+  font-size:10px;
+  font-weight:900;
+  color:#475569;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-keepa iframe{
   width:100%;
@@ -1817,7 +1848,7 @@ body:is(.fourth-layout, .fifth-layout) .l4-center{
 body:is(.fourth-layout, .fifth-layout) .l4-center .center-cards{
   flex: 1;
   min-height: 0;
-  max-height: 320px;          /* ここを好みで調整可 */
+  max-height: 420px;          /* ここを好みで調整可 */
   overflow-y: auto;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
