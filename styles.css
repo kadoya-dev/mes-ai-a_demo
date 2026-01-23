@@ -1374,11 +1374,16 @@ body:is(.fourth-layout, .fifth-layout) .l4-keepa{
   background:#f3f4f6;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-keepa .keepa-mini{
-  height:180px;
+  height:150px;
   border-radius:14px;
   overflow:hidden;
   border:1px solid var(--line);
   background:#fff;
+}
+body:is(.fourth-layout, .fifth-layout) .l4-keepa .keepa-score-title{
+  font-weight:900;
+  margin-bottom:6px;
+  color:#0f172a;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-keepa .keepa-risk{
   margin-bottom:6px;

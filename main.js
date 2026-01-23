@@ -1743,6 +1743,7 @@ function createProductCard(asin, data) {
         </div>
 
         <div class="l4-keepa l4-block">
+          <div class="keepa-score-title">商品スコア</div>
           <div class="keepa-risk">
             <div class="risk-index">
               <div class="risk-item warning">
@@ -1768,7 +1769,7 @@ function createProductCard(asin, data) {
               </div>
             </div>
           </div>
-          <div class="head">商品スコア</div>
+          <div class="head">keepaグラフ</div>
           <div class="keepa-mini">
             <img class="keepa-image" src="keepa2graph.png" alt="keepaグラフ" />
           </div>
