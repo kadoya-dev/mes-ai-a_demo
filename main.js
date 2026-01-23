@@ -1062,9 +1062,9 @@ function buildRecommendBlock(data) {
   labelsCol.appendChild(actionsRow);
 
   const rowDefs = [
-    { id: "stable", label: "🟢 安定", factor: 0.85 },
-    { id: "balance", label: "🟡 バランス", factor: 1 },
-    { id: "growth", label: "🔴 成長", factor: 1.2 }
+    { id: "stable", label: "コツコツ🐢", factor: 0.85 },
+    { id: "balance", label: "ほどよく", factor: 1 },
+    { id: "growth", label: "しっかり🐇", factor: 1.2 }
   ];
 
   rowDefs.forEach((rowDef) => {
