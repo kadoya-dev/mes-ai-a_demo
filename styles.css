@@ -70,6 +70,16 @@ a{ color:inherit; }
   font-weight:700;
   background:#fff;
 }
+.card-top .memo-save{
+  height:32px;
+  padding:0 16px;
+  border-radius:999px;
+  border:1px solid var(--line);
+  background:#fff;
+  font-size:12px;
+  font-weight:900;
+  cursor:pointer;
+}
 .header-left h1{
   margin:0;
   font-size:16px;
@@ -532,6 +542,11 @@ a{ color:inherit; }
   color:#0f172a;
   word-break:break-word;
 }
+.v-html .asin-link{
+  color:#2563eb;
+  text-decoration:underline;
+  font-weight:900;
+}
 
 .v-tags{
   display:flex;
@@ -682,10 +697,11 @@ a{ color:inherit; }
   background:#fff;
   overflow:hidden;
 }
-.keepa-wrap iframe{
+.keepa-wrap img{
   width:100%;
   height:100%;
-  border:0;
+  object-fit:cover;
+  display:block;
 }
 
 /* =========================
@@ -899,10 +915,11 @@ body.third-layout .keepa-mini{
   border:1px solid var(--line);
   background:#fff;
 }
-body.third-layout .keepa-mini iframe{
+body.third-layout .keepa-mini img{
   width:100%;
   height:100%;
-  border:0;
+  object-fit:cover;
+  display:block;
 }
 
 body.third-layout .l3-mes{
@@ -1013,13 +1030,13 @@ body:is(.fourth-layout, .fifth-layout) .l4-info .l4-info-media{
 }
 body:is(.fourth-layout, .fifth-layout) .l4-info .l4-info-media .image-box{
   padding: 8px;
-  min-height: 160px;
+  min-height: 240px;
   display:flex;
   align-items:center;
   justify-content:center;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-info .l4-info-media .image-box img{
-  height: 160px;
+  height: 240px;
   width:100%;
   object-fit:cover;
 }
@@ -1029,6 +1046,9 @@ body:is(.fourth-layout, .fifth-layout) .l4-info .info-top{
   gap:8px 10px;
   margin-bottom: 10px;
   align-items:start;
+  flex: 0 0 auto;
+  min-height: 55px;
+  overflow: visible;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-info .info-top .v-tags{
   flex-wrap:wrap;
@@ -1171,7 +1191,6 @@ body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-head{
   align-items:center;
   gap:12px;
   flex-wrap:wrap;
-  justify-content:space-between;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-action-group{
   display:flex;
@@ -1401,7 +1420,7 @@ body:is(.fourth-layout, .fifth-layout) .l4-keepa .risk-item.safe .risk-ring{
 body:is(.fourth-layout, .fifth-layout) .l4-keepa .risk-ring::after{
   content:"";
   position:absolute;
-  inset:6px;
+  inset:7px;
   background:#fff;
   border-radius:50%;
   box-shadow: inset 0 0 0 1px #e2e8f0;
@@ -1437,7 +1456,8 @@ body:is(.fourth-layout, .fifth-layout) .l4-mes .risk-num{
 body:is(.fourth-layout, .fifth-layout) .l4-keepa iframe{
   width:100%;
   height:100%;
-  border:0;
+  object-fit:cover;
+  display:block;
 }
 
 /* 需要供給グラフ */
@@ -1795,7 +1815,7 @@ body:is(.fourth-layout, .fifth-layout) .l4-variable .center-card.var-profit.is-n
    layout4: 主要項目を3列表示（幅を切り詰め）
    ───────────────────────────── */
 body:is(.fourth-layout, .fifth-layout) .l4-center .center-cards{
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
   padding-right: 2px;
 }
