@@ -1374,14 +1374,14 @@ body:is(.fourth-layout, .fifth-layout) .l4-keepa{
   background:#f3f4f6;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-keepa .keepa-mini{
-  height:140px;
+  height:180px;
   border-radius:14px;
   overflow:hidden;
   border:1px solid var(--line);
   background:#fff;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-keepa .keepa-risk{
-  margin-bottom:8px;
+  margin-bottom:6px;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-keepa .risk-index{
   display:grid;
