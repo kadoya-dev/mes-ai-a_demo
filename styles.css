@@ -1374,7 +1374,7 @@ body:is(.fourth-layout, .fifth-layout) .l4-keepa{
   background:#f3f4f6;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-keepa .keepa-mini{
-  height:150px;
+  height:130px;
   border-radius:14px;
   overflow:hidden;
   border:1px solid var(--line);
@@ -1445,6 +1445,13 @@ body:is(.fourth-layout, .fifth-layout) .l4-keepa .risk-caption{
   font-size:10px;
   font-weight:900;
   color:#475569;
+}
+body:is(.fourth-layout, .fifth-layout) .l4-mes .risk-index,
+body:is(.fourth-layout, .fifth-layout) .l4-mes .risk-item,
+body:is(.fourth-layout, .fifth-layout) .l4-mes .risk-caption,
+body:is(.fourth-layout, .fifth-layout) .l4-mes .risk-note,
+body:is(.fourth-layout, .fifth-layout) .l4-mes .risk-num{
+  display:none;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-keepa iframe{
   width:100%;
