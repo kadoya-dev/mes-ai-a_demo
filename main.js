@@ -27,7 +27,6 @@ const METRICS_ALL = [
   { id: "FBA最安値", label: "FBA最安値", sourceKey: "FBA最安値" },
 
   { id: "粗利益率予測", label: "粗利益率予測", sourceKey: "粗利益率予測" },
-  { id: "入金額予測", label: "入金額予測（円）", sourceKey: "入金額予測" },
   { id: "粗利益予測", label: "粗利益予測（1個）", sourceKey: "粗利益予測" },
 
   { id: "粗利益", label: "粗利益", sourceKey: "粗利益" },
@@ -148,7 +147,6 @@ const DEFAULT_ZONES = {
     tokM("送料"),
     tokM("関税"),
     tokM("仕入れ目安単価"),
-    tokM("入金額予測"),
     tokM("入金額（円）"),
     tokM("入金額計（円）")
   ],
@@ -920,7 +918,6 @@ function buildCenterCards(container, ctx, data) {
     "送料",
     "関税",
     "仕入れ目安単価",
-    "入金額予測",
     "入金額（円）",
     "入金額計（円）"
   ]);
