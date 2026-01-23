@@ -1554,32 +1554,6 @@ function createProductCard(asin, data) {
 
           <div class="l4-variable">
             <div class="var-cards">
-              <div class="center-card var-risk">
-                <div class="k">危険度指数</div>
-                <div class="risk-index">
-                  <div class="risk-item warning">
-                    <div class="risk-ring" style="--risk-value: 62;">
-                      <div class="risk-num">62</div>
-                      <div class="risk-note">注意</div>
-                    </div>
-                    <div class="risk-caption">直近重視</div>
-                  </div>
-                  <div class="risk-item safe">
-                    <div class="risk-ring" style="--risk-value: 38;">
-                      <div class="risk-num">38</div>
-                      <div class="risk-note">安定</div>
-                    </div>
-                    <div class="risk-caption">回数重視</div>
-                  </div>
-                  <div class="risk-item warning">
-                    <div class="risk-ring" style="--risk-value: 54;">
-                      <div class="risk-num">54</div>
-                      <div class="risk-note">注意</div>
-                    </div>
-                    <div class="risk-caption">両方</div>
-                  </div>
-                </div>
-              </div>
               <div class="center-card var-sell">
                 <div class="k">販売価格（$）</div>
                 <input class="v js-sell js-sellInput" type="number" step="0.01" placeholder="例: 39.99" />
@@ -1722,6 +1696,31 @@ function createProductCard(asin, data) {
 
         <div class="l4-keepa l4-block">
           <div class="head">keepaグラフ</div>
+          <div class="keepa-risk">
+            <div class="risk-index">
+              <div class="risk-item warning">
+                <div class="risk-ring" style="--risk-value: 62;">
+                  <div class="risk-num">62</div>
+                  <div class="risk-note">注意</div>
+                </div>
+                <div class="risk-caption">直近重視</div>
+              </div>
+              <div class="risk-item warning">
+                <div class="risk-ring" style="--risk-value: 54;">
+                  <div class="risk-num">54</div>
+                  <div class="risk-note">注意</div>
+                </div>
+                <div class="risk-caption">両方</div>
+              </div>
+              <div class="risk-item safe">
+                <div class="risk-ring" style="--risk-value: 38;">
+                  <div class="risk-num">38</div>
+                  <div class="risk-note">安定</div>
+                </div>
+                <div class="risk-caption">回数重視</div>
+              </div>
+            </div>
+          </div>
           <div class="keepa-mini">
             <iframe class="js-keepaFrame" src="" loading="lazy"></iframe>
           </div>
