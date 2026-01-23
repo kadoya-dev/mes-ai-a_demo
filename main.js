@@ -1744,6 +1744,31 @@ function createProductCard(asin, data) {
 
         <div class="l4-keepa l4-block">
           <div class="head">keepaグラフ</div>
+          <div class="keepa-risk">
+            <div class="risk-index">
+              <div class="risk-item warning">
+                <div class="risk-ring" style="--risk-value: 62;">
+                  <div class="risk-num">62</div>
+                  <div class="risk-note">注意</div>
+                </div>
+                <div class="risk-caption">直近重視</div>
+              </div>
+              <div class="risk-item warning">
+                <div class="risk-ring" style="--risk-value: 54;">
+                  <div class="risk-num">54</div>
+                  <div class="risk-note">注意</div>
+                </div>
+                <div class="risk-caption">両方</div>
+              </div>
+              <div class="risk-item safe">
+                <div class="risk-ring" style="--risk-value: 38;">
+                  <div class="risk-num">38</div>
+                  <div class="risk-note">安定</div>
+                </div>
+                <div class="risk-caption">回数重視</div>
+              </div>
+            </div>
+          </div>
           <div class="keepa-mini">
             <img class="keepa-image" src="keepa2graph.png" alt="keepaグラフ" />
           </div>
