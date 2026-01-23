@@ -1016,21 +1016,6 @@ function buildRecommendBlock(data) {
   heading.className = "recommend-title";
   heading.textContent = "推奨仕入数";
 
-  const actionGroup = document.createElement("div");
-  actionGroup.className = "recommend-action-group";
-
-  const attackBtn = document.createElement("button");
-  attackBtn.type = "button";
-  attackBtn.className = "recommend-btn";
-  attackBtn.textContent = "≪🔴 成長";
-
-  const guardBtn = document.createElement("button");
-  guardBtn.type = "button";
-  guardBtn.className = "recommend-btn";
-  guardBtn.textContent = "🟢 安定≫";
-
-  actionGroup.appendChild(attackBtn);
-  actionGroup.appendChild(guardBtn);
   head.appendChild(heading);
 
   const table = document.createElement("div");
@@ -1056,10 +1041,9 @@ function buildRecommendBlock(data) {
   const labelsCol = document.createElement("div");
   labelsCol.className = "recommend-labels";
 
-  const actionsRow = document.createElement("div");
-  actionsRow.className = "recommend-actions-left";
-  actionsRow.appendChild(actionGroup);
-  labelsCol.appendChild(actionsRow);
+  const headerSpacer = document.createElement("div");
+  headerSpacer.className = "recommend-cell recommend-cell-head";
+  labelsCol.appendChild(headerSpacer);
 
   const rowDefs = [
     { id: "stable", label: "コツコツ🐢", factor: 0.85 },
@@ -1109,10 +1093,6 @@ function buildRecommendBlock(data) {
   columnsViewport.appendChild(columnsInner);
   columnsWrap.appendChild(columnsViewport);
 
-  const actionRow = document.createElement("div");
-  actionRow.className = "recommend-actions-row";
-  actionRow.appendChild(actionGroup);
-  table.appendChild(actionRow);
   table.appendChild(labelsCol);
   table.appendChild(columnsWrap);
 
@@ -1148,31 +1128,7 @@ function buildRecommendBlock(data) {
       defaultRowId
     );
     updateRecommendVisibility();
-    attackBtn.disabled =
-      currentCardIndex === 0 && rowOrder[currentRowIndex] === "growth";
-    guardBtn.disabled =
-      currentCardIndex === cardOrder.length - 1 &&
-      rowOrder[currentRowIndex] === "stable";
   };
-
-  guardBtn.addEventListener("click", () => {
-    currentRowIndex -= 1;
-    if (currentRowIndex < 0) {
-      currentRowIndex = rowOrder.length - 1;
-      currentCardIndex = (currentCardIndex + 1) % cardOrder.length;
-    }
-    applySelection();
-  });
-
-  attackBtn.addEventListener("click", () => {
-    currentRowIndex += 1;
-    if (currentRowIndex >= rowOrder.length) {
-      currentRowIndex = 0;
-      currentCardIndex =
-        (currentCardIndex - 1 + cardOrder.length) % cardOrder.length;
-    }
-    applySelection();
-  });
 
   wrap.addEventListener("click", (event) => {
     const target = event.target;

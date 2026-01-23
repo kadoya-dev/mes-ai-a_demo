@@ -1257,7 +1257,7 @@ body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-columns-inner{
 }
 body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-labels{
   display:grid;
-  grid-template-rows: repeat(3, var(--recommend-row-height, 36px));
+  grid-template-rows: auto repeat(3, var(--recommend-row-height, 36px));
   gap:6px;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-col{
@@ -1318,7 +1318,7 @@ body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-col .recommend-cell
   justify-content:flex-end;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-cell-value.is-muted{
-  opacity:0.5;
+  opacity:1;
 }
 body:is(.fourth-layout, .fifth-layout) .l4-center .recommend-cell-value.is-active{
   background:#fff;
