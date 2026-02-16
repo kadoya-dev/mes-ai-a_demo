@@ -1,0 +1,57 @@
+# 商品カード内 項目一覧（レイアウト5 / `fifth-layout`）
+
+`createProductCard()` の `isFourthLayout` 分岐（`fourth-layout` と `fifth-layout` 共通）を基準に、商品カード内の項目を整理。  
+参照実装: `main.js`。
+
+| セクション | コンポーネント | 要素ID/クラス | タイプ | 表示文言/ラベル | 入出力 | 初期値/状態 | 備考 |
+|---|---|---|---|---|---|---|---|
+| カード共通ヘッダ | ASINタイトル | `.title` | テキスト | `ASIN: ${asin}` | 出力 | ASIN値を表示 | 商品カード生成時に埋め込み |
+| カード共通ヘッダ | メモ入力 | `.asin-memo` | `input[type=text]` | placeholder: `メモ` | 入力 | 空 | ASINごとのメモ用途 |
+| カード共通ヘッダ | メモ保存 | `.memo-save` | `button` | `保存` | 入力(クリック) | - | メモ保存アクション |
+| 商品情報 | セクション見出し | `.l4-info .head` | テキスト | `商品情報` | 出力 | 固定表示 | - |
+| 商品情報 | 上部情報コンテナ | `.js-infoTop` | コンテナ | - | 出力 | 空コンテナ | JSで主要情報を描画 |
+| 商品情報 | 商品画像 | `.l4-info .image-box img` | `img` | alt: `商品画像` | 出力 | `data["商品画像"]` がなければ空文字 | 読込失敗時 `display:none` |
+| 商品情報 | 詳細情報グリッド | `.js-infoGrid` | コンテナ | - | 出力 | 空コンテナ | JSで情報行を描画 |
+| 主要指標 | 指標カード群 | `.js-centerCards` | コンテナ | - | 出力 | 空コンテナ | JSで中心指標を描画 |
+| 主要指標(変動) | FBA最安値(過去3ヶ月) | `.js-fbaLowest` | テキスト | `FBA最安値（過去3ヶ月FBA最安値）` | 出力 | `－` | `FBA最安値` / `過去3月FBA最安値` から設定 |
+| 主要指標(変動) | 販売価格 | `.js-sell.js-sellInput` | `input[type=number]` | `販売価格（$）` / placeholder `例: 39.99` | 入力 | `data["販売額（ドル）"]` があれば初期反映 | step `0.01` |
+| 主要指標(変動) | 粗利益 | `.js-varProfitCombined` | テキスト | `粗利益` | 出力 | `－` | 販売価格や各費用入力で再計算 |
+| カート(上位3ショップ) | セクションタイトル | `.shop-panel-title` | テキスト | `上位3ショップ（価格の安い順）` | 出力 | 固定表示 | - |
+| カート(上位3ショップ) | 全ショップを見る | `.js-viewAll` | `button` | `全ショップを見る` | 入力(クリック) | - | ショップ一覧表示制御 |
+| カート(上位3ショップ) | 1位ショップ名 | `.shop-card:nth-child(1) .shop-name` | テキスト | `Amazon` | 出力 | 固定表示 | ランク表示 `1` |
+| カート(上位3ショップ) | 1位金額入力 | `.shop-card:nth-child(1) .js-shopAmount` | `input[type=number]` | placeholder `金額` + `円` | 入力 | 空 | step `1` |
+| カート(上位3ショップ) | 1位粗利益率 | `.shop-card:nth-child(1) .js-shopMargin` | テキスト | `粗利益率` | 出力 | `0%` | 入力値に連動 |
+| カート(上位3ショップ) | 1位数量入力 | `.shop-card:nth-child(1) .js-shopQty` | `input[type=number]` | `数量` | 入力 | `0` | min `0`, step `1` |
+| カート(上位3ショップ) | 2位ショップ名 | `.shop-card:nth-child(2) .shop-name` | テキスト | `Yahoo` | 出力 | 固定表示 | ランク表示 `2` |
+| カート(上位3ショップ) | 2位金額入力 | `.shop-card:nth-child(2) .js-shopAmount` | `input[type=number]` | placeholder `金額` + `円` | 入力 | `data["日本自己発送最安値"]` があれば初期反映 | step `1` |
+| カート(上位3ショップ) | 2位粗利益率 | `.shop-card:nth-child(2) .js-shopMargin` | テキスト | `粗利益率` | 出力 | `0%` | 入力値に連動 |
+| カート(上位3ショップ) | 2位数量入力 | `.shop-card:nth-child(2) .js-shopQty` | `input[type=number]` | `数量` | 入力 | `0` | min `0`, step `1` |
+| カート(上位3ショップ) | 3位ショップ名 | `.shop-card:nth-child(3) .shop-name` | テキスト | `楽天` | 出力 | 固定表示 | ランク表示 `3` |
+| カート(上位3ショップ) | 3位金額入力 | `.shop-card:nth-child(3) .js-shopAmount` | `input[type=number]` | placeholder `金額` + `円` | 入力 | `data["日本最安値"]` があれば初期反映 | step `1` |
+| カート(上位3ショップ) | 3位粗利益率 | `.shop-card:nth-child(3) .js-shopMargin` | テキスト | `粗利益率` | 出力 | `0%` | 入力値に連動 |
+| カート(上位3ショップ) | 3位数量入力 | `.shop-card:nth-child(3) .js-shopQty` | `input[type=number]` | `数量` | 入力 | `0` | min `0`, step `1` |
+| カート(その他ショップ) | セクションタイトル | `.js-extraShopList` 親 `.shop-panel-title` | テキスト | `その他のショップ` | 出力 | 固定表示 | - |
+| カート(その他ショップ) | ショップ名入力 | `.js-customShop .js-shopName` | `input[type=text]` | placeholder `ショップ名` | 入力 | 空 | 追加ショップ行 |
+| カート(その他ショップ) | 金額入力 | `.js-customShop .js-shopAmount` | `input[type=number]` | placeholder `金額` + `円` | 入力 | 空 | step `1` |
+| カート(その他ショップ) | 粗利益率 | `.js-customShop .js-shopMargin` | テキスト | `粗利益率` | 出力 | `0%` | 入力値に連動 |
+| カート(その他ショップ) | 数量入力 | `.js-customShop .js-shopQty` | `input[type=number]` | `数量` | 入力 | `0` | min `0`, step `1` |
+| カート(その他ショップ) | 行追加 | `.js-addShop` | `button` | `＋` | 入力(クリック) | - | 追加行生成 |
+| カート(その他ショップ) | 行削除 | `.shop-remove` | `button` | `－` | 入力(クリック) | - | 行削除 |
+| 収支内訳 | 入金額 | `.js-cartBreakdownIncome` | テキスト | `入金額` | 出力 | `￥0` | 計算結果 |
+| 収支内訳 | 仕入れ価格 | `.js-cartBreakdownExpense` | テキスト | `仕入れ価格` | 出力 | `￥0` | 計算結果 |
+| 収支内訳 | 送料 | `.js-cartBreakdownShipping` | テキスト | `送料` | 出力 | `￥0` | 計算結果 |
+| 収支内訳 | 関税 | `.js-cartBreakdownTariff` | テキスト | `関税` | 出力 | `￥0` | 計算結果 |
+| 収支内訳 | 粗利益額(率) | `.js-cartBreakdownProfit` | テキスト | `粗利益額(率)` | 出力 | `￥0` | 計算結果 |
+| カート操作 | 後で仕入れる | `.js-later` | `button` | `後で仕入れる` | 入力(クリック) | - | 後買いリスト用途 |
+| カート操作 | 仕入れリスト追加 | `.js-addCart` | `button` | `仕入れリスト` | 入力(クリック) | - | カート反映 |
+| カート操作 | 表示ブロック | `.js-blockToggle` | `button` | `表示ブロック🚫` | 入力(クリック) | - | 表示制御用途 |
+| 内部計算用 | 販売価格 hidden | `.l4-buy .js-sell[type=hidden]` | `input[type=hidden]` | - | 入出力(内部) | 空 | 計算整合用 |
+| keepa | セクション見出し | `.l4-keepa .head` | テキスト | `keepaグラフ` | 出力 | 固定表示 | - |
+| keepa | keepa画像 | `.l4-keepa .keepa-image` | `img` | alt: `keepaグラフ` | 出力 | `keepa2graph.png` | ミニ表示 |
+| 需要供給グラフ | セクション見出し | `.l4-mes .head` | テキスト | `需要供給グラフ（180日）` | 出力 | 固定表示 | - |
+| 需要供給グラフ | ASINスコアラベル | `.asin-score-label` | テキスト | `ASINスコア` | 出力 | 固定表示 | - |
+| 需要供給グラフ | ASINスコア値 | `.asin-score-value` | テキスト | `62` | 出力 | `62` | CSS変数 `--asin-score: 62` |
+| 需要供給グラフ | グラフ種別(需要＆供給) | `.js-chkDS` | `input[type=radio]` | `《需要＆供給》` | 入力 | checked | `name="graph-${asin}"` |
+| 需要供給グラフ | グラフ種別(供給＆価格) | `.js-chkSP` | `input[type=radio]` | `《供給＆価格》` | 入力 | 未選択 | `name="graph-${asin}"` |
+| 需要供給グラフ | グラフ描画領域 | `.js-chart` | `canvas` | - | 出力 | 空キャンバス | Chart.js 描画対象 |
+
